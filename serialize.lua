@@ -46,7 +46,7 @@ function toLua(x, tabchar, newlinechar, serializeForType)
 			-- TODO override for specific metatables?  as I'm doing for types?
 			
 			if touchedTables[x] then
-				return '[recursive reference]'	-- TODO allow recursive serialization by declaring locals before their reference?
+				return 'error("recursive reference")'	-- TODO allow recursive serialization by declaring locals before their reference?
 			else
 				touchedTables[x] = true
 				
