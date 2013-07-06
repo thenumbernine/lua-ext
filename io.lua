@@ -51,3 +51,10 @@ function io.readproc(cmd)
 	return d
 end
 
+function io.getfiledir(fn)
+	return fn:match('^(.*)/([^/]-)$')
+end
+function io.getfileext(fn)
+	return fn:match('^(.*)%.([^%.]-)$')
+end
+

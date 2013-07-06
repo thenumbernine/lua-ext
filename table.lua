@@ -185,3 +185,11 @@ function table:inf(cmp)
 	return bestk, bestv
 end
 
+function table:sum()
+	local s = 0
+	for _,v in pairs(self) do
+		s = s + tonumber(v)
+	end
+	return s
+end
+
