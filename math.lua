@@ -45,8 +45,13 @@ end
 
 math.infinity = 1/0			-- phase this out?
 math.inf = math.infinity	-- in favor of this?
+-- or just use math.huge ...
 
 math.nan = 0/0
 
 math.twoPi = 2 * math.pi
+math.e = math.exp(1)
+
+-- why isn't this done in the first place?
+debug.setmetatable(0, {__index = math})
 
