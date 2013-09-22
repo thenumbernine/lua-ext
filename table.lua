@@ -155,7 +155,6 @@ function table:kvmerge()
 end
 
 -- TODO - math instead of table?
--- NOTICE as of 2012.12.04 I changed this to match :find( and return k,v instead of just v
 function table:sup(cmp)
 	local bestk, bestv
 	if cmp then
@@ -191,5 +190,12 @@ function table:sum()
 		s = s + tonumber(v)
 	end
 	return s
+end
+
+-- in-place sort is fine, but it returns nothing.  for kicks I'd like to chain methods
+local oldsort = table.sort
+function table:sort(...)
+	oldsort(self, ...)
+	return self
 end
 
