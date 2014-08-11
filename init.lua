@@ -34,3 +34,19 @@ _ = os.execute
 -- it would be awesome to track loaded dependencies and auto-reload them too
 -- should be easy to do by overriding 'require'
 function reload(n) package.loaded[n] = nil return require 'n' end
+
+-- for-loop to generate a table
+function range(a,b,c)
+	local t = table()
+	if c then
+		for x=a,b,c do
+			t:insert(x)
+		end
+	else
+		for x=a,b do
+			t:insert(x)
+		end
+	end
+	return t
+end
+

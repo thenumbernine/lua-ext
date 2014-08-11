@@ -192,10 +192,30 @@ function table:sum()
 	return s
 end
 
+function table:last()
+	return self[#self]
+end
+
+-- just like string subset
+function table.sub(t,i,j)
+	j = j or #t
+	if i < 0 then 
+		i = math.max(1, #t + i + 1)
+	end
+	local res = {}
+	for k=i,j do
+		res[k-i+1] = t[k]
+	end
+	setmetatable(res, table)
+	return res
+end
+
 -- in-place sort is fine, but it returns nothing.  for kicks I'd like to chain methods
 local oldsort = table.sort
 function table:sort(...)
 	oldsort(self, ...)
 	return self
 end
+
+table.unpack = unpack
 
