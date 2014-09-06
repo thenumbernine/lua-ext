@@ -42,8 +42,12 @@ function range(a,b,c)
 		for x=a,b,c do
 			t:insert(x)
 		end
-	else
+	elseif b then
 		for x=a,b do
+			t:insert(x)
+		end
+	else
+		for x=1,a do
 			t:insert(x)
 		end
 	end
