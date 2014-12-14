@@ -184,12 +184,21 @@ function table:inf(cmp)
 	return bestk, bestv
 end
 
-function table:sum()
-	local s = 0
+-- combine elements of
+function table:combine(callback)
+	local s
 	for _,v in pairs(self) do
-		s = s + tonumber(v)
+		if not s then
+			s = v
+		else
+			s = callback(s, v)
+		end
 	end
 	return s
+end
+
+function table:sum()
+	return table.combine(self, function(a,b) return a+b end)
 end
 
 function table:last()
