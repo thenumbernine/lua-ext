@@ -20,6 +20,7 @@
 	THE SOFTWARE.
 --]]
 
+require 'ext.meta'
 require 'ext.math'
 require 'ext.table'
 require 'ext.string'

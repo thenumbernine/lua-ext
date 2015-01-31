@@ -26,13 +26,15 @@ require 'ext.table'
 
 local function newmember(class, ...)
 	local obj = setmetatable({}, class)
-	if obj.init then obj:init(...) end
+	if obj.init then return obj, obj:init(...) end
 	return obj
 end
 
-local function callnew(self, ...)
-	return self:new(...)
-end
+local classmeta = {
+	__call = function(self, ...)
+		return self:new(...)
+	end,
+}
 
 local function isa(self, cl)
 	assert(cl, "isa expected a class")
@@ -53,7 +55,7 @@ local function class(...)
 	cl.new = newmember
 	cl.isa = isa
 	
-	setmetatable(cl, {__call = callnew})
+	setmetatable(cl, classmeta)
 	
 	return cl
 end

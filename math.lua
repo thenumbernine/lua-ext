@@ -52,6 +52,3 @@ math.nan = 0/0
 math.twoPi = 2 * math.pi
 math.e = math.exp(1)
 
--- why isn't this done in the first place?
-debug.setmetatable(0, {__index = math})
-
