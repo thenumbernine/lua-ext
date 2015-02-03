@@ -43,6 +43,20 @@ function io.writefile(fn, d)
 	return true
 end
 
+-- if you don't mind errors thrown, here's readfile, writefile, and fileexists combined into a metafunction
+-- TODO handle directories ... with creation, nested access, and iterators.  but this requires testing if a file is a dir... which requires lfs... 
+local dir = function()
+	return setmetatable({}, {
+		__index = function(t,k)
+			return assert(io.readfile(k))
+		end,
+		__newindex = function(t,k,v)
+			assert(io.writefile(k,v))
+		end,
+	})
+end
+io.file = dir() 
+
 function io.readproc(cmd)
 	local f, err = io.popen(cmd)
 	if not f then return false, err end

@@ -23,9 +23,32 @@ debug.setmetatable(0, {__index = math})
 -- strings
 getmetatable('').__concat = defaultConcat	
 
+local function combineFunctionsWithBinaryOperator(f, g, op)
+	if type(f) == 'function' and type(g) == 'function' then
+		return function(...) return op(f(...), g(...)) end
+	elseif type(f) == 'function' then
+		return function(...) return op(f(...), g) end
+	elseif type(g) == 'function' then
+		return function(...) return op(f, g(...)) end
+	else
+		return function() return op(f, g) end	-- shouldn't get called unless __add is called explicitly
+	end
+end
+
+-- primitive functions.  should these be public?  or put in a single table?
+local function add(a,b) return a + b end
+local function sub(a,b) return a - b end
+local function mul(a,b) return a * b end
+local function div(a,b) return a / b end
+local function pow(a,b) return a ^ b end
+local function mod(a,b) return a % b end
+
 -- function operators generate functions
-debug.setmetatable(function()end, {
-	__concat = defaultConcat,
+-- f(x) = y, g(x) = z, (f+g)(x) = y+z 
+debug.setmetatable(function() end, {
+	-- I could make this a function composition like the rest of the meta operations, 
+	-- but instead I'm going to have it follow the default __concat convention I have with other primitive types
+	__concat = defaultConcat,	
 	__tostring = function(f)
 		assert(type(f) == 'function')
 		local m = debug.getmetatable(f)
@@ -34,12 +57,16 @@ debug.setmetatable(function()end, {
 		debug.setmetatable(f, m)
 		return s .. ' ' .. string.dump(f)
 	end,
-	__add = function(f, g) return function(...) return f(...) + g(...) end end,
-	__sub = function(f, g) return function(...) return f(...) - g(...) end end,
-	__mul = function(f, g) return function(...) return f(...) * g(...) end end,
-	__div = function(f, g) return function(...) return f(...) / g(...) end end,
-	__pow = function(f, g) return function(...) return f(...) ^ g(...) end end,
-	__mod = function(f, g) return function(...) return f(...) % g(...) end end,
+	__add = function(f, g) return combineFunctionsWithBinaryOperator(f, g, add) end,
+	__sub = function(f, g) return combineFunctionsWithBinaryOperator(f, g, sub) end,
+	__mul = function(f, g) return combineFunctionsWithBinaryOperator(f, g, mul) end,
+	__div = function(f, g) return combineFunctionsWithBinaryOperator(f, g, div) end,
+	__pow = function(f, g) return combineFunctionsWithBinaryOperator(f, g, pow) end,
+	__mod = function(f, g) return combineFunctionsWithBinaryOperator(f, g, mod) end,
+	__unm = function(f) return function(...) return -f(...) end end,
+	__len = function(f) return function(...) return #f(...) end end,
+	-- boolean operations aren't overloaded just yet.  should they be?
+	--__call doesn't work anyways
 	-- TODO comparison operations too?  probably not equivalence for compatability with sort() and anything else
 	-- TODO boolean operations?  anything else?
 	--[[ here's one option for allowing any function object dereference to be mapped to a new function
@@ -76,6 +103,12 @@ debug.setmetatable(function()end, {
 				local callargs = {unpack(args)}
 				for _,v in ipairs{...} do table.insert(callargs, v) end
 				return f(unpack(callargs))
+			end
+		end,
+		-- swaps the next two arguments
+		swap = function(f)
+			return function(a, b, ...)
+				return f(b, a, ...)
 			end
 		end,
 	}
