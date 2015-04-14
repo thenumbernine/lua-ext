@@ -20,5 +20,10 @@
 	THE SOFTWARE.
 --]]
 
-require 'ext.meta'
-require 'ext.env'(_G)
+return {
+	io = io,
+	math = math,
+	os = os,
+	string = string,
+	table = table,
+}

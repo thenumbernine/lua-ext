@@ -20,5 +20,15 @@
 	THE SOFTWARE.
 --]]
 
-require 'ext.meta'
-require 'ext.env'(_G)
+return function(env)
+	env.math = require 'ext.math'
+	env.table = require 'ext.table'
+	env.string = require 'ext.string'
+	env.io = require 'ext.io'
+	env.file = require 'ext.file'
+	env.tolua = require 'ext.tolua'
+	env.class = require 'ext.class'
+	env.reload = require 'ext.reload'
+	env.range = require 'ext.range'
+	env._ = os.execute
+end

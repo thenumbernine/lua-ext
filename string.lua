@@ -1,5 +1,5 @@
 --[[
-	Copyright (c) 2013 Christopher E. Moore ( christopher.e.moore@gmail.com / http://christopheremoore.net )
+	Copyright (c) 2015 Christopher E. Moore ( christopher.e.moore@gmail.com / http://christopheremoore.net )
 
 	Permission is hereby granted, free of charge, to any person obtaining a copy
 	of this software and associated documentation files (the "Software"), to deal
@@ -20,11 +20,20 @@
 	THE SOFTWARE.
 --]]
 
-require 'ext.table'
+--[[
+notice that,
+while this does override the 'string' and add some extra stuff,
+it does not explicitly replace the default string metatable __index
+to do that, require 'ext.meta' (or do it yourself)
+--]]
+local string = {}
+for k,v in pairs(require'ext.original'.string) do string[k] = v end
+
+local table = require 'ext.table'
 
 function string.split(s, exp)
 	s = tostring(s)
-	local t = table.new()
+	local t = table()
 	local searchpos = 1
 	local start, fin = s:find(exp, searchpos)
 	while start do
@@ -41,7 +50,7 @@ function string.trim(s)
 end
 
 function string.bytes(s)
-	return table.new{s:byte(1,#s)}
+	return table{s:byte(1,#s)}
 end
 
 --[[
@@ -91,3 +100,5 @@ function string.hexdump(d, l, w, c)
 	end
 	return table.concat(s)
 end
+
+return string

@@ -1,5 +1,5 @@
 --[[
-	Copyright (c) 2013 Christopher E. Moore ( christopher.e.moore@gmail.com / http://christopheremoore.net )
+	Copyright (c) 2015 Christopher E. Moore ( christopher.e.moore@gmail.com / http://christopheremoore.net )
 
 	Permission is hereby granted, free of charge, to any person obtaining a copy
 	of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,9 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 	THE SOFTWARE.
 --]]
+
+local io = {}
+for k,v in pairs(require 'ext.original'.io) do io[k] = v end
 
 function io.fileexists(fn)
 	local f, err = io.open(fn, 'r')
@@ -43,20 +46,6 @@ function io.writefile(fn, d)
 	return true
 end
 
--- if you don't mind errors thrown, here's readfile, writefile, and fileexists combined into a metafunction
--- TODO handle directories ... with creation, nested access, and iterators.  but this requires testing if a file is a dir... which requires lfs... 
-local dir = function()
-	return setmetatable({}, {
-		__index = function(t,k)
-			return assert(io.readfile(k))
-		end,
-		__newindex = function(t,k,v)
-			assert(io.writefile(k,v))
-		end,
-	})
-end
-io.file = dir() 
-
 function io.readproc(cmd)
 	local f, err = io.popen(cmd)
 	if not f then return false, err end
@@ -68,7 +57,9 @@ end
 function io.getfiledir(fn)
 	return fn:match('^(.*)/([^/]-)$')
 end
+
 function io.getfileext(fn)
 	return fn:match('^(.*)%.([^%.]-)$')
 end
 
+return io

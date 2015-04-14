@@ -1,5 +1,5 @@
 --[[
-	Copyright (c) 2013 Christopher E. Moore ( christopher.e.moore@gmail.com / http://christopheremoore.net )
+	Copyright (c) 2015 Christopher E. Moore ( christopher.e.moore@gmail.com / http://christopheremoore.net )
 
 	Permission is hereby granted, free of charge, to any person obtaining a copy
 	of this software and associated documentation files (the "Software"), to deal
@@ -20,13 +20,8 @@
 	THE SOFTWARE.
 --]]
 
-function math.trunc(x)
-	if x < 0 then return math.ceil(x) else return math.floor(x) end
-end
-
-function math.fpart(x)
-	return x - math.floor(x)
-end
+local math = {}
+for k,v in pairs(require'ext.original'.math) do math[k] = v end
 
 function math.clamp(v,min,max)
 	return math.min(math.max(v,min), max)
@@ -38,17 +33,16 @@ function math.sign(x)
 	return 0
 end
 
--- .5 rounds up
+function math.trunc(x)
+	if x < 0 then return math.ceil(x) else return math.floor(x) end
+end
+
 function math.round(x)
 	return math.floor(x+.5)
 end
 
-math.infinity = 1/0			-- phase this out?
-math.inf = math.infinity	-- in favor of this?
--- or just use math.huge ...
-
 math.nan = 0/0
 
-math.twoPi = 2 * math.pi
 math.e = math.exp(1)
 
+return math

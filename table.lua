@@ -1,5 +1,5 @@
 --[[
-	Copyright (c) 2013 Christopher E. Moore ( christopher.e.moore@gmail.com / http://christopheremoore.net )
+	Copyright (c) 2015 Christopher E. Moore ( christopher.e.moore@gmail.com / http://christopheremoore.net )
 
 	Permission is hereby granted, free of charge, to any person obtaining a copy
 	of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,9 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 	THE SOFTWARE.
 --]]
+
+local table = {}
+for k,v in pairs(require'ext.original'.table) do table[k] = v end
 
 table.__index = table
 
@@ -60,7 +63,7 @@ end
 -- cb(value[, key]) returns newvalue[, newkey]
 -- nil newkey means use the old key
 function table:map(cb)
-	local t = table.new()
+	local t = table()
 	for k,v in pairs(self) do
 		local nv, nk = cb(v,k,t)
 		if not nk then nk = k end
@@ -75,7 +78,7 @@ end
 -- currently the handling of integer keys is the only difference between this 
 -- and calling table.map and returning nil kills on filtered items 
 function table:filter(f)
-	local t = table.new()
+	local t = table()
 	if type(f) == 'function' then 
 		for k,v in pairs(self) do
 			if f(v,k) then
@@ -147,7 +150,7 @@ end
 
 -- I need to think of a better name for this... kvpairs() ?
 function table:kvmerge()
-	local t = table.new()
+	local t = table()
 	for k,v in pairs(self) do
 		table.insert(t, {k,v})
 	end
@@ -220,7 +223,7 @@ function table.sub(t,i,j)
 end
 
 -- in-place sort is fine, but it returns nothing.  for kicks I'd like to chain methods
-local oldsort = table.sort
+local oldsort = require 'ext.original'.table.sort
 function table:sort(...)
 	oldsort(self, ...)
 	return self
@@ -228,3 +231,4 @@ end
 
 table.unpack = unpack
 
+return table

@@ -1,5 +1,5 @@
 --[[
-	Copyright (c) 2013 Christopher E. Moore ( christopher.e.moore@gmail.com / http://christopheremoore.net )
+	Copyright (c) 2015 Christopher E. Moore ( christopher.e.moore@gmail.com / http://christopheremoore.net )
 
 	Permission is hereby granted, free of charge, to any person obtaining a copy
 	of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,8 @@
 	THE SOFTWARE.
 --]]
 
+local table = require 'ext.table'
+
 local defaultSerializeForType = {
 	number = tostring,
 	boolean = tostring,
@@ -27,7 +29,7 @@ local defaultSerializeForType = {
 	string = function(v) return ('%q'):format(v) end,
 }
 
-function toLua(x, tabchar, newlinechar, serializeForType)
+local function tolua(x, tabchar, newlinechar, serializeForType)
 	if not tabchar then tabchar = '\t' end
 	if not newlinechar then newlinechar = '\n' end
 	local function toLuaKey(k)
@@ -105,3 +107,5 @@ function toLua(x, tabchar, newlinechar, serializeForType)
 	end
 	return toLuaRecurse(x)
 end
+
+return tolua
