@@ -21,6 +21,7 @@
 --]]
 
 local _, lfs = pcall(require, 'lfs')
+local io = require 'ext.io'
 
 local filemeta
 filemeta = {
