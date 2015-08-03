@@ -32,12 +32,14 @@ local defaultSerializeForType = {
 local function tolua(x, args)
 	local indentChar = ''
 	local newlineChar = ''
-	if args.indent then
-		indentChar = '\t'
-		newlineChar = '\n'
-	end
-	local serializeForType = args.serializeForType 
-	
+	local serializeForType 
+	if args then
+		if args.indent then
+			indentChar = '\t'
+			newlineChar = '\n'
+		end
+		serializeForType = args.serializeForType 
+	end	
 	local function toLuaKey(k)
 		if type(k) == 'string' and k:match('^[_,a-z,A-Z][_,a-z,A-Z,0-9]*$') then
 			return k
