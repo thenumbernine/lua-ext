@@ -29,9 +29,15 @@ local defaultSerializeForType = {
 	string = function(v) return ('%q'):format(v) end,
 }
 
-local function tolua(x, tabchar, newlinechar, serializeForType)
-	if not tabchar then tabchar = '\t' end
-	if not newlinechar then newlinechar = '\n' end
+local function tolua(x, args)
+	local indentChar = ''
+	local newlineChar = ''
+	if args.indent then
+		indentChar = '\t'
+		newlineChar = '\n'
+	end
+	local serializeForType = args.serializeForType 
+	
 	local function toLuaKey(k)
 		if type(k) == 'string' and k:match('^[_,a-z,A-Z][_,a-z,A-Z,0-9]*$') then
 			return k
@@ -42,7 +48,7 @@ local function tolua(x, tabchar, newlinechar, serializeForType)
 	local touchedTables = {}
 	function toLuaRecurse(x, tab)
 		if not tab then tab = '' end
-		local newtab = tab .. tabchar
+		local newtab = tab .. indentChar
 		local xtype = type(x)
 		if xtype == 'table' then
 			-- TODO override for specific metatables?  as I'm doing for types?
@@ -85,8 +91,8 @@ local function tolua(x, tabchar, newlinechar, serializeForType)
 				mixed = mixed:map(function(kv) return table.concat(kv, '=') end)
 				s:append(mixed)
 
-				local rs = '{'..newlinechar
-				if #s > 0 then rs = rs .. newtab ..s:concat(','..newlinechar..newtab) .. newlinechar end
+				local rs = '{'..newlineChar
+				if #s > 0 then rs = rs .. newtab ..s:concat(','..newlineChar..newtab) .. newlineChar end
 				rs = rs .. tab.. '}'
 				return rs
 			end
