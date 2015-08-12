@@ -22,23 +22,32 @@
 
 local table = require 'ext.table'
 
+local function escapeString(s)
+	return ('%q'):format(s)
+end
+
 local defaultSerializeForType = {
 	number = tostring,
 	boolean = tostring,
 	['nil'] = tostring,
-	string = function(v) return ('%q'):format(v) end,
+	string = escapeString,
+	['function'] = function(x)
+		return 'load(' .. escapeString(string.dump(x)) .. ')'
+	end,
 }
 
 local function tolua(x, args)
 	local indentChar = ''
 	local newlineChar = ''
 	local serializeForType 
+	local serializeMetatables
 	if args then
 		if args.indent then
 			indentChar = '\t'
 			newlineChar = '\n'
 		end
 		serializeForType = args.serializeForType 
+		serializeMetatables = args.serializeMetatables
 	end	
 	local function toLuaKey(k)
 		if type(k) == 'string' and k:match('^[_,a-z,A-Z][_,a-z,A-Z,0-9]*$') then
@@ -52,11 +61,12 @@ local function tolua(x, args)
 		if not tab then tab = '' end
 		local newtab = tab .. indentChar
 		local xtype = type(x)
+		local result
 		if xtype == 'table' then
 			-- TODO override for specific metatables?  as I'm doing for types?
 			
 			if touchedTables[x] then
-				return 'error("recursive reference")'	-- TODO allow recursive serialization by declaring locals before their reference?
+				result = 'error("recursive reference")'	-- TODO allow recursive serialization by declaring locals before their reference?
 			else
 				touchedTables[x] = true
 				
@@ -96,7 +106,7 @@ local function tolua(x, args)
 				local rs = '{'..newlineChar
 				if #s > 0 then rs = rs .. newtab ..s:concat(','..newlineChar..newtab) .. newlineChar end
 				rs = rs .. tab.. '}'
-				return rs
+				result = rs
 			end
 		else
 			local serializeFunction
@@ -107,11 +117,19 @@ local function tolua(x, args)
 				serializeFunction = defaultSerializeForType[xtype]
 			end
 			if serializeFunction then
-				return serializeFunction(x)
+				result = serializeFunction(x)
 			else
-				return '['..type(x)..':'..tostring(x)..']'
+				result = '['..type(x)..':'..tostring(x)..']'
 			end
 		end
+		assert(result)
+		if serializeMetatables then
+			local m = getmetatable(x)
+			if m then
+				result = 'setmetatable('..result..', '..toLuaRecurse(m, newtab)..')'
+			end
+		end
+		return result
 	end
 	return toLuaRecurse(x)
 end
