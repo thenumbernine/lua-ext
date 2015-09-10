@@ -20,14 +20,18 @@
 	THE SOFTWARE.
 --]]
 
-local _, lfs = pcall(require, 'lfs')
-lfs = _ and lfs
+local function lfs()
+	local result, lfs = pcall(require, 'lfs')
+	return result and lfs
+end
+
 local io = require 'ext.io'
 
 local filemeta
 filemeta = {
 	-- directory listing
 	__call = function(t, state, lastfunc)
+		local lfs = lfs()
 		if not lfs then error("directory listing only available with lfs") end
 		assert(not lastfunc, "make sure to call() the dir")
 		return coroutine.wrap(function()
@@ -44,18 +48,19 @@ filemeta = {
 	
 	-- read file
 	__index = function(t,k)
+		local lfs = lfs()
 		if not lfs then
-			-- if no lfs then no nested read dereferences 
+			-- if no lfs then no nested read dereferences
 			return io.readfile(k)
 		else
 			local fn = k:sub(1,1) == '/' and k or (t.path..'/'..k)
 			local attr = lfs.attributes(fn)
-			if not attr then 
-				return false, "couldn't open file" 
+			if not attr then
+				return false, "couldn't open file"
 			end
 			if attr.mode == 'directory' then
 				return setmetatable({
-					path = fn 
+					path = fn
 				}, filemeta)
 			elseif attr.mode == 'file' then
 				return io.readfile(fn)
