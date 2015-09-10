@@ -23,28 +23,26 @@
 local ffi = require 'ffi'
 require 'ffi.c.stdlib'
 
--- uses C malloc paired with ffi-based garbage collection 
--- typecasts correctly
--- and retains the ability to manually free
--- (so you don't have to manually free it)
--- NOTICE casting *AFTER* wrapping will crash, probably due to the gc thinking the old pointer is gone
--- also ffi.gc retains type, so no worries about casting before
+--[[
+uses C malloc paired with ffi-based garbage collection 
+typecasts correctly
+and retains the ability to manually free
+(so you don't have to manually free it)
+NOTICE casting *AFTER* wrapping will crash, probably due to the gc thinking the old pointer is gone
+also ffi.gc retains type, so no worries about casting before
+--]]
 local function gcnew(T, n)
---print('type',T)
---print('num',n)
---print('sizeof type',ffi.sizeof(T))
 	local ptr = ffi.C.malloc(n * ffi.sizeof(T))
---print('ptr',ptr,'type',ffi.typeof(ptr))
 	ptr = ffi.cast(T..'*', ptr)
---print('cast ptr', ptr,'type',ffi.typeof(ptr))
 	ptr = ffi.gc(ptr, ffi.C.free)
---print('gc wrapped ptr',ptr,'type',ffi.typeof(ptr))
 	return ptr
 end
 
--- manual free of a pointer
--- frees the ptr and removes it from the gc 
--- (just in case you want to manually free a pointer)
+--[[
+manual free of a pointer
+frees the ptr and removes it from the gc 
+(just in case you want to manually free a pointer)
+--]]
 local function gcfree(ptr)
 	ffi.C.free(ffi.gc(ptr, nil))
 end
