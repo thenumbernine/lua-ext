@@ -5,4 +5,8 @@ I'm sure this will grow out of hand.
 Note to users: I often use "require 'ext'" in place of "require 'ext.init'" in my code.
 This is courtesy of a LUA_PATH pattern "foo/?/init.lua" in addition to the typical "foo/?.lua".
 
-I'm changing them around to allow its use without muddying up the global environment table.
+NOTICE:
+
+- file.lua optionally depends on lfs, if available
+
+- gcmem.lua depends on ffi, particularly some ffi headers of stdio
