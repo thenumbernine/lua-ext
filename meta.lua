@@ -80,7 +80,9 @@ debug.setmetatable(function() end, {
 		debug.setmetatable(f, nil)
 		local s = tostring(f)
 		debug.setmetatable(f, m)
-		return s .. ' ' .. string.dump(f)
+		local result, str = pcall(string.dump, f)
+		if result then s = s .. ' ' .. str end
+		return s
 	end,
 	__add = function(f, g) return combineFunctionsWithBinaryOperator(f, g, add) end,
 	__sub = function(f, g) return combineFunctionsWithBinaryOperator(f, g, sub) end,
@@ -136,6 +138,7 @@ debug.setmetatable(function() end, {
 				return f(b, a, ...)
 			end
 		end,
+		dump = string.dump,
 	}
 	--]]
 })

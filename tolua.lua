@@ -23,7 +23,7 @@
 local table = require 'ext.table'
 
 local function escapeString(s)
-	return ('%q'):format(s)
+	return ('%q'):format(s):gsub('\\\n','\\n')
 end
 
 local defaultSerializeForType = {
