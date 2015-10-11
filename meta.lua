@@ -20,6 +20,8 @@
 	THE SOFTWARE.
 --]]
 
+local table = require 'ext.table'
+
 -- fix up lua type metatables
 
 local function defaultConcat(a,b) return tostring(a) .. tostring(b) end
@@ -114,18 +116,18 @@ debug.setmetatable(function() end, {
 			return function(...)
 				local args = {...}
 				for i=#funcs,1,-1 do
-					args = {funcs[i](unpack(args))}
+					args = {funcs[i](table.unpack(args))}
 				end
-				return unpack(args)
+				return table.unpack(args)
 			end
 		end,
 		-- bind / partial apply -- currying first args, and allowing vararg rest of args
 		bind = function(f, ...)
 			local args = {...}
 			return function(...)
-				local callargs = {unpack(args)}
+				local callargs = {table.unpack(args)}
 				for _,v in ipairs{...} do table.insert(callargs, v) end
-				return f(unpack(callargs))
+				return f(table.unpack(callargs))
 			end
 		end,
 		-- swaps the next two arguments
