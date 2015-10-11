@@ -41,6 +41,9 @@ setmetatable(table, {
 	end
 })
 
+-- 5.2 or 5.3 compatible
+table.unpack = table.unpack or unpack
+
 -- something to consider:
 -- mapvalue() returns a new table
 -- but append() modifies the current table
@@ -145,7 +148,7 @@ function table:removeObject(...)
 		removedKeys:insert(k)
 		k = table.find(self, ...)
 	end
-	return unpack(removedKeys)
+	return table.unpack(removedKeys)
 end
 
 -- I need to think of a better name for this... kvpairs() ?
@@ -228,7 +231,5 @@ function table:sort(...)
 	oldsort(self, ...)
 	return self
 end
-
-table.unpack = unpack
 
 return table
