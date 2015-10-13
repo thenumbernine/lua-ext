@@ -172,7 +172,7 @@ function table:sup(cmp)
 			if bestv == nil or v > bestv then bestk, bestv = k, v end
 		end
 	end
-	return bestk, bestv
+	return bestv, bestk
 end
 
 -- TODO - math instead of table?
@@ -187,7 +187,7 @@ function table:inf(cmp)
 			if bestv == nil or v < bestv then bestk, bestv = k, v end
 		end
 	end
-	return bestk, bestv
+	return bestv, bestk
 end
 
 -- combine elements of
