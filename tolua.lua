@@ -22,6 +22,17 @@
 
 local table = require 'ext.table'
 
+-- table.maxn was removed in 5.2
+local function maxn(t)
+	local max
+	for k,v in pairs(t) do
+		if type(k) == 'number' then
+			max = max and math.max(max, k) or k
+		end
+	end
+	return k
+end
+
 local function escapeString(s)
 	return ('%q'):format(s):gsub('\\\n','\\n')
 end
@@ -71,7 +82,7 @@ local function tolua(x, args)
 				touchedTables[x] = true
 				
 				-- prelim see if we can write it as an indexed table
-				local numx = table.maxn(x)
+				local numx = maxn(x)
 				local intNilKeys, intNonNilKeys = 0, 0				
 				for i=1,numx do
 					if x[i] == nil then
