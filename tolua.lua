@@ -24,13 +24,13 @@ local table = require 'ext.table'
 
 -- table.maxn was removed in 5.2
 local function maxn(t)
-	local max
+	local max = 0
 	for k,v in pairs(t) do
 		if type(k) == 'number' then
-			max = max and math.max(max, k) or k
+			max = math.max(max, k)
 		end
 	end
-	return k
+	return max
 end
 
 local function escapeString(s)
