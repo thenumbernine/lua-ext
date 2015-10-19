@@ -21,7 +21,7 @@
 --]]
 
 local table = {}
-for k,v in pairs(require'ext.original'.table) do table[k] = v end
+for k,v in pairs(require 'table') do table[k] = v end
 
 table.__index = table
 
@@ -226,7 +226,7 @@ function table.sub(t,i,j)
 end
 
 -- in-place sort is fine, but it returns nothing.  for kicks I'd like to chain methods
-local oldsort = require 'ext.original'.table.sort
+local oldsort = require 'table'.sort
 function table:sort(...)
 	oldsort(self, ...)
 	return self

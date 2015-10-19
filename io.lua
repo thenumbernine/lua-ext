@@ -21,7 +21,7 @@
 --]]
 
 local io = {}
-for k,v in pairs(require 'ext.original'.io) do io[k] = v end
+for k,v in pairs(require 'io') do io[k] = v end
 
 function io.fileexists(fn)
 	local f, err = io.open(fn, 'r')

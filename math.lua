@@ -21,7 +21,7 @@
 --]]
 
 local math = {}
-for k,v in pairs(require'ext.original'.math) do math[k] = v end
+for k,v in pairs(require 'math') do math[k] = v end
 
 function math.clamp(v,min,max)
 	return math.min(math.max(v,min), max)

@@ -27,7 +27,7 @@ it does not explicitly replace the default string metatable __index
 to do that, require 'ext.meta' (or do it yourself)
 --]]
 local string = {}
-for k,v in pairs(require'ext.original'.string) do string[k] = v end
+for k,v in pairs(require 'string') do string[k] = v end
 
 local table = require 'ext.table'
 
