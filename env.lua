@@ -21,6 +21,7 @@
 --]]
 
 return function(env)
+	env = env or _G
 	env.math = require 'ext.math'
 	env.table = require 'ext.table'
 	env.string = require 'ext.string'

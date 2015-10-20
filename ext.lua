@@ -21,4 +21,4 @@
 --]]
 
 require 'ext.meta'
-require 'ext.env'(_G)
+require 'ext.env'()
