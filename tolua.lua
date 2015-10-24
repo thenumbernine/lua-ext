@@ -30,9 +30,11 @@ b.a=a
 tolua(a) would give ...
 {b={a=error('recursive reference')}}
 
-but how about, if something is marked in touched tables, then referenced again ...
-what if its moved up front, given a local, and the ref gets the local name?
- ... and the local ref will have to be added later:
+but how about, if something is found that is marked in touched tables ...
+1) wrap everything in a function block
+2) give root a local
+3) add assignments of self-references after-the-fact
+
 (function()
 	local _tmp={b={}}
 	_tmp.b.a= _tmp
@@ -79,15 +81,25 @@ local function tolua(x, args)
 		serializeForType = args.serializeForType 
 		serializeMetatables = args.serializeMetatables
 	end	
-	local function toLuaKey(k)
+	
+	local wrapWithFunction = false
+	local recursiveReferences = table()
+	local touchedTables = {}
+	
+	local function toLuaKey(k, path)
 		if type(k) == 'string' and k:match('^[_,a-z,A-Z][_,a-z,A-Z,0-9]*$') then
-			return k
+			return k, true
 		else
-			return '['..toLuaRecurse(k)..']'
+			local result = toLuaRecurse(k, nil, path, true)
+			if result then
+				return '['..result..']', false
+			else
+				return false, false
+			end
 		end
 	end
-	local touchedTables = {}
-	function toLuaRecurse(x, tab)
+	
+	function toLuaRecurse(x, tab, path, keyRef)
 		if not tab then tab = '' end
 		local newtab = tab .. indentChar
 		local xtype = type(x)
@@ -96,9 +108,21 @@ local function tolua(x, args)
 			-- TODO override for specific metatables?  as I'm doing for types?
 			
 			if touchedTables[x] then
-				result = 'error("recursive reference")'	-- TODO allow recursive serialization by declaring locals before their reference?
+				result = false	-- false is used internally and means recursive reference
+				wrapWithFunction = true
+				
+				-- we're serializing *something*
+				-- is it a value?  if so, use the 'path' to dereference the key
+				-- is it a key?  if so the what's the value ..
+				-- do we have to add an entry for both?
+				-- maybe the caller should be responsible for populating this table ...
+				if keyRef then
+					recursiveReferences:insert('root'..path..'['..touchedTables[x]..'] = error("can\'t handle recursive references in keys")')
+				else 
+					recursiveReferences:insert('root'..path..' = '..touchedTables[x])
+				end
 			else
-				touchedTables[x] = true
+				touchedTables[x] = 'root'..path
 				
 				-- prelim see if we can write it as an indexed table
 				local numx = maxn(x)
@@ -117,7 +141,11 @@ local function tolua(x, args)
 				local addedIntKeys = {}
 				if intNonNilKeys >= intNilKeys * 2 then	-- some metric
 					for k=1,numx do
-						s:insert(toLuaRecurse(x[k], newtab))
+						local nextResult = toLuaRecurse(x[k], newtab, path and path..'['..k..']')
+						if nextResult then
+							s:insert(nextResult)
+						-- else x[k] is a recursive reference 
+						end
 						addedIntKeys[k] = true
 					end
 				end
@@ -126,7 +154,20 @@ local function tolua(x, args)
 				local mixed = table()
 				for k,v in pairs(x) do
 					if not addedIntKeys[k] then
-						mixed:insert{toLuaKey(k), toLuaRecurse(v, newtab)}
+						local keyStr, usesDot = toLuaKey(k, path)
+						if keyStr then
+							local newpath
+							if path then
+								newpath = path 
+								if usesDot then newpath = newpath .. '.' end
+								newpath = newpath .. keyStr
+							end
+							local nextResult = toLuaRecurse(v, newtab, newpath)
+							if nextResult then
+								mixed:insert{keyStr, nextResult}
+							-- else x[k] is a recursive reference
+							end
+						end
 					end
 				end
 				mixed:sort(function(a,b) return a[1] < b[1] end)	-- sort by keys
@@ -152,7 +193,7 @@ local function tolua(x, args)
 				result = '['..type(x)..':'..tostring(x)..']'
 			end
 		end
-		assert(result)
+		assert(result ~= nil)
 		if serializeMetatables then
 			local m = getmetatable(x)
 			if m then
@@ -161,7 +202,19 @@ local function tolua(x, args)
 		end
 		return result
 	end
-	return toLuaRecurse(x)
+
+	local str = toLuaRecurse(x, nil, '')
+	
+	if wrapWithFunction then
+		str = '(function()' .. newlineChar
+			.. indentChar .. 'local root = '..str .. ' ' .. newlineChar
+			-- TODO defer self-references to here
+			.. recursiveReferences:concat(' '..newlineChar..indentChar) .. ' ' .. newlineChar
+			.. indentChar .. 'return root ' .. newlineChar
+			.. 'end)()'
+	end
+	
+	return str
 end
 
 return tolua
