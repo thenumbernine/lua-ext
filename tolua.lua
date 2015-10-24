@@ -20,9 +20,28 @@
 	THE SOFTWARE.
 --]]
 
+--[[
+how to handle recursion ...
+a={}
+b={}
+a.b=b
+b.a=a
+
+tolua(a) would give ...
+{b={a=error('recursive reference')}}
+
+but how about, if something is marked in touched tables, then referenced again ...
+what if its moved up front, given a local, and the ref gets the local name?
+ ... and the local ref will have to be added later:
+(function()
+	local _tmp={b={}}
+	_tmp.b.a= _tmp
+	return _tmp
+end)()
+--]]
+
 local table = require 'ext.table'
 
--- table.maxn was removed in 5.2
 local function maxn(t)
 	local max = 0
 	for k,v in pairs(t) do
