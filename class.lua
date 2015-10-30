@@ -36,6 +36,7 @@ local classmeta = {
 	end,
 }
 
+-- usage: obj:isa(class)
 local function isa(self, cl)
 	assert(cl, "isa expected a class")
 	if self.class == cl then return true end
@@ -55,8 +56,12 @@ local function class(...)
 	cl.new = newmember
 	cl.isa = isa
 	
-	setmetatable(cl, classmeta)
+	-- class.is(object)
+	cl.is = function(x)
+		return type(x) == 'table' and x.isa and x:isa(cl)
+	end
 	
+	setmetatable(cl, classmeta)
 	return cl
 end
 
