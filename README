@@ -9,4 +9,4 @@ NOTICE:
 
 - file.lua optionally depends on lfs, if available
 
-- gcmem.lua depends on ffi, particularly some ffi headers of stdio
+- gcmem.lua depends on ffi, particularly some ffi headers of stdio found in my lua-ffi-bindings project: https://github.com/thenumbernine/lua-ffi-bindings

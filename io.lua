@@ -58,6 +58,8 @@ function io.getfiledir(fn)
 	return fn:match('^(.*)/([^/]-)$')
 end
 
+-- this should really return the extension first.
+-- that is the function name, after all.
 function io.getfileext(fn)
 	return fn:match('^(.*)%.([^%.]-)$')
 end

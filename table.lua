@@ -162,6 +162,7 @@ function table:kvmerge()
 end
 
 -- TODO - math instead of table?
+-- TODO - have cmp default to operator> just like inf and sort?
 function table:sup(cmp)
 	local bestk, bestv
 	if cmp then
