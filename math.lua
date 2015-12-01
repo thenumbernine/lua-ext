@@ -23,6 +23,10 @@
 local math = {}
 for k,v in pairs(require 'math') do math[k] = v end
 
+math.nan = 0/0
+
+math.e = math.exp(1)
+
 function math.clamp(v,min,max)
 	return math.min(math.max(v,min), max)
 end
@@ -41,8 +45,22 @@ function math.round(x)
 	return math.floor(x+.5)
 end
 
-math.nan = 0/0
+function math.cosh(x)
+	return (math.exp(x) + math.exp(-x)) / 2
+end
 
-math.e = math.exp(1)
+function math.sinh(x)
+	return (math.exp(x) - math.exp(-x)) / 2
+end
+
+function math.tanh(x)
+	local ep = math.exp(x)
+	local en = math.exp(-x)
+	return (ep - en) / (ep + en)
+end
+
+function math.isfinite(x)
+	return x ~= math.huge and x ~= -math.huge and x == x
+end
 
 return math
