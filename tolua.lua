@@ -64,7 +64,38 @@ local defaultSerializeForType = {
 	['nil'] = tostring,
 	string = escapeString,
 	['function'] = function(x)
-		return 'load(' .. escapeString(string.dump(x)) .. ')'
+		local result, s = pcall(string.dump, x)
+		
+		if results then
+			s = 'load('..escapeString(s)..')'
+		else
+			-- if string.dump failed then check the builtins
+			-- check the global object and one table deep 
+			-- todo maybe, check against a predefined set of functions?
+			if s == "unable to dump given function" then
+				for k,v in pairs(_G) do
+					if v == x then
+						s = k
+						break
+					elseif type(v) == 'table' then
+						-- only one level deep ...
+						local done = false
+						for k2,v2 in pairs(v) do
+							if v2 == x then
+								s = k..'.'..k2
+								done = true
+								break
+							end
+						end
+						if done then break end
+					end
+				end
+			else
+				error("got a function I could neither dump nor lookup in the global namespace nor one level deep")
+			end
+		end
+			
+		return s
 	end,
 }
 
