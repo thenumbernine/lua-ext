@@ -70,7 +70,7 @@ local function mod(a,b) return a % b end
 
 -- function operators generate functions
 -- f(x) = y, g(x) = z, (f+g)(x) = y+z 
-debug.setmetatable(function() end, {
+local functionMeta = {
 	-- I could make this a function composition like the rest of the meta operations, 
 	-- but instead I'm going to have it follow the default __concat convention I have with other primitive types
 	__concat = defaultConcat,
@@ -108,7 +108,6 @@ debug.setmetatable(function() end, {
 		--  returns a function that returns that object's __index to the key argument 
 		-- so if f() = {a=1} then f:index'a'() == 1
 		index = function(f, k) return function(...) return f(...)[k] end end,
-		_ = function(f, k) return function(...) return f(...)[k] end end,	-- shorthand
 		-- takes a function that returns an object
 		--  returns a function that applies that object's __newindex to the key and value arguments
 		-- so if t={} and f()==t then f:assign('a',1)() assigns t.a==1
@@ -142,7 +141,11 @@ debug.setmetatable(function() end, {
 		dump = string.dump,
 	}
 	--]]
-})
+}
+-- shorthand
+functionMeta.__index._ = functionMeta.__index.index 
+functionMeta.__index.o = functionMeta.__index.compose
+debug.setmetatable(function() end, functionMeta)
 
 -- TODO lightuserdata, if you can create it within lua somehow ...
 
