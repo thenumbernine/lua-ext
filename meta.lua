@@ -108,6 +108,7 @@ debug.setmetatable(function() end, {
 		--  returns a function that returns that object's __index to the key argument 
 		-- so if f() = {a=1} then f:index'a'() == 1
 		index = function(f, k) return function(...) return f(...)[k] end end,
+		_ = function(f, k) return function(...) return f(...)[k] end end,	-- shorthand
 		-- takes a function that returns an object
 		--  returns a function that applies that object's __newindex to the key and value arguments
 		-- so if t={} and f()==t then f:assign('a',1)() assigns t.a==1
