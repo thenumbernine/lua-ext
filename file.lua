@@ -39,29 +39,52 @@ filemeta = {
 		local lfs = lfs()
 		if not lfs then
 			-- no lfs?  use a fallback of shell ls or dir (based on OS)
+			local fns
 			-- all I'm using ffi for is reading the OS ...
-			local ffi = ffi()	-- no lfs?  are you using luajit?
-			if not ffi then
-				error("directory listing only available with lfs or ffi")
+--			local ffi = ffi()	-- no lfs?  are you using luajit?
+--			if not ffi then
+				-- if 'dir' exists ...
+				--	local filestr = io.readproc('dir "'..t.path..'"')
+				--	error('you are here: '..filestr)
+				-- if 'ls' exists ...
+				local cmd = 'ls '..t.path:gsub([[|&;<>`\"' \t\r\n#~=%$%(%)%%%[%*%?]], [[\%0]])
+				local filestr = io.readproc(cmd)
+				local string = require 'ext.string'
+				fns = string.split(filestr, '\n')
+				assert(fns:remove() == '')
+--[[
 			else
 				-- do a directory listing
-				local fns
 				-- TODO escape?
 				if ffi.os == 'Windows' then
-					local filestr = io.readproc('dir "'..t.path..'"')
-					error('you are here: '..filestr)
+					-- put your stupid FindFirstFile/FindNextFile code here
+					error('windows sucks...')
 				else
-					local filestr = io.readproc('ls '..t.path:gsub([[|&;<>`\"' \t\r\n#~=%$%(%)%%%[%*%?]], [[\%0]]))
-					fns = filestr:split'\n'
-					assert(fns:remove() == '')
-				end
-				return coroutine.wrap(function()
-					for _,k in ipairs(fns) do
-						local fn = k:sub(1,1) == '/' and k or (t.path..'/'..k)
-						coroutine.yield(k, io.readfile(fn))					
+					fns = {}
+					require 'ffi.c.dirent'
+					-- https://stackoverflow.com/questions/10678522/how-can-i-get-this-readdir-code-sample-to-search-other-directories
+					local dirp = ffi.C.opendir(t.path)
+					if dirp == nil then
+						error('failed to open dir '..t.path)
 					end
-				end)
+					repeat
+						local dp = ffi.C.readdir(dirp)
+						if dp == nil then break end
+						local name = ffi.string(dp[0].d_name)
+						if name ~= '.' and name ~= '..' then
+							table.insert(fns, name)
+						end
+					until false
+					ffi.C.closedir(dirp)
+				end
 			end
+--]]
+			return coroutine.wrap(function()
+				for _,k in ipairs(fns) do
+					local fn = k:sub(1,1) == '/' and k or (t.path..'/'..k)
+					coroutine.yield(k, io.readfile(fn))					
+				end
+			end)
 		else
 			return coroutine.wrap(function()
 				for k in lfs.dir(t.path) do
@@ -78,19 +101,50 @@ filemeta = {
 	
 	-- read file
 	__index = function(t,k)
+		local fn = k:sub(1,1) == '/' and k or (t.path..'/'..k)
 		local lfs = lfs()
 		if not lfs then
-			-- if no lfs then no nested read dereferences
-			return io.readfile(k)
+--			local ffi = ffi()
+--			if not ffi then
+				-- if no lfs then no nested read dereferences
+				-- and let directories error
+				-- TODO you could work around this for directories: 
+				-- f:read(1) for 5.1,jit,5.2,5.3 returns nil, 'Is a directory', 21
+				local f = io.open(fn,'rb')
+				if not f then return nil end
+				local result, reason, errcode = f:read(1)
+				if result == nil
+				and reason == 'Is a directory'
+				and errcode == 21 
+				then
+					f:close()
+					-- is a directory
+					return setmetatable({
+						path = fn,
+					}, filemeta)
+				else
+					f:seek('set')
+					local d = f:read('*a')
+					f:close()
+					return d
+				end
+--[[
+			else
+				if ffi.os == 'Windows' then
+					error('sorry windows')
+				else
+					error('TODO stat() for ffi...')
+				end
+			end
+--]]
 		else
-			local fn = k:sub(1,1) == '/' and k or (t.path..'/'..k)
 			local attr = lfs.attributes(fn)
 			if not attr then
 				return false, "couldn't open file"
 			end
 			if attr.mode == 'directory' then
 				return setmetatable({
-					path = fn
+					path = fn,
 				}, filemeta)
 			elseif attr.mode == 'file' then
 				return io.readfile(fn)
@@ -122,4 +176,3 @@ filemeta = {
 local file = setmetatable({path='.'}, filemeta)
 
 return file
-
