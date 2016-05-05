@@ -24,6 +24,10 @@ local function lfs()
 	local result, lfs = pcall(require, 'lfs')
 	return result and lfs
 end
+local function ffi()
+	local result, ffi = pcall(require, 'ffi')
+	return result and ffi
+end
 
 local io = require 'ext.io'
 
@@ -31,19 +35,45 @@ local filemeta
 filemeta = {
 	-- directory listing
 	__call = function(t, state, lastfunc)
-		local lfs = lfs()
-		if not lfs then error("directory listing only available with lfs") end
 		assert(not lastfunc, "make sure to call() the dir")
-		return coroutine.wrap(function()
-			for k in lfs.dir(t.path) do
-				if k ~= '.' and k ~= '..' then
-					local fn = k:sub(1,1) == '/' and k or (t.path..'/'..k)
-					-- I shouldn't have io.readfile for performance
-					--  but for convenience it is so handy...
-					coroutine.yield(k, io.readfile(fn))
+		local lfs = lfs()
+		if not lfs then
+			-- no lfs?  use a fallback of shell ls or dir (based on OS)
+			-- all I'm using ffi for is reading the OS ...
+			local ffi = ffi()	-- no lfs?  are you using luajit?
+			if not ffi then
+				error("directory listing only available with lfs or ffi")
+			else
+				-- do a directory listing
+				local fns
+				-- TODO escape?
+				if ffi.os == 'Windows' then
+					local filestr = io.readproc('dir "'..t.path..'"')
+					error('you are here: '..filestr)
+				else
+					local filestr = io.readproc('ls '..t.path:gsub([[|&;<>`\"' \t\r\n#~=%$%(%)%%%[%*%?]], [[\%0]]))
+					fns = filestr:split'\n'
+					assert(fns:remove() == '')
 				end
+				return coroutine.wrap(function()
+					for _,k in ipairs(fns) do
+						local fn = k:sub(1,1) == '/' and k or (t.path..'/'..k)
+						coroutine.yield(k, io.readfile(fn))					
+					end
+				end)
 			end
-		end)
+		else
+			return coroutine.wrap(function()
+				for k in lfs.dir(t.path) do
+					if k ~= '.' and k ~= '..' then
+						local fn = k:sub(1,1) == '/' and k or (t.path..'/'..k)
+						-- I shouldn't have io.readfile for performance
+						--  but for convenience it is so handy...
+						coroutine.yield(k, io.readfile(fn))
+					end
+				end
+			end)
+		end
 	end,
 	
 	-- read file
