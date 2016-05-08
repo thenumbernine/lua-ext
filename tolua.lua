@@ -91,7 +91,7 @@ local defaultSerializeForType = {
 					end
 				end
 			else
-				error("got a function I could neither dump nor lookup in the global namespace nor one level deep")
+				return "error('got a function I could neither dump nor lookup in the global namespace nor one level deep')"
 			end
 		end
 			
