@@ -66,7 +66,7 @@ local defaultSerializeForType = {
 	['function'] = function(x)
 		local result, s = pcall(string.dump, x)
 		
-		if results then
+		if result then
 			s = 'load('..escapeString(s)..')'
 		else
 			-- if string.dump failed then check the builtins
