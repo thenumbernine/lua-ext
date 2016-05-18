@@ -116,7 +116,8 @@ local function tolua(x, args)
 	local wrapWithFunction = false
 	local recursiveReferences = table()
 	local touchedTables = {}
-	
+
+	local toLuaRecurse
 	local function toLuaKey(k, path)
 		if type(k) == 'string' and k:match('^[_,a-z,A-Z][_,a-z,A-Z,0-9]*$') then
 			return k, true
@@ -130,7 +131,7 @@ local function tolua(x, args)
 		end
 	end
 	
-	function toLuaRecurse(x, tab, path, keyRef)
+	toLuaRecurse = function(x, tab, path, keyRef)
 		if not tab then tab = '' end
 		local newtab = tab .. indentChar
 		local xtype = type(x)
