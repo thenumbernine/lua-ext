@@ -99,6 +99,11 @@ local defaultSerializeForType = {
 	end,
 }
 
+-- returns 'true' if k is a valid variable name
+local function isVarName(k)
+	return type(k) == 'string' and k:match('^[_,a-z,A-Z][_,a-z,A-Z,0-9]*$')
+end
+
 local function tolua(x, args)
 	local indentChar = ''
 	local newlineChar = ''
@@ -119,7 +124,7 @@ local function tolua(x, args)
 
 	local toLuaRecurse
 	local function toLuaKey(k, path)
-		if type(k) == 'string' and k:match('^[_,a-z,A-Z][_,a-z,A-Z,0-9]*$') then
+		if isVarName(k) then
 			return k, true
 		else
 			local result = toLuaRecurse(k, nil, path, true)
@@ -249,4 +254,16 @@ local function tolua(x, args)
 	return str
 end
 
-return tolua
+return setmetatable({}, {
+	__call = function(self, ...)
+		return tolua(...)
+	end,
+	__index = {
+		-- the function itself
+		tolua = tolua,
+		-- escaping a Lua string for load() to use
+		escapeString = escapeString,
+		-- returns 'true' if the key passed is a valid Lua variable string, 'false' otherwise
+		isVarName = isVarName,
+	}
+})
