@@ -199,6 +199,10 @@ local defaultSerializeForType = {
 	end,
 }
 
+local defaultSerializeMetatableFunc = function(state, m, x, tab)
+	return toLuaRecurse(state, m, tab..state.indentChar)
+end
+
 toLuaRecurse = function(state, x, tab, path, keyRef)
 	if not tab then tab = '' end
 	
@@ -222,7 +226,14 @@ toLuaRecurse = function(state, x, tab, path, keyRef)
 	if state.serializeMetatables then
 		local m = getmetatable(x)
 		if m then
-			result = 'setmetatable('..result..', '..toLuaRecurse(state, m, tab..state.indentChar)..')'
+			local serializeMetatableFunc = state.serializeMetatableFunc or defaultSerializeMetatableFunc
+			local mstr = serializeMetatableFunc(state, m, x, tab)
+			-- make sure you get something
+			assert(mstr ~= nil)
+			-- but if that something is nil, i.e. setmetatable(something newly created with a nil metatable, nil), then don't bother modifing the code
+			if mstr ~= 'nil' then
+				result = 'setmetatable('..result..', '..mstr..')'
+			end
 		end
 	end
 	
@@ -245,6 +256,7 @@ local function tolua(x, args)
 		end
 		state.serializeForType = args.serializeForType 
 		state.serializeMetatables = args.serializeMetatables
+		state.serializeMetatableFunc = args.serializeMetatableFunc
 	end	
 	
 	local str = toLuaRecurse(state, x, nil, '')
@@ -272,5 +284,7 @@ return setmetatable({}, {
 		isVarName = isVarName,
 		-- table of default serialization functions indexed by each time
 		defaultSerializeForType = defaultSerializeForType,
+		-- default metatable serialization function
+		defaultSerializeMetatableFunc = defaultSerializeMetatableFunc,
 	}
 })
