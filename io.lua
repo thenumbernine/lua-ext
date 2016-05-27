@@ -64,4 +64,20 @@ function io.getfileext(fn)
 	return fn:match('^(.*)%.([^%.]-)$')
 end
 
+-- TODO you could work around this for directories: 
+-- f:read(1) for 5.1,jit,5.2,5.3 returns nil, 'Is a directory', 21
+function io.isdir(fn)
+	local f = io.open(fn,'rb')
+	if not f then return false end
+	local result, reason, errcode = f:read(1)
+	f:close()
+	if result == nil
+	and reason == 'Is a directory'
+	and errcode == 21
+	then
+		return true
+	end
+	return false
+end
+
 return io

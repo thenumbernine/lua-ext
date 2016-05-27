@@ -108,25 +108,13 @@ filemeta = {
 --			if not ffi then
 				-- if no lfs then no nested read dereferences
 				-- and let directories error
-				-- TODO you could work around this for directories: 
-				-- f:read(1) for 5.1,jit,5.2,5.3 returns nil, 'Is a directory', 21
-				local f = io.open(fn,'rb')
-				if not f then return nil end
-				local result, reason, errcode = f:read(1)
-				if result == nil
-				and reason == 'Is a directory'
-				and errcode == 21 
-				then
-					f:close()
+				if io.isdir(fn) then
 					-- is a directory
 					return setmetatable({
 						path = fn,
 					}, filemeta)
 				else
-					f:seek('set')
-					local d = f:read('*a')
-					f:close()
-					return d
+					return io.readfile(fn)
 				end
 --[[
 			else
