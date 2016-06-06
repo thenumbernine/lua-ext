@@ -107,11 +107,19 @@ local functionMeta = {
 		-- takes a function that returns an object
 		--  returns a function that returns that object's __index to the key argument 
 		-- so if f() = {a=1} then f:index'a'() == 1
-		index = function(f, k) return function(...) return f(...)[k] end end,
+		index = function(f, k)
+			return function(...)
+				return f(...)[k]
+			end
+		end,
 		-- takes a function that returns an object
 		--  returns a function that applies that object's __newindex to the key and value arguments
 		-- so if t={} and f()==t then f:assign('a',1)() assigns t.a==1
-		assign = function(f, k, v) return function(...) f(...)[k] = v end end,
+		assign = function(f, k, v)
+			return function(...)
+				f(...)[k] = v
+			end
+		end,
 		compose = function(...)	-- equivalent of lisp's "mapcar"
 			local funcs = {...}
 			local funcsn = select('#', ...)
@@ -129,10 +137,15 @@ local functionMeta = {
 		-- bind / partial apply -- currying first args, and allowing vararg rest of args
 		bind = function(f, ...)
 			local args = {...}
+			local argn = select('#', ...)
 			return function(...)
-				local callargs = {table.unpack(args)}
-				for _,v in ipairs{...} do table.insert(callargs, v) end
-				return f(table.unpack(callargs))
+				local n = argn
+				local callargs = {table.unpack(args, 1, n)}
+				for i=1,select('#', ...) do
+					n=n+1
+					callargs[n] = select(i, ...)
+				end
+				return f(table.unpack(callargs, 1, n))
 			end
 		end,
 		-- swaps the next two arguments
