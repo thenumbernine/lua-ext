@@ -47,9 +47,15 @@ filemeta = {
 				--	local filestr = io.readproc('dir "'..t.path..'"')
 				--	error('you are here: '..filestr)
 				-- if 'ls' exists ...
-				local cmd = 'ls '..t.path:gsub('[|&;<>`\"\' \t\r\n#~=%$%(%)%%%[%*%?]', [[\%0]])
-				local filestr = io.readproc(cmd)
+				
 				local string = require 'ext.string'
+				local cmd
+				if _G.ffi and _G.ffi.os == 'Windows' then
+					cmd = 'dir /b "'..t.path:gsub('/','\\')..'"'
+				else
+					cmd = 'ls '..t.path:gsub('[|&;<>`\"\' \t\r\n#~=%$%(%)%%%[%*%?]', [[\%0]])
+				end
+				local filestr = io.readproc(cmd)
 				fns = string.split(filestr, '\n')
 				assert(fns:remove() == '')
 --[[
