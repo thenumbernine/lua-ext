@@ -45,22 +45,8 @@ function math.round(x)
 	return math.floor(x+.5)
 end
 
-function math.cosh(x)
-	return (math.exp(x) + math.exp(-x)) / 2
-end
-
-function math.sinh(x)
-	return (math.exp(x) - math.exp(-x)) / 2
-end
-
-function math.tanh(x)
-	local ep = math.exp(x)
-	local en = math.exp(-x)
-	return (ep - en) / (ep + en)
-end
-
-function math.isfinite(x)
-	return x ~= math.huge and x ~= -math.huge and x == x
-end
+function math.isnan(x) return x ~= x end
+function math.isinf(x) return x == math.huge or x == -math.huge end
+function math.isfinite(x) return not math.isnan(x) and not math.isinf(x) end
 
 return math
