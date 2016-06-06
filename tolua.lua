@@ -44,16 +44,6 @@ end)()
 
 local table = require 'ext.table'
 
-local function maxn(t)
-	local max = 0
-	for k,v in pairs(t) do
-		if type(k) == 'number' then
-			max = math.max(max, k)
-		end
-	end
-	return max
-end
-
 local function escapeString(s)
 	return ('%q'):format(s):gsub('\\\n','\\n')
 end
@@ -141,7 +131,7 @@ local defaultSerializeForType = {
 			state.touchedTables[x] = 'root'..path
 			
 			-- prelim see if we can write it as an indexed table
-			local numx = maxn(x)
+			local numx = table.maxn(x)
 			local intNilKeys, intNonNilKeys = 0, 0				
 			for i=1,numx do
 				if x[i] == nil then

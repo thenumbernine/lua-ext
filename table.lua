@@ -227,6 +227,16 @@ function table.sub(t,i,j)
 	return res
 end
 
+function table.maxn(t)
+	local max = 0
+	for k,v in pairs(t) do
+		if type(k) == 'number' then
+			max = math.max(max, k)
+		end
+	end
+	return max
+end
+
 -- in-place sort is fine, but it returns nothing.  for kicks I'd like to chain methods
 local oldsort = require 'table'.sort
 function table:sort(...)

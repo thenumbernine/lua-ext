@@ -114,13 +114,16 @@ local functionMeta = {
 		assign = function(f, k, v) return function(...) f(...)[k] = v end end,
 		compose = function(...)	-- equivalent of lisp's "mapcar"
 			local funcs = {...}
-			for _,f in ipairs(funcs) do assert(type(f) == 'function') end
+			local funcsn = select('#', ...)
+			for i=1,funcsn do
+				assert(type(funcs[i]) == 'function')
+			end
 			return function(...)
 				local args = {...}
-				for i=#funcs,1,-1 do
-					args = {funcs[i](table.unpack(args))}
+				for i=funcsn,1,-1 do
+					args = {funcs[i](table.unpack(args,1,table.maxn(args)))}
 				end
-				return table.unpack(args)
+				return table.unpack(args,1,table.maxn(args))
 			end
 		end,
 		-- bind / partial apply -- currying first args, and allowing vararg rest of args
