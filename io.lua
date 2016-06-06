@@ -24,10 +24,16 @@ local io = {}
 for k,v in pairs(require 'io') do io[k] = v end
 
 function io.fileexists(fn)
-	local f, err = io.open(fn, 'r')
-	if not f then return false, err end
-	f:close()
-	return true
+	-- TODO a better windows detect
+	if ffi and ffi.os == 'Windows' then
+		return 'yes' == io.readproc('if exist "'..fn:gsub('/','\\')..'" (echo yes) else (echo no)'):trim()
+	else
+		-- here's a version that works for OSX ...
+		local f, err = io.open(fn, 'r')
+		if not f then return false, err end
+		f:close()
+		return true
+	end
 end
 
 function io.readfile(fn)
@@ -64,20 +70,25 @@ function io.getfileext(fn)
 	return fn:match('^(.*)%.([^%.]-)$')
 end
 
--- TODO you could work around this for directories: 
--- f:read(1) for 5.1,jit,5.2,5.3 returns nil, 'Is a directory', 21
 function io.isdir(fn)
-	local f = io.open(fn,'rb')
-	if not f then return false end
-	local result, reason, errcode = f:read(1)
-	f:close()
-	if result == nil
-	and reason == 'Is a directory'
-	and errcode == 21
-	then
-		return true
+	if ffi and ffi.os == 'Windows' then
+		return 'yes' == io.readproc('if exist "'..fn:gsub('/','\\')..'\\*" (echo yes) else (echo no)'):trim()
+	else
+		-- for OSX:
+		-- TODO you could work around this for directories: 
+		-- f:read(1) for 5.1,jit,5.2,5.3 returns nil, 'Is a directory', 21
+		local f = io.open(fn,'rb')
+		if not f then return false end
+		local result, reason, errcode = f:read(1)
+		f:close()
+		if result == nil
+		and reason == 'Is a directory'
+		and errcode == 21
+		then
+			return true
+		end
+		return false
 	end
-	return false
 end
 
 return io
