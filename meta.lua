@@ -150,7 +150,9 @@ local functionMeta = {
 				return f(table.unpack(callargs, 1, n))
 			end
 		end,
-		-- take a number of arguments, apply them individually to each function returned
+		-- Takes a function and a number of arguments,
+		-- returns a function that applies them individually,
+		-- first to the function, then to each function returned
 		unravel = function(f, n)
 			return function(...)
 				local s = f
