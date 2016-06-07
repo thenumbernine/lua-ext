@@ -120,7 +120,7 @@ local functionMeta = {
 				f(...)[k] = v
 			end
 		end,
-		compose = function(...)	-- equivalent of lisp's "mapcar"
+		compose = function(...)	
 			local funcs = {...}
 			local funcsn = select('#', ...)
 			for i=1,funcsn do
@@ -128,10 +128,12 @@ local functionMeta = {
 			end
 			return function(...)
 				local args = {...}
+				local argn = select('#', ...)
 				for i=funcsn,1,-1 do
-					args = {funcs[i](table.unpack(args,1,table.maxn(args)))}
+					args = {funcs[i](table.unpack(args,1,argn))}
+					argn = table.maxn(args)
 				end
-				return table.unpack(args,1,table.maxn(args))
+				return table.unpack(args,1,argn)
 			end
 		end,
 		-- bind / partial apply -- currying first args, and allowing vararg rest of args
@@ -146,6 +148,16 @@ local functionMeta = {
 					callargs[n] = select(i, ...)
 				end
 				return f(table.unpack(callargs, 1, n))
+			end
+		end,
+		-- take a number of arguments, apply them individually to each function returned
+		unravel = function(f, n)
+			return function(...)
+				local s = f
+				for i=1,n do
+					s = s(select(i, ...))
+				end
+				return s
 			end
 		end,
 		-- swaps the next two arguments
