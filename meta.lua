@@ -48,15 +48,26 @@ debug.setmetatable(0, {__index = require 'ext.math'})
 getmetatable('').__concat = defaultConcat	
 getmetatable('').__index = require 'ext.string'
 
+-- It'd be fun if I could apply the operator to all return values, and not just the first ...
+-- like (function() return 1,2 end + function() return 3,4 end)() returns 4,6
 local function combineFunctionsWithBinaryOperator(f, g, op)
 	if type(f) == 'function' and type(g) == 'function' then
-		return function(...) return op(f(...), g(...)) end
+		return function(...)
+			return op(f(...), g(...))
+		end
 	elseif type(f) == 'function' then
-		return function(...) return op(f(...), g) end
+		return function(...)
+			return op(f(...), g)
+		end
 	elseif type(g) == 'function' then
-		return function(...) return op(f, g(...)) end
+		return function(...)
+			return op(f, g(...))
+		end
 	else
-		return function() return op(f, g) end	-- shouldn't get called unless __add is called explicitly
+		-- shouldn't get called unless __add is called explicitly
+		return function()
+			return op(f, g)
+		end
 	end
 end
 
