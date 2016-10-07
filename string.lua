@@ -82,23 +82,39 @@ function string.hexdump(d, l, w, c)
 	if not l or l < 1 then l = 32 end
 	if not w or w < 1 then w = 1 end
 	if not c or c < 1 then c = 8 end
-	local s = {}
+	local table = require 'ext.table'
+	local s = table()
+	local rhs = table()
 	local col = 0
 	for i=1,#d,w do
-		if i % l == 1 then table.insert(s, string.format('%.8x ', (i-1))) col = 1 end
-		table.insert(s, ' ')
+		if i % l == 1 then 
+			s:insert(string.format('%.8x ', (i-1))) 
+			rhs = table()
+			col = 1 
+		end
+		s:insert' '
 		for j=w,1,-1 do
 			local e = i+j-1
 			local sub = d:sub(e,e)
 			if #sub > 0 then
-				table.insert(s, string.format('%.2x', string.byte(sub)))
+				local b = string.byte(sub)
+				s:insert(string.format('%.2x', b))
+				rhs:insert(b >= 32 and sub or '.')
 			end
 		end
-		if col % c == 0 then table.insert(s, ' ') end
-		if (i + w - 1) % l == 0 then table.insert(s, '\n') end
+		if col % c == 0 then 
+			s:insert' ' 
+		end
+		if (i + w - 1) % l == 0 or i+w>#d then 
+			s:insert' '
+			s:insert(rhs:concat())
+		end
+		if (i + w - 1) % l == 0 then 
+			s:insert'\n'
+		end
 		col = col + 1
 	end
-	return table.concat(s)
+	return s:concat()
 end
 
 return string

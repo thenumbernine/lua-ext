@@ -71,7 +71,10 @@ function io.getfileext(fn)
 end
 
 function io.isdir(fn)
-	if ffi and ffi.os == 'Windows' then
+	if (ffi and ffi.os == 'Windows')
+	-- TODO only detect this once
+	or io.popen'uname':read'*l' == 'MSYS_NT-10.0'
+	then
 		return 'yes' == io.readproc('if exist "'..fn:gsub('/','\\')..'\\*" (echo yes) else (echo no)'):trim()
 	else
 		-- for OSX:
