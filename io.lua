@@ -20,6 +20,8 @@
 	THE SOFTWARE.
 --]]
 
+local string = require 'ext.string'
+
 local io = {}
 for k,v in pairs(require 'io') do io[k] = v end
 
@@ -75,7 +77,12 @@ function io.isdir(fn)
 	-- TODO only detect this once
 	or io.popen'uname':read'*l' == 'MSYS_NT-10.0'
 	then
-		return 'yes' == io.readproc('if exist "'..fn:gsub('/','\\')..'\\*" (echo yes) else (echo no)'):trim()
+		return 'yes' == 
+			string.trim(io.readproc(
+				'if exist "'
+				..fn:gsub('/','\\')
+				..'\\*" (echo yes) else (echo no)'
+			))
 	else
 		-- for OSX:
 		-- TODO you could work around this for directories: 
