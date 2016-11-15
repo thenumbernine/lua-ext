@@ -32,4 +32,6 @@ return function(env)
 	env.reload = require 'ext.reload'
 	env.range = require 'ext.range'
 	env._ = os.execute
+	env.gcnew = require 'ext.gcmem'.new
+	env.gcfree = require 'ext.gcmem'.free
 end

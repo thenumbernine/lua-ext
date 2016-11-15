@@ -114,18 +114,22 @@ local defaultSerializeForType = {
 		-- TODO override for specific metatables?  as I'm doing for types?
 		
 		if state.touchedTables[x] then
-			result = false	-- false is used internally and means recursive reference
-			state.wrapWithFunction = true
-			
-			-- we're serializing *something*
-			-- is it a value?  if so, use the 'path' to dereference the key
-			-- is it a key?  if so the what's the value ..
-			-- do we have to add an entry for both?
-			-- maybe the caller should be responsible for populating this table ...
-			if keyRef then
-				state.recursiveReferences:insert('root'..path..'['..state.touchedTables[x]..'] = error("can\'t handle recursive references in keys")')
-			else 
-				state.recursiveReferences:insert('root'..path..' = '..state.touchedTables[x])
+			if state.skipRecursiveReferences then
+				result = 'error("recursive reference")'
+			else
+				result = false	-- false is used internally and means recursive reference
+				state.wrapWithFunction = true
+				
+				-- we're serializing *something*
+				-- is it a value?  if so, use the 'path' to dereference the key
+				-- is it a key?  if so the what's the value ..
+				-- do we have to add an entry for both?
+				-- maybe the caller should be responsible for populating this table ...
+				if keyRef then
+					state.recursiveReferences:insert('root'..path..'['..state.touchedTables[x]..'] = error("can\'t handle recursive references in keys")')
+				else 
+					state.recursiveReferences:insert('root'..path..' = '..state.touchedTables[x])
+				end
 			end
 		else
 			state.touchedTables[x] = 'root'..path
@@ -247,6 +251,7 @@ local function tolua(x, args)
 		state.serializeForType = args.serializeForType 
 		state.serializeMetatables = args.serializeMetatables
 		state.serializeMetatableFunc = args.serializeMetatableFunc
+		state.skipRecursiveReferences = args.skipRecursiveReferences 
 	end	
 	
 	local str = toLuaRecurse(state, x, nil, '')
