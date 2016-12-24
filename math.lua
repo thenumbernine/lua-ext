@@ -47,6 +47,6 @@ end
 
 function math.isnan(x) return x ~= x end
 function math.isinf(x) return x == math.huge or x == -math.huge end
-function math.isfinite(x) return not math.isnan(x) and not math.isinf(x) end
+function math.isfinite(x) return tonumber(x) and not math.isnan(x) and not math.isinf(x) end
 
 return math
