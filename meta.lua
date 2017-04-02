@@ -48,25 +48,47 @@ numbermeta = {
 --[[ tostring machine precision of arbitrary base
 	base = 10,
 	maxdigits = 50,
-	__tostring = function(t)
-		local base = numbermeta.base
-		local i = math.floor(math.log(t,base))+1
-		t = t / base^i
+	__tostring = function(t,base)
 		local s = {}
-		local dot
-		while true do
-			t = t * base
-			local last = math.floor(t)
-			table.insert(s, last)
-			t = t - last	
-			i = i - 1
-			if i < 1 then 
-				if not dot then
-					dot = true
-					table.insert(s, '.')
+		if t < 0 then 
+			t = -t 
+			table.insert(s, '-')
+		end
+		if t == 0 then 
+			table.insert(s, '0.')
+		else
+			--print('t',t)
+			if not base then base = numbermeta.base end
+			--print('base',base)
+			local i = math.floor(math.log(t,base))+1
+			if i == math.huge then error'infinite number of digits' end
+			--print('i',i)	
+			t = t / base^i
+			--print('t',t)
+			local dot
+			while true do
+				if i < 1 then 
+					if not dot then
+						dot = true
+						table.insert(s, '.')
+						table.insert(s, ('0'):rep(-i))
+					end
+					if t == 0 then break end
+					if i <= -numbermeta.maxdigits then break end
+				end		
+				t = t * base
+				local last = math.floor(t)
+				t = t - last
+				if last >= 0 and last < 10 then
+					last = string.char(('0'):byte() + last)
+				elseif last >= 10 and last < 10+26 then
+					last = string.char(('a'):byte() + last-10)
+				else
+					last = '?'
 				end
-				if t == 0 then break end
-				if i < -numbermeta.maxdigits then break end
+				table.insert(s, last)
+				i = i - 1
+				--print('t',t,'i',i,'last',last)	
 			end
 		end
 		return table.concat(s)
