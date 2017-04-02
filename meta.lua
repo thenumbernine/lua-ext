@@ -46,6 +46,8 @@ local numbermeta
 numbermeta = {
 	__index = require 'ext.math',
 --[[ tostring machine precision of arbitrary base
+	base = 10,
+	maxdigits = 50,
 	__tostring = function(t)
 		local base = numbermeta.base
 		local i = math.floor(math.log(t,base))+1
@@ -57,15 +59,14 @@ numbermeta = {
 			local last = math.floor(t)
 			table.insert(s, last)
 			t = t - last	
-			i=i-1
+			i = i - 1
 			if i < 1 then 
 				if not dot then
 					dot = true
 					table.insert(s, '.')
 				end
-				if t == 0 then 
-					break 
-				end
+				if t == 0 then break end
+				if i < -numbermeta.maxdigits then break end
 			end
 		end
 		return table.concat(s)
