@@ -42,7 +42,37 @@ debug.setmetatable(true, {
 })
 
 -- numbers
-debug.setmetatable(0, {__index = require 'ext.math'})	
+local numbermeta
+numbermeta = {
+	__index = require 'ext.math',
+--[[ tostring machine precision of arbitrary base
+	__tostring = function(t)
+		local base = numbermeta.base
+		local i = math.floor(math.log(t,base))+1
+		t = t / base^i
+		local s = {}
+		local dot
+		while true do
+			t = t * base
+			local last = math.floor(t)
+			table.insert(s, last)
+			t = t - last	
+			i=i-1
+			if i < 1 then 
+				if not dot then
+					dot = true
+					table.insert(s, '.')
+				end
+				if t == 0 then 
+					break 
+				end
+			end
+		end
+		return table.concat(s)
+	end,
+--]]
+}
+debug.setmetatable(0, numbermeta)	
 
 -- strings
 getmetatable('').__concat = defaultConcat	
@@ -85,16 +115,7 @@ local functionMeta = {
 	-- I could make this a function composition like the rest of the meta operations, 
 	-- but instead I'm going to have it follow the default __concat convention I have with other primitive types
 	__concat = defaultConcat,
-	__tostring = function(f)
-		assert(type(f) == 'function')
-		local m = debug.getmetatable(f)
-		debug.setmetatable(f, nil)
-		local s = tostring(f)
-		debug.setmetatable(f, m)
-		local result, str = pcall(string.dump, f)
-		if result then s = s .. ' ' .. str end
-		return s
-	end,
+	dump = function(f) return string.dump(f) end,
 	__add = function(f, g) return combineFunctionsWithBinaryOperator(f, g, add) end,
 	__sub = function(f, g) return combineFunctionsWithBinaryOperator(f, g, sub) end,
 	__mul = function(f, g) return combineFunctionsWithBinaryOperator(f, g, mul) end,
@@ -190,4 +211,3 @@ functionMeta.__index.o = functionMeta.__index.compose
 debug.setmetatable(function() end, functionMeta)
 
 -- TODO lightuserdata, if you can create it within lua somehow ...
-
