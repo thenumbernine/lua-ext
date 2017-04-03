@@ -26,6 +26,7 @@ return function(env)
 	env.table = require 'ext.table'
 	env.string = require 'ext.string'
 	env.io = require 'ext.io'
+	env.os = require 'ext.os'
 	env.file = require 'ext.file'
 	env.tolua = require 'ext.tolua'
 	env.class = require 'ext.class'
