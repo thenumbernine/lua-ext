@@ -42,59 +42,79 @@ debug.setmetatable(true, {
 })
 
 -- numbers
-local numbermeta
-numbermeta = {
-	__index = require 'ext.math',
+local numbermeta = {__index = require 'ext.math'}
 --[[ tostring machine precision of arbitrary base
-	base = 10,
-	maxdigits = 50,
-	__tostring = function(t,base)
-		local s = {}
-		if t < 0 then 
-			t = -t 
-			table.insert(s, '-')
-		end
-		if t == 0 then 
-			table.insert(s, '0.')
-		else
-			--print('t',t)
-			if not base then base = numbermeta.base end
-			--print('base',base)
-			local i = math.floor(math.log(t,base))+1
-			if i == math.huge then error'infinite number of digits' end
-			--print('i',i)	
-			t = t / base^i
-			--print('t',t)
-			local dot
-			while true do
-				if i < 1 then 
-					if not dot then
-						dot = true
-						table.insert(s, '.')
-						table.insert(s, ('0'):rep(-i))
-					end
-					if t == 0 then break end
-					if i <= -numbermeta.maxdigits then break end
-				end		
-				t = t * base
-				local last = math.floor(t)
-				t = t - last
-				if last >= 0 and last < 10 then
-					last = string.char(('0'):byte() + last)
-				elseif last >= 10 and last < 10+26 then
-					last = string.char(('a'):byte() + last-10)
-				else
-					last = '?'
-				end
-				table.insert(s, last)
-				i = i - 1
-				--print('t',t,'i',i,'last',last)	
+local alphabets = {
+	{('0'):byte(), ('9'):byte()},	-- latin numbers
+	{('a'):byte(), ('z'):byte()},	-- english
+	{0x3b1, 0x3c9},	-- greek
+	{0x430, 0x45f},	-- cyrillic
+	{0x561, 0x586},	-- armenian
+	{0x905, 0x939},	-- devanagari
+	{0x2f00, 0x2fd5},	-- kangxi
+	{0x3041, 0x3096},	-- hiragana
+	{0x30a1, 0x30fa},	-- katakana
+	{0x4e00, 0x9fd0},	-- chinese, japanese, korean characters
+}
+
+local hasutf8, utf8 = pcall(require, 'utf8')
+local function charfor(last)
+	for _,alphabet in ipairs(alphabets) do
+		local start,fin = table.unpack(alphabet)
+		if last <= fin-start then
+			last = last + start
+			if hasutf8 then
+				return utf8.char(last)
+			else
+				return string.char(last)
 			end
 		end
-		return table.concat(s)
-	end,
+		last = last - (fin - start + 1)
+	end
+	error 'you need more alphabets to represent that many digits'
+end
+
+numbermeta.base = 10
+numbermeta.maxdigits = 50
+numbermeta.__tostring = function(t,base)
+	local s = {}
+	if t < 0 then 
+		t = -t 
+		table.insert(s, '-')
+	end
+	if t == 0 then 
+		table.insert(s, '0.')
+	else
+		--print('t',t)
+		if not base then base = numbermeta.base end
+		--print('base',base)
+		local i = math.floor(math.log(t,base))+1
+		if i == math.huge then error'infinite number of digits' end
+		--print('i',i)	
+		t = t / base^i
+		--print('t',t)
+		local dot
+		while true do
+			if i < 1 then 
+				if not dot then
+					dot = true
+					table.insert(s, '.')
+					table.insert(s, ('0'):rep(-i))
+				end
+				if t == 0 then break end
+				if i <= -numbermeta.maxdigits then break end
+			end		
+			t = t * base
+			local last = math.floor(t)
+			t = t - last
+			table.insert(s, charfor(last))
+			i = i - 1
+			--print('t',t,'i',i,'last',last)	
+		end
+	end
+	return table.concat(s)
+end
 --]]
-}
 debug.setmetatable(0, numbermeta)	
 
 -- strings
