@@ -43,7 +43,8 @@ debug.setmetatable(true, {
 
 -- numbers
 local numbermeta = {__index = require 'ext.math'}
---[[ tostring machine precision of arbitrary base
+
+-- [[ tostring machine precision of arbitrary base
 local alphabets = {
 	{('0'):byte(), ('9'):byte()},	-- latin numbers
 	{('a'):byte(), ('z'):byte()},	-- english
@@ -58,25 +59,27 @@ local alphabets = {
 }
 
 local hasutf8, utf8 = pcall(require, 'utf8')
-local function charfor(last)
+local function charfor(digit)
 	for _,alphabet in ipairs(alphabets) do
 		local start,fin = table.unpack(alphabet)
-		if last <= fin-start then
-			last = last + start
+		if digit <= fin - start then
+			digit = digit + start
 			if hasutf8 then
-				return utf8.char(last)
+				return utf8.char(digit)
 			else
-				return string.char(last)
+				return string.char(digit)
 			end
 		end
-		last = last - (fin - start + 1)
+		digit = digit - (fin - start + 1)
 	end
 	error 'you need more alphabets to represent that many digits'
 end
 
 numbermeta.base = 10
 numbermeta.maxdigits = 50
-numbermeta.__tostring = function(t,base)
+-- I'm not going to set this as __tostring by default, but I will leave it as part of the meta
+-- feel free to use it with a line something like (function(m)m.__tostring=m.tostring end)(debug.getmetatable(0))
+numbermeta.tostring = function(t,base)
 	local s = {}
 	if t < 0 then 
 		t = -t 
@@ -105,11 +108,12 @@ numbermeta.__tostring = function(t,base)
 				if i <= -numbermeta.maxdigits then break end
 			end		
 			t = t * base
-			local last = math.floor(t)
-			t = t - last
-			table.insert(s, charfor(last))
+			local digit = math.floor(t)
+			-- at this point 'digit' holds an integer value in [0,base)
+			t = t - digit
+			table.insert(s, charfor(digit))
 			i = i - 1
-			--print('t',t,'i',i,'last',last)	
+			--print('t',t,'i',i,'digit',digit)	
 		end
 	end
 	return table.concat(s)
