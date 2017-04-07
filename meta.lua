@@ -109,8 +109,19 @@ numbermeta.tostring = function(t,base)
 			end		
 			t = t * base
 			local digit = math.floor(t)
-			-- at this point 'digit' holds an integer value in [0,base)
 			t = t - digit
+			-- at this point 'digit' holds an integer value in [0,base)
+			-- there's two ways we can go about it:
+			-- 1) traditionally, where each digit represents an integer, times some base^i for some i
+			--	in this case, for fractional bases, the last (fraction) digit is only considered up to the fraction
+			--  i.e. in base 2.5, from 0b..1b we have the span of 1, partitioned by digits 0.1b at 2/5ths the distance, 0.2b at 4/5ths the distance, and 1.0 and 5/5ths the distance
+			-- 		from 1b..2b we have the same span,
+			--		and from 2b..10b we have half that span, from 2 to 2.5
+			--		therefore the value 2.2b would represent 2.8, which is also represetned by 10.0112210002002002...
+			-- so as long as the span between digits can represent fractions of base^i rather than whole base^i's
+			--	we can have multiple representations of numbers
+			-- 2) stretched.  in this case a fractional span, such as from 2b to 10b in base 2.5, would be stretched 
+			-- 		this is harder to convey when descibing the number system
 			table.insert(s, charfor(digit))
 			i = i - 1
 			--print('t',t,'i',i,'digit',digit)	
