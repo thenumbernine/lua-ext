@@ -260,6 +260,9 @@ local functionMeta = {
 			end
 		end,
 		dump = string.dump,
+		-- coroutine access
+		wrap = coroutine.wrap,
+		co = coroutine.create,
 	}
 	--]]
 }
@@ -267,5 +270,12 @@ local functionMeta = {
 functionMeta.__index._ = functionMeta.__index.index 
 functionMeta.__index.o = functionMeta.__index.compose
 debug.setmetatable(function() end, functionMeta)
+
+-- coroutines
+do
+	local c = coroutine.create(function() end)
+	debug.setmetatable(c, {__index = coroutine})
+	c:resume()	-- and now it's dead
+end
 
 -- TODO lightuserdata, if you can create it within lua somehow ...
