@@ -21,6 +21,9 @@
 --]]
 
 local table = require 'ext.table'
+local string = require 'ext.string'
+local math = require 'ext.math'
+local coroutine = require 'ext.coroutine'
 
 -- fix up lua type metatables
 
@@ -42,7 +45,7 @@ debug.setmetatable(true, {
 })
 
 -- numbers
-local numbermeta = {__index = require 'ext.math'}
+local numbermeta = {__index = math}
 
 -- [[ tostring machine precision of arbitrary base
 local alphabets = {
@@ -134,7 +137,7 @@ debug.setmetatable(0, numbermeta)
 
 -- strings
 getmetatable('').__concat = defaultConcat	
-getmetatable('').__index = require 'ext.string'
+getmetatable('').__index = string
 
 -- It'd be fun if I could apply the operator to all return values, and not just the first ...
 -- like (function() return 1,2 end + function() return 3,4 end)() returns 4,6
@@ -273,9 +276,11 @@ debug.setmetatable(function() end, functionMeta)
 
 -- coroutines
 do
+	-- make a temp thread to se its metatable
 	local c = coroutine.create(function() end)
 	debug.setmetatable(c, {__index = coroutine})
-	c:resume()	-- and now it's dead
+	c:resume()
+	-- and now it's dead
 end
 
 -- TODO lightuserdata, if you can create it within lua somehow ...

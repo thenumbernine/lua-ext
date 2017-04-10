@@ -25,6 +25,7 @@ return function(env)
 	env.math = require 'ext.math'
 	env.table = require 'ext.table'
 	env.string = require 'ext.string'
+	env.coroutine = require 'ext.coroutine'
 	env.io = require 'ext.io'
 	env.os = require 'ext.os'
 	env.file = require 'ext.file'
