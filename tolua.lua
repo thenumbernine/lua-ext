@@ -83,22 +83,26 @@ local defaultSerializeForType = {
 			-- check the global object and one table deep 
 			-- todo maybe, check against a predefined set of functions?
 			if s == "unable to dump given function" then
+				local found
 				for k,v in pairs(_G) do
 					if v == x then
+						found = true
 						s = k
 						break
 					elseif type(v) == 'table' then
 						-- only one level deep ...
-						local done = false
 						for k2,v2 in pairs(v) do
 							if v2 == x then
 								s = k..'.'..k2
-								done = true
+								found = true
 								break
 							end
 						end
-						if done then break end
+						if found then break end
 					end
+				end
+				if not found then
+					s = "error('"..s.."')"
 				end
 			else
 				return "error('got a function I could neither dump nor lookup in the global namespace nor one level deep')"
