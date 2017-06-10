@@ -84,7 +84,7 @@ end
 -- this should really return the extension first.
 -- that is the function name, after all.
 function io.getfileext(fn)
-	return fn:match('^(.*)%.([^%.]-)$')
+	return fn:match('^(.*)%.([^%./]-)$')
 end
 
 function io.isdir(fn)
