@@ -82,7 +82,7 @@ numbermeta.base = 10
 numbermeta.maxdigits = 50
 -- I'm not going to set this as __tostring by default, but I will leave it as part of the meta
 -- feel free to use it with a line something like (function(m)m.__tostring=m.tostring end)(debug.getmetatable(0))
-numbermeta.tostring = function(t,base)
+numbermeta.__index.tostring = function(t,base)
 	local s = {}
 	if t < 0 then 
 		t = -t 
