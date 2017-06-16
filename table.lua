@@ -156,7 +156,7 @@ end
 function table:kvpairs()
 	local t = table()
 	for k,v in pairs(self) do
-		table.insert(t, {k=v})
+		table.insert(t, {[k]=v})
 	end
 	return t
 end
