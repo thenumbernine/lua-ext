@@ -153,11 +153,10 @@ function table:removeObject(...)
 	return table.unpack(removedKeys)
 end
 
--- I need to think of a better name for this... kvpairs() ?
-function table:kvmerge()
+function table:kvpairs()
 	local t = table()
 	for k,v in pairs(self) do
-		table.insert(t, {k,v})
+		table.insert(t, {k=v})
 	end
 	return t
 end

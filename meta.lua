@@ -82,7 +82,7 @@ numbermeta.base = 10
 numbermeta.maxdigits = 50
 -- I'm not going to set this as __tostring by default, but I will leave it as part of the meta
 -- feel free to use it with a line something like (function(m)m.__tostring=m.tostring end)(debug.getmetatable(0))
-numbermeta.__index.tostring = function(t,base)
+numbermeta.__index.tostring = function(t, base, maxdigits)
 	local s = {}
 	if t < 0 then 
 		t = -t 
@@ -93,6 +93,7 @@ numbermeta.__index.tostring = function(t,base)
 	else
 		--print('t',t)
 		if not base then base = numbermeta.base end
+		if not maxdigits then maxdigits = numbermeta.maxdigits end
 		--print('base',base)
 		local i = math.floor(math.log(t,base))+1
 		if i == math.huge then error'infinite number of digits' end
@@ -108,7 +109,7 @@ numbermeta.__index.tostring = function(t,base)
 					table.insert(s, ('0'):rep(-i))
 				end
 				if t == 0 then break end
-				if i <= -numbermeta.maxdigits then break end
+				if i <= -maxdigits then break end
 			end		
 			t = t * base
 			local digit = math.floor(t)
