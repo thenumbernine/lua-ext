@@ -187,6 +187,10 @@ function table:sum()
 	return table.combine(self, function(a,b) return a+b end)
 end
 
+function table:product()
+	return table.combine(self, function(a,b) return a*b end)
+end
+
 function table:last()
 	return self[#self]
 end
@@ -203,6 +207,22 @@ function table.sub(t,i,j)
 	end
 	setmetatable(res, table)
 	return res
+end
+
+function table.reverse(t)
+	local r = table()
+	for i=#t,1,-1 do
+		r:insert(t[i])
+	end
+	return r
+end
+
+function table.rep(t,n)
+	local c = table()
+	for i=1,n do
+		c:append(t)
+	end
+	return c
 end
 
 function table.maxn(t)

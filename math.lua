@@ -27,4 +27,45 @@ function math.isnan(x) return x ~= x end
 function math.isinf(x) return x == math.huge or x == -math.huge end
 function math.isfinite(x) return tonumber(x) and not math.isnan(x) and not math.isinf(x) end
 
+function math.isprime(n)
+	if n < 2 then return false end	-- 1 isnt prime
+	for i=2,math.floor(math.sqrt(n)) do
+		if n%i == 0 then
+			return false
+		end
+	end
+	return true
+end
+
+function math.factors(n)
+	local f = table()
+	for i=1,n do
+		if n%i == 0 then 
+			f:insert(i)
+		end
+	end
+	return f
+end
+
+-- returns a table containing the prime factorization of the number
+function math.primeFactorization(n)
+	local f = table()
+	while n > 1 do
+		local found = false
+		for i=2,math.floor(math.sqrt(n)) do
+			if n%i == 0 then
+				n = n/i
+				f:insert(i)
+				found = true
+				break
+			end
+		end
+		if not found then
+			f:insert(n)
+			break
+		end
+	end
+	return f
+end
+
 return math
