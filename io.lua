@@ -78,7 +78,10 @@ function io.isdir(fn)
 		if ffi then
 			windows = ffi.os == 'Windows'
 		else
-			windows = io.popen'uname':read'*l' == 'MSYS_NT-10.0'
+			windows = ({
+				msys = true,
+				ming = true,
+			})[io.popen'uname':read'*l':sub(1,4):lower()]
 		end
 		if windows then
 			return 'yes' == 
