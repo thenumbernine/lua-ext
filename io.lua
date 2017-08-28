@@ -17,17 +17,10 @@ function io.fileexists(fn)
 	if lfs then
 		return lfs.attributes(fn) ~= nil
 	else
-		local ffi = ffi()
-		-- TODO a better windows detect
-		if ffi and ffi.os == 'Windows' then
-			return 'yes' == io.readproc('if exist "'..fn:gsub('/','\\')..'" (echo yes) else (echo no)'):trim()
-		else
-			-- here's a version that works for OSX ...
-			local f, err = io.open(fn, 'r')
-			if not f then return false, err end
-			f:close()
-			return true
-		end
+		local f, err = io.open(fn, 'r')
+		if not f then return false, err end
+		f:close()
+		return true
 	end
 end
 
