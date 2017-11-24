@@ -28,7 +28,7 @@ end
 
 -- returns 'true' if k is a valid variable name
 local function isVarName(k)
-	return type(k) == 'string' and k:match('^[_,a-z,A-Z][_,a-z,A-Z,0-9]*$')
+	return type(k) == 'string' and k:match('^[_a-zA-Z][_a-zA-Z0-9]*$')
 end
 
 local toLuaRecurse
