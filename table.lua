@@ -197,7 +197,6 @@ end
 
 -- just like string subset
 function table.sub(t,i,j)
-	j = j or #t
 	if i < 0 then 
 		if j == nil then
 			i = math.max(1, #t + i + 1)
@@ -205,6 +204,7 @@ function table.sub(t,i,j)
 			i = 1
 		end
 	end
+	j = j or #t
 	local res = {}
 	for k=i,j do
 		res[k-i+1] = t[k]
