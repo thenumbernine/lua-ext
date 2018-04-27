@@ -199,7 +199,11 @@ end
 function table.sub(t,i,j)
 	j = j or #t
 	if i < 0 then 
-		i = math.max(1, #t + i + 1)
+		if j == nil then
+			i = math.max(1, #t + i + 1)
+		else
+			i = 1
+		end
 	end
 	local res = {}
 	for k=i,j do
