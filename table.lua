@@ -202,10 +202,10 @@ function table.sub(t,i,j)
 			i = math.max(1, #t + i + 1)
 		else
 			i = 1
-			j = math.min(j, #t)
 		end
 	end
 	j = j or #t
+	j = math.min(j, #t)
 	local res = {}
 	for k=i,j do
 		res[k-i+1] = t[k]
