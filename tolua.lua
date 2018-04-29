@@ -250,16 +250,18 @@ local function tolua(x, args)
 		recursiveReferences = table(),
 		touchedTables = {},
 	}
+	local indent = true
 	if args then
-		if args.indent ~= false then
-			state.indentChar = '\t'
-			state.newlineChar = '\n'
-		end
+		if args.indent == false then indent = false end
 		state.serializeForType = args.serializeForType 
 		state.serializeMetatables = args.serializeMetatables
 		state.serializeMetatableFunc = args.serializeMetatableFunc
 		state.skipRecursiveReferences = args.skipRecursiveReferences 
 	end	
+	if indent then
+			state.indentChar = '\t'
+			state.newlineChar = '\n'
+	end
 	
 	local str = toLuaRecurse(state, x, nil, '')
 	
