@@ -166,9 +166,27 @@ local defaultSerializeForType = {
 			mixed = mixed:map(function(kv) return table.concat(kv, '=') end)
 			s:append(mixed)
 
-			local rs = '{'..state.newlineChar
-			if #s > 0 then rs = rs .. newtab ..s:concat(','..state.newlineChar..newtab) .. state.newlineChar end
-			rs = rs .. tab.. '}'
+			local charsLong = 0
+			for i=1,#s do charsLong = charsLong + #s[i] end
+			local thisNewLineChar, thisNewLineSepChar, thisTab, thisNewTab
+			if charsLong <= 160 then
+				thisNewLineChar = ''
+				thisNewLineSepChar = ' '
+				thisTab = ''
+				thisNewTab = ''
+			else
+				thisNewLineChar = state.newlineChar
+				thisNewLineSepChar = state.newlineChar
+				thisTab = tab
+				thisNewTab = newtab
+			end
+		
+			local rs = '{'..thisNewLineChar
+			if #s > 0 then
+				rs = rs .. thisNewTab .. s:concat(','..thisNewLineSepChar..thisNewTab) .. thisNewLineChar
+			end
+			rs = rs .. thisTab .. '}'
+			
 			result = rs
 		end
 		return result
@@ -216,7 +234,14 @@ toLuaRecurse = function(state, x, tab, path, keyRef)
 	return result
 end
 
-
+--[[
+args:
+	indent = default to 'true', set to 'false' to make results concise
+	serializeForType = a table with keys of lua types and values of callbacks for serializing those types
+	serializeMetatables = set to 'true' to include serialization of metatables
+	serializeMetatableFunc = function to override the default serialization of metatables
+	skipRecursiveReferences = default to 'false', set this to 'true' to not include serialization of recursive references
+--]]
 local function tolua(x, args)
 	local state = {
 		indentChar = '',
@@ -226,7 +251,7 @@ local function tolua(x, args)
 		touchedTables = {},
 	}
 	if args then
-		if args.indent then
+		if args.indent ~= false then
 			state.indentChar = '\t'
 			state.newlineChar = '\n'
 		end

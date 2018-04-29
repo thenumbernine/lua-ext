@@ -12,12 +12,12 @@ also ffi.gc retains type, so no worries about casting before
 that was true, but now it's always losing the ptr and crashing, so I'm going to fall back on ffi.new
 --]]
 local function gcnew(T, n)
-	--[[
+	-- [[
 	local ptr = ffi.C.malloc(n * ffi.sizeof(T))
 	ptr = ffi.cast(T..'*', ptr)
 	ptr = ffi.gc(ptr, ffi.C.free)
 	--]]
-	-- [[ 
+	--[[ 
 	local ptr = ffi.new(T..'['..n..']')
 	--]]
 	return ptr
