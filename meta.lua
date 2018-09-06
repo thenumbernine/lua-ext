@@ -1,7 +1,7 @@
 local table = require 'ext.table'
 local string = require 'ext.string'
-local math = require 'ext.math'
 local coroutine = require 'ext.coroutine'
+local number = require 'ext.number'
 
 -- fix up lua type metatables
 
@@ -22,97 +22,7 @@ debug.setmetatable(true, {
 	}
 })
 
--- numbers
-local numbermeta = {__index = math}
-
--- [[ tostring machine precision of arbitrary base
-local alphabets = {
-	{('0'):byte(), ('9'):byte()},	-- latin numbers
-	{('a'):byte(), ('z'):byte()},	-- english
-	{0x3b1, 0x3c9},	-- greek
-	{0x430, 0x45f},	-- cyrillic
-	{0x561, 0x586},	-- armenian
-	{0x905, 0x939},	-- devanagari
-	{0x2f00, 0x2fd5},	-- kangxi
-	{0x3041, 0x3096},	-- hiragana
-	{0x30a1, 0x30fa},	-- katakana
-	{0x4e00, 0x9fd0},	-- chinese, japanese, korean characters
-}
-
-local hasutf8, utf8 = pcall(require, 'utf8')
-local function charfor(digit)
-	for _,alphabet in ipairs(alphabets) do
-		local start,fin = table.unpack(alphabet)
-		if digit <= fin - start then
-			digit = digit + start
-			if hasutf8 then
-				return utf8.char(digit)
-			else
-				return string.char(digit)
-			end
-		end
-		digit = digit - (fin - start + 1)
-	end
-	error 'you need more alphabets to represent that many digits'
-end
-
-numbermeta.base = 10
-numbermeta.maxdigits = 50
--- I'm not going to set this as __tostring by default, but I will leave it as part of the meta
--- feel free to use it with a line something like (function(m)m.__tostring=m.tostring end)(debug.getmetatable(0))
-numbermeta.__index.tostring = function(t, base, maxdigits)
-	local s = {}
-	if t < 0 then 
-		t = -t 
-		table.insert(s, '-')
-	end
-	if t == 0 then 
-		table.insert(s, '0.')
-	else
-		--print('t',t)
-		if not base then base = numbermeta.base end
-		if not maxdigits then maxdigits = numbermeta.maxdigits end
-		--print('base',base)
-		local i = math.floor(math.log(t,base))+1
-		if i == math.huge then error'infinite number of digits' end
-		--print('i',i)	
-		t = t / base^i
-		--print('t',t)
-		local dot
-		while true do
-			if i < 1 then 
-				if not dot then
-					dot = true
-					table.insert(s, '.')
-					table.insert(s, ('0'):rep(-i))
-				end
-				if t == 0 then break end
-				if i <= -maxdigits then break end
-			end		
-			t = t * base
-			local digit = math.floor(t)
-			t = t - digit
-			-- at this point 'digit' holds an integer value in [0,base)
-			-- there's two ways we can go about it:
-			-- 1) traditionally, where each digit represents an integer, times some base^i for some i
-			--	in this case, for fractional bases, the last (fraction) digit is only considered up to the fraction
-			--  i.e. in base 2.5, from 0b..1b we have the span of 1, partitioned by digits 0.1b at 2/5ths the distance, 0.2b at 4/5ths the distance, and 1.0 and 5/5ths the distance
-			-- 		from 1b..2b we have the same span,
-			--		and from 2b..10b we have half that span, from 2 to 2.5
-			--		therefore the value 2.2b would represent 2.8, which is also represetned by 10.0112210002002002...
-			-- so as long as the span between digits can represent fractions of base^i rather than whole base^i's
-			--	we can have multiple representations of numbers
-			-- 2) stretched.  in this case a fractional span, such as from 2b to 10b in base 2.5, would be stretched 
-			-- 		this is harder to convey when descibing the number system
-			table.insert(s, charfor(digit))
-			i = i - 1
-			--print('t',t,'i',i,'digit',digit)	
-		end
-	end
-	return table.concat(s)
-end
---]]
-debug.setmetatable(0, numbermeta)	
+debug.setmetatable(0, number)
 
 -- strings
 getmetatable('').__concat = defaultConcat	
@@ -254,12 +164,6 @@ functionMeta.__index.o = functionMeta.__index.compose
 debug.setmetatable(function() end, functionMeta)
 
 -- coroutines
-do
-	-- make a temp thread to se its metatable
-	local c = coroutine.create(function() end)
-	debug.setmetatable(c, {__index = coroutine})
-	c:resume()
-	-- and now it's dead
-end
+debug.setmetatable(coroutine.create(function() end), {__index = coroutine})
 
 -- TODO lightuserdata, if you can create it within lua somehow ...

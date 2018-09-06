@@ -127,12 +127,15 @@ local defaultSerializeForType = {
 				end
 			end
 
+			local hasSubTable
+
 			local s = table()
 			
 			-- add integer keys without keys explicitly. nil-padded so long as there are 2x values than nils
 			local addedIntKeys = {}
 			if intNonNilKeys >= intNilKeys * 2 then	-- some metric
 				for k=1,numx do
+					if type(x[k]) == 'table' then hasSubTable = true end
 					local nextResult = toLuaRecurse(state, x[k], newtab, path and path..'['..k..']')
 					if nextResult then
 						s:insert(nextResult)
@@ -146,6 +149,7 @@ local defaultSerializeForType = {
 			local mixed = table()
 			for k,v in pairs(x) do
 				if not addedIntKeys[k] then
+					if type(v) == 'table' then hasSubTable = true end
 					local keyStr, usesDot = toLuaKey(state, k, path)
 					if keyStr then
 						local newpath
@@ -166,10 +170,8 @@ local defaultSerializeForType = {
 			mixed = mixed:map(function(kv) return table.concat(kv, '=') end)
 			s:append(mixed)
 
-			local charsLong = 0
-			for i=1,#s do charsLong = charsLong + #s[i] end
 			local thisNewLineChar, thisNewLineSepChar, thisTab, thisNewTab
-			if charsLong <= 160 then
+			if not hasSubTable then
 				thisNewLineChar = ''
 				thisNewLineSepChar = ' '
 				thisTab = ''
