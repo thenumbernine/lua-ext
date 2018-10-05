@@ -247,10 +247,4 @@ function table:sort(...)
 	return self
 end
 
-function table.getn(...)
-	local t = setmetatable({...}, table)
-	t.n = select('#', ...)
-	return t
-end
-
 return table
