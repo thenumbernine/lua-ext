@@ -41,18 +41,29 @@ function table:removeKeys(...)
 	end
 end
 
--- cb(value[, key]) returns newvalue[, newkey]
+-- cb(value, key, newtable) returns newvalue[, newkey]
 -- nil newkey means use the old key
 function table:map(cb)
 	local t = table()
 	for k,v in pairs(self) do
 		local nv, nk = cb(v,k,t)
-		if not nk then nk = k end
+		if nk == nil then nk = k end
 		t[nk] = nv
 	end
 	return t
 end
 
+-- cb(value, key, newtable) returns newvalue[, newkey]
+-- nil newkey means use the old key
+function table:mapi(cb)
+	local t = table()
+	for i=1,#self do
+		local nv, nk = cb(v,k,t)
+		if nk == nil then nk = k end
+		t[nk] = nv
+	end
+	return t
+end
 
 -- this excludes keys that don't pass the callback function
 -- if the key is an ineteger then it is table.remove'd
