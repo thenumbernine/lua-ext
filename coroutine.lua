@@ -5,7 +5,7 @@ for k,v in pairs(require 'coroutine') do coroutine[k] = v end
 -- if the thread is dead, return false
 -- if the thread is alive and resume failed due to error, prints the stack trace of the thread upon error
 -- 	as opposed to assert(coroutine.resume(thread)), which only prints the stack trace of the resume statement
--- if the thread is alive and resume succeeded, prints true
+-- if the thread is alive and resume succeeded, returns true
 function coroutine.assertresume(thread, ...)
 	if coroutine.status(thread) == 'dead' then
 		return false
