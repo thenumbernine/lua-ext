@@ -57,7 +57,8 @@ end
 -- nil newkey means use the old key
 function table:mapi(cb)
 	local t = table()
-	for i=1,#self do
+	for k=1,#self do
+		local v = self[k]
 		local nv, nk = cb(v,k,t)
 		if nk == nil then nk = k end
 		t[nk] = nv
