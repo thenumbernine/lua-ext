@@ -22,8 +22,12 @@ end)()
 
 local table = require 'ext.table'
 
+local function builtinPairs(t)
+	return next,t,nil
+end
+
 local function escapeString(s)
-	return ('%q'):format(s):gsub('\\\n','\\n')
+	return (('%q'):format(s):gsub('\\\n','\\n'))
 end
 
 -- returns 'true' if k is a valid variable name
@@ -46,6 +50,19 @@ local function toLuaKey(state, k, path)
 	end
 end
 
+
+-- another copy of maxn, with custom pairs 
+function maxn(t, state)
+	local max = 0
+	for k,v in state.pairs(t) do
+		if type(k) == 'number' then
+			max = math.max(max, k)
+		end
+	end
+	return max
+end
+
+
 local defaultSerializeForType = {
 	number = function(state,x) return tostring(x) end,
 	boolean = function(state,x) return tostring(x) end,
@@ -62,14 +79,14 @@ local defaultSerializeForType = {
 			-- todo maybe, check against a predefined set of functions?
 			if s == "unable to dump given function" then
 				local found
-				for k,v in pairs(_G) do
+				for k,v in state.pairs(_G) do
 					if v == x then
 						found = true
 						s = k
 						break
 					elseif type(v) == 'table' then
 						-- only one level deep ...
-						for k2,v2 in pairs(v) do
+						for k2,v2 in state.pairs(v) do
 							if v2 == x then
 								s = k..'.'..k2
 								found = true
@@ -117,7 +134,7 @@ local defaultSerializeForType = {
 			state.touchedTables[x] = 'root'..path
 			
 			-- prelim see if we can write it as an indexed table
-			local numx = table.maxn(x)
+			local numx = maxn(x, state)
 			local intNilKeys, intNonNilKeys = 0, 0				
 			for i=1,numx do
 				if x[i] == nil then
@@ -147,7 +164,7 @@ local defaultSerializeForType = {
 
 			-- sort key/value pairs added here by key
 			local mixed = table()
-			for k,v in pairs(x) do
+			for k,v in state.pairs(x) do
 				if not addedIntKeys[k] then
 					if type(v) == 'table' then hasSubTable = true end
 					local keyStr, usesDot = toLuaKey(state, k, path)
@@ -195,8 +212,11 @@ local defaultSerializeForType = {
 	end,
 }
 
-local defaultSerializeMetatableFunc = function(state, m, x, tab)
-	return toLuaRecurse(state, m, tab..state.indentChar)
+local function defaultSerializeMetatableFunc(state, m, x, tab, path, keyRef)
+	-- only serialize the metatables of tables
+	-- otherwise, assume the current metatable is the default one (which is usually nil)
+	if type(x) ~= 'table' then return 'nil' end
+	return toLuaRecurse(state, m, tab..state.indentChar, path, keyRef)
 end
 
 toLuaRecurse = function(state, x, tab, path, keyRef)
@@ -221,13 +241,15 @@ toLuaRecurse = function(state, x, tab, path, keyRef)
 	
 	if state.serializeMetatables then
 		local m = getmetatable(x)
-		if m then
+		if m ~= nil then
 			local serializeMetatableFunc = state.serializeMetatableFunc or defaultSerializeMetatableFunc
-			local mstr = serializeMetatableFunc(state, m, x, tab)
+			local mstr = serializeMetatableFunc(state, m, x, tab, path, keyRef)
 			-- make sure you get something
 			assert(mstr ~= nil)
 			-- but if that something is nil, i.e. setmetatable(something newly created with a nil metatable, nil), then don't bother modifing the code
-			if mstr ~= 'nil' then
+			if mstr ~= 'nil' and mstr ~= false then
+				-- if this is false then the result was deferred and we need to add this line to wherever else... 
+				assert(result ~= false)
 				result = 'setmetatable('..result..', '..mstr..')'
 			end
 		end
@@ -239,6 +261,7 @@ end
 --[[
 args:
 	indent = default to 'true', set to 'false' to make results concise
+	pairs = default to a form of pairs() which iterates over all fields using next().  Set this to your own custom pairs function, or 'pairs' if you would like serialization to respect the __pairs metatable (which it does not by default).
 	serializeForType = a table with keys of lua types and values of callbacks for serializing those types
 	serializeMetatables = set to 'true' to include serialization of metatables
 	serializeMetatableFunc = function to override the default serialization of metatables
@@ -264,7 +287,8 @@ local function tolua(x, args)
 			state.indentChar = '\t'
 			state.newlineChar = '\n'
 	end
-	
+	state.pairs = builtinPairs
+
 	local str = toLuaRecurse(state, x, nil, '')
 	
 	if state.wrapWithFunction then
