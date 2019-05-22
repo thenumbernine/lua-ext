@@ -22,6 +22,34 @@ setmetatable(table, {
 -- 5.2 or 5.3 compatible
 table.unpack = table.unpack or unpack
 
+-- 5.1 compatible
+if not table.pack then
+	function table.pack(...)
+		local t = {...}
+		t.n = select('#', ...)
+		return setmetatable(t, table)
+	end
+else
+	local oldpack = table.pack
+	function table.pack(...)
+		return setmetatable(oldpack(...), table)
+	end
+end
+
+-- non-5.1 compat:
+if not table.maxn then
+	function table.maxn(t)
+		local max = 0
+		for k,v in pairs(t) do
+			if type(k) == 'number' then
+				max = math.max(max, k)
+			end
+		end
+		return max
+	end
+end
+
+
 -- something to consider:
 -- mapvalue() returns a new table
 -- but append() modifies the current table
@@ -240,16 +268,6 @@ function table.rep(t,n)
 		c:append(t)
 	end
 	return c
-end
-
-function table.maxn(t)
-	local max = 0
-	for k,v in pairs(t) do
-		if type(k) == 'number' then
-			max = math.max(max, k)
-		end
-	end
-	return max
 end
 
 -- in-place sort is fine, but it returns nothing.  for kicks I'd like to chain methods

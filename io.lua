@@ -35,6 +35,14 @@ end
 function io.readfile(fn)
 	local f, err = io.open(fn, 'rb')
 	if not f then return false, err end
+
+	-- file.read compat (tested on Windows)
+	-- 						*a	a	*l	l 
+	-- lua-5.3.5:			yes	yes	yes	yes		jit == nil and _VERSION == 'Lua 5.3'
+	-- lua-5.2.4:			yes	no	yes	no		jit == nil and _VERSION == 'Lua 5.2'
+	-- lua-5.1.5:			yes	no	yes	no		jit == nil and _VERSION == 'Lua 5.1'
+	-- luajit-2.1.0-beta3:	yes	yes	yes	yes		(jit.version == 'LuaJIT 2.1.0-beta3' / jit.version_num == 20100)
+	-- luajit-2.0.5			yes	no	yes	no		(jit.version == 'LuaJIT 2.0.5' / jit.version_num == 20005)
 	local d = f:read('*a')
 	f:close()
 	return d
@@ -108,6 +116,152 @@ function io.isdir(fn)
 			return false
 		end
 	end
+end
+
+-- in Lua 5.3.5 at least:
+-- (for file = getmetatable(io.open(something)))
+-- io.read ~= file.read
+-- file.__index == file
+-- within meta.lua, simply modifying the file metatable 
+-- but if someone requires ext/io.lua and not lua then io.open and all subsequently created files will need to be modified
+if (jit and jit.version_num < 20100)
+or (not jit and _VERSION < 'Lua 5.2')
+then
+	-- even though io.read is basically the same as file.read, they are still different functions
+	-- so file.read will still have to be separately overridden
+	local oldfileread
+	local function newfileread(...)
+		local n = select('#', ...)	
+		local newargs = {}
+		for i=1,n do
+			local fmt = select(i, ...)
+			if fmt == 'a' then fmt = '*a' 
+			elseif fmt == 'l' then fmt = '*l'
+			elseif fmt == 'n' then fmt = '*n'
+			end
+			newargs[i] = fmt
+		end
+		return oldfileread(...)
+	end
+	io.read = function(...)
+		return newfileread(io.stdout, ...)
+	end
+	
+	local oldfilemeta = getmetatable(io.stdout)
+	local newfilemeta = {}
+	for k,v in pairs(oldfilemeta) do
+		newfilemeta[k] = v
+	end
+
+	-- override file:read
+	oldfileread = oldfilemeta.read
+	newfilemeta.read = newfileread 
+
+	-- should these be overridden in this case, or only when running ext/meta.lua?
+	setmetatable(io.stdin, newfilemeta)
+	setmetatable(io.stdout, newfilemeta)
+	setmetatable(io.stderr, newfilemeta)
+
+	local oldioopen = io.open
+	function io.open(...)
+		local f = oldioopen(...)
+		setmetatable(f, newfilemeta)
+		return f
+	end
+end
+
+function io.dir(path)
+	local lfs = lfs()
+	if not lfs then
+		-- no lfs?  use a fallback of shell ls or dir (based on OS)
+		local fns
+		-- all I'm using ffi for is reading the OS ...
+--			local ffi = ffi()	-- no lfs?  are you using luajit?
+--			if not ffi then
+			-- if 'dir' exists ...
+			--	local filestr = io.readproc('dir "'..path..'"')
+			--	error('you are here: '..filestr)
+			-- if 'ls' exists ...
+			
+			local string = require 'ext.string'
+			local cmd
+			if _G.ffi and _G.ffi.os == 'Windows' then
+				cmd = 'dir /b "'..path:gsub('/','\\')..'"'
+			else
+				cmd = 'ls '..path:gsub('[|&;<>`\"\' \t\r\n#~=%$%(%)%%%[%*%?]', [[\%0]])
+			end
+			local filestr = io.readproc(cmd)
+			fns = string.split(filestr, '\n')
+			assert(fns:remove() == '')
+--[[
+		else
+			-- do a directory listing
+			-- TODO escape?
+			if ffi.os == 'Windows' then
+				-- put your stupid FindFirstFile/FindNextFile code here
+				error('windows sucks...')
+			else
+				fns = {}
+				require 'ffi.c.dirent'
+				-- https://stackoverflow.com/questions/10678522/how-can-i-get-this-readdir-code-sample-to-search-other-directories
+				local dirp = ffi.C.opendir(path)
+				if dirp == nil then
+					error('failed to open dir '..path)
+				end
+				repeat
+					local dp = ffi.C.readdir(dirp)
+					if dp == nil then break end
+					local name = ffi.string(dp[0].d_name)
+					if name ~= '.' and name ~= '..' then
+						table.insert(fns, name)
+					end
+				until false
+				ffi.C.closedir(dirp)
+			end
+		end
+--]]
+		return coroutine.wrap(function()
+			for _,k in ipairs(fns) do
+				local fn = k:sub(1,1) == '/' and k or (path..'/'..k)
+				coroutine.yield(k, io.readfile(fn))					
+			end
+		end)
+	else
+		return coroutine.wrap(function()
+			for k in lfs.dir(path) do
+				if k ~= '.' and k ~= '..' then
+					local fn = k:sub(1,1) == '/' and k or (path..'/'..k)
+					-- I shouldn't have io.readfile for performance
+					--  but for convenience it is so handy...
+					coroutine.yield(k, io.readfile(fn))
+				end
+			end
+		end)
+	end
+end
+
+--[[ recurse directory
+args:
+	path = directory to search from
+	callback(filename, isdir) = optional callback to filter each file
+--]]
+function io.rdir(path, callback, fs)
+	local table = require 'ext.table'
+	fs = fs or table()
+	for f in io.dir(path) do
+		if io.isdir(path..'/'..f) then
+			if f ~= '.' and f ~= '..' then
+				if not callback or callback(f, true) then
+					io.rdir(path..'/'..f, callback, fs)
+				end
+			end
+		else
+			if not callback or callback(f, false) then
+				fs:insert(path..'/'..f)
+			end
+		end
+	end
+	return fs
 end
 
 return io
