@@ -124,8 +124,7 @@ end
 -- file.__index == file
 -- within meta.lua, simply modifying the file metatable 
 -- but if someone requires ext/io.lua and not lua then io.open and all subsequently created files will need to be modified
-if (jit and jit.version_num < 20100)
-or (not jit and _VERSION < 'Lua 5.2')
+if jit or (not jit and _VERSION < 'Lua 5.2')
 then
 	-- even though io.read is basically the same as file.read, they are still different functions
 	-- so file.read will still have to be separately overridden
@@ -147,7 +146,7 @@ then
 		return newfileread(io.stdout, ...)
 	end
 	
-	local oldfilemeta = getmetatable(io.stdout)
+	local oldfilemeta = debug.getmetatable(io.stdout)
 	local newfilemeta = {}
 	for k,v in pairs(oldfilemeta) do
 		newfilemeta[k] = v
@@ -158,14 +157,14 @@ then
 	newfilemeta.read = newfileread 
 
 	-- should these be overridden in this case, or only when running ext/meta.lua?
-	setmetatable(io.stdin, newfilemeta)
-	setmetatable(io.stdout, newfilemeta)
-	setmetatable(io.stderr, newfilemeta)
+	debug.setmetatable(io.stdin, newfilemeta)
+	debug.setmetatable(io.stdout, newfilemeta)
+	debug.setmetatable(io.stderr, newfilemeta)
 
 	local oldioopen = io.open
 	function io.open(...)
 		local f = oldioopen(...)
-		setmetatable(f, newfilemeta)
+		debug.setmetatable(f, newfilemeta)
 		return f
 	end
 end
