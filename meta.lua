@@ -145,6 +145,16 @@ local functionMeta = {
 				return s
 			end
 		end,
+		-- grows/shrinks the number of args passed.  pads with nil.
+		nargs = function(f, n)
+			return function(...)
+				local t = {}
+				for i=1,n do
+					t[i] = select(i, ...)
+				end
+				return f(table.unpack(t, 1, n))
+			end
+		end,
 		-- swaps the next two arguments
 		swap = function(f)
 			return function(a, b, ...)
