@@ -12,6 +12,7 @@ return function(env)
 	env.class = require 'ext.class'
 	env.reload = require 'ext.reload'
 	env.range = require 'ext.range'
+	env.op = require 'ext.op'
 	env._ = os.execute
 	-- requires ffi
 	--env.gcnew = require 'ext.gcmem'.new

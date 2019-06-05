@@ -2,6 +2,7 @@ local table = require 'ext.table'
 local string = require 'ext.string'
 local coroutine = require 'ext.coroutine'
 local number = require 'ext.number'
+local op = require 'ext.op'
 
 -- fix up lua type metatables
 
@@ -14,9 +15,9 @@ debug.setmetatable(nil, {__concat = defaultConcat})
 debug.setmetatable(true, {
 	__concat = defaultConcat,
 	__index = {
-		and_ = function(a,b) return a and b end,
-		or_ = function(a,b) return a or b end,
-		not_ = function(a) return not a end,
+		and_ = op.land,
+		or_ = op.lor,
+		not_ = op.lnot,
 		xor = function(a,b) return a ~= b end,
 		implies = function(a,b) return not a or b end,
 	}
@@ -52,12 +53,6 @@ local function combineFunctionsWithBinaryOperator(f, g, op)
 end
 
 -- primitive functions.  should these be public?  or put in a single table?
-local function add(a,b) return a + b end
-local function sub(a,b) return a - b end
-local function mul(a,b) return a * b end
-local function div(a,b) return a / b end
-local function pow(a,b) return a ^ b end
-local function mod(a,b) return a % b end
 
 -- function operators generate functions
 -- f(x) = y, g(x) = z, (f+g)(x) = y+z 
@@ -66,12 +61,12 @@ local functionMeta = {
 	-- but instead I'm going to have it follow the default __concat convention I have with other primitive types
 	__concat = defaultConcat,
 	dump = function(f) return string.dump(f) end,
-	__add = function(f, g) return combineFunctionsWithBinaryOperator(f, g, add) end,
-	__sub = function(f, g) return combineFunctionsWithBinaryOperator(f, g, sub) end,
-	__mul = function(f, g) return combineFunctionsWithBinaryOperator(f, g, mul) end,
-	__div = function(f, g) return combineFunctionsWithBinaryOperator(f, g, div) end,
-	__pow = function(f, g) return combineFunctionsWithBinaryOperator(f, g, pow) end,
-	__mod = function(f, g) return combineFunctionsWithBinaryOperator(f, g, mod) end,
+	__add = function(f, g) return combineFunctionsWithBinaryOperator(f, g, op.add) end,
+	__sub = function(f, g) return combineFunctionsWithBinaryOperator(f, g, op.sub) end,
+	__mul = function(f, g) return combineFunctionsWithBinaryOperator(f, g, op.mul) end,
+	__div = function(f, g) return combineFunctionsWithBinaryOperator(f, g, op.div) end,
+	__mod = function(f, g) return combineFunctionsWithBinaryOperator(f, g, op.mod) end,
+	__pow = function(f, g) return combineFunctionsWithBinaryOperator(f, g, op.pow) end,
 	__unm = function(f) return function(...) return -f(...) end end,
 	__len = function(f) return function(...) return #f(...) end end,
 	-- boolean operations aren't overloaded just yet.  should they be?
@@ -102,28 +97,52 @@ local functionMeta = {
 				f(...)[k] = v
 			end
 		end,
+		
+		-- f:compose(g1, ...) returns a function that evaluates to f(g1(...(gn(args))))
 		compose = function(...)	
-			local funcs = {...}
-			local funcsn = select('#', ...)
-			for i=1,funcsn do
+			local funcs = table.back(...)
+			for i=1,funcs.n do
 				assert(type(funcs[i]) == 'function')
 			end
 			return function(...)
-				local args = {...}
-				local argn = select('#', ...)
-				for i=funcsn,1,-1 do
-					args = {funcs[i](table.unpack(args,1,argn))}
-					argn = table.maxn(args)
+				local args = table.pack(...)
+				for i=funcs.n,1,-1 do
+					args = table.pack(funcs[i](table.unpack(args,1,args.n)))
 				end
-				return table.unpack(args,1,argn)
+				return table.unpack(args,1,args.n)
 			end
 		end,
+		
+		-- f:compose_n(n, g) returns a function that evaluates to f(arg[1], ... arg[j-1], g(arg[j]), arg[j+1], ..., arg[n])
+		compose_n = function(f, n, ...)
+			local funcs = table.pack(...)
+			return function(...)
+				local args = table.pack(...)
+			
+				local ntharg = {args[n]}
+				ntharg.n = n <= args.n and 1 or 0
+				for i=funcs.n,1,-1 do
+					ntharg = table.pack(funcs[i](table.unpack(ntharg,1,ntharg.n)))
+				end
+		
+				-- if we're replacing the last argument and it returns varargs then allow them to expand
+				-- if you don't want this behavior then use :nargs(#) to limit the number of results
+				if n < args.n then
+					args[n] = ntharg[1]
+				else
+					for i=1,results.n do
+						args[args.n+i] = ntharg[i]
+					end
+				end
+				return f(table.unpack(args, 1, args.n))
+			end
+		end,
+		
 		-- bind / partial apply -- currying first args, and allowing vararg rest of args
 		bind = function(f, ...)
-			local args = {...}
-			local argn = select('#', ...)
+			local args = table.pack(...)
 			return function(...)
-				local n = argn
+				local n = args.n
 				local callargs = {table.unpack(args, 1, n)}
 				for i=1,select('#', ...) do
 					n=n+1
@@ -171,6 +190,7 @@ local functionMeta = {
 -- shorthand
 functionMeta.__index._ = functionMeta.__index.index 
 functionMeta.__index.o = functionMeta.__index.compose
+functionMeta.__index.o_n = functionMeta.__index.compose_n
 debug.setmetatable(function() end, functionMeta)
 
 -- coroutines
