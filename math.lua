@@ -5,6 +5,9 @@ math.nan = 0/0
 
 math.e = math.exp(1)
 
+-- luajit and lua 5.1 compat ...
+if not math.atan2 then math.atan2 = math.atan end
+
 function math.clamp(v,min,max)
 	return math.min(math.max(v,min), max)
 end
