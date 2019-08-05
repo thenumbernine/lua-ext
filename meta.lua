@@ -100,7 +100,7 @@ local functionMeta = {
 		
 		-- f:compose(g1, ...) returns a function that evaluates to f(g1(...(gn(args))))
 		compose = function(...)	
-			local funcs = table.back(...)
+			local funcs = table.pack(...)
 			for i=1,funcs.n do
 				assert(type(funcs[i]) == 'function')
 			end

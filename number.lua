@@ -32,12 +32,33 @@ function number.charfor(digit)
 			if hasutf8 then
 				return utf8.char(digit)
 			else
+				-- TODO this will fail with utf8 chars beyond ascii
 				return string.char(digit)
 			end
 		end
 		digit = digit - (fin - start + 1)
 	end
 	error 'you need more alphabets to represent that many digits'
+end
+
+-- TODO rename above function to 'tochar' ?
+function number.todigit(ch)
+	local lastTotalIndex = 0
+	for _,alphabet in ipairs(number.alphabets) do
+		local start,fin = table.unpack(alphabet)
+		local indexInAlphabet
+		if hasutf8 then
+			indexInAlphabet = utf8.codepoint(ch)
+		else
+			-- TODO this will fail with utf8 chars beyond ascii
+			indexInAlphabet = string.byte(ch)
+		end
+		if indexInAlphabet >= start and indexInAlphabet < fin then
+			return lastTotalIndex + (indexInAlphabet - start)
+		end
+		lastTotalIndex = lastTotalIndex + (fin - start + 1)
+	end
+	error"couldn't find the character in all the alphabets"
 end
 
 number.base = 10
