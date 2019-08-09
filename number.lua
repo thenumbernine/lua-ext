@@ -43,17 +43,17 @@ end
 
 -- TODO rename above function to 'tochar' ?
 function number.todigit(ch)
+	local indexInAlphabet
+	if hasutf8 then
+		indexInAlphabet = utf8.codepoint(ch)
+	else
+		-- TODO this will fail with utf8 chars beyond ascii
+		indexInAlphabet = string.byte(ch)
+	end
 	local lastTotalIndex = 0
 	for _,alphabet in ipairs(number.alphabets) do
 		local start,fin = table.unpack(alphabet)
-		local indexInAlphabet
-		if hasutf8 then
-			indexInAlphabet = utf8.codepoint(ch)
-		else
-			-- TODO this will fail with utf8 chars beyond ascii
-			indexInAlphabet = string.byte(ch)
-		end
-		if indexInAlphabet >= start and indexInAlphabet < fin then
+		if indexInAlphabet >= start and indexInAlphabet <= fin then
 			return lastTotalIndex + (indexInAlphabet - start)
 		end
 		lastTotalIndex = lastTotalIndex + (fin - start + 1)

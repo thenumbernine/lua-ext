@@ -52,12 +52,13 @@ end
 
 -- returns a table containing the prime factorization of the number
 function math.primeFactorization(n)
+	n = math.floor(n)
 	local f = table()
 	while n > 1 do
 		local found = false
 		for i=2,math.floor(math.sqrt(n)) do
 			if n%i == 0 then
-				n = n/i
+				n = math.floor(n/i)
 				f:insert(i)
 				found = true
 				break
