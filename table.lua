@@ -223,12 +223,14 @@ function table:combine(callback)
 	return s
 end
 
+local op = require 'ext.op'
+
 function table:sum()
-	return table.combine(self, function(a,b) return a+b end)
+	return table.combine(self, op.add)
 end
 
 function table:product()
-	return table.combine(self, function(a,b) return a*b end)
+	return table.combine(self, op.mul)
 end
 
 function table:last()

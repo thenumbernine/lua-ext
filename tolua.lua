@@ -64,7 +64,12 @@ end
 
 
 local defaultSerializeForType = {
-	number = function(state,x) return tostring(x) end,
+	number = function(state,x) 
+		if x == math.huge then return 'math.huge' end
+		if x == -math.huge then return '-math.huge' end
+		if x ~= x then return '0/0' end
+		return tostring(x) 
+	end,
 	boolean = function(state,x) return tostring(x) end,
 	['nil'] = function(state,x) return tostring(x) end,
 	string = function(state,x) return escapeString(x) end,
