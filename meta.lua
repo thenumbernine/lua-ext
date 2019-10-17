@@ -125,15 +125,9 @@ local functionMeta = {
 					ntharg = table.pack(funcs[i](table.unpack(ntharg,1,ntharg.n)))
 				end
 		
-				-- if we're replacing the last argument and it returns varargs then allow them to expand
-				-- if you don't want this behavior then use :nargs(#) to limit the number of results
-				if n < args.n then
-					args[n] = ntharg[1]
-				else
-					for i=1,results.n do
-						args[args.n+i] = ntharg[i]
-					end
-				end
+				args[n] = ntharg[1]
+				args.n = math.max(args.n, n)
+				
 				return f(table.unpack(args, 1, args.n))
 			end
 		end,
@@ -151,6 +145,20 @@ local functionMeta = {
 				return f(table.unpack(callargs, 1, n))
 			end
 		end,
+	
+		-- bind argument n, n+1, n+2, ... to the values provided
+		bind_n = function(f, n, ...)
+			local nargs = table.pack(...)
+			return function(...)
+				local args = table.pack(...)
+				for i=1,nargs.n do
+					args[n+i-1] = nargs[i]
+				end
+				args.n = math.max(args.n, n+nargs.n-1)
+				return f(table.unpack(args, 1, args.n))
+			end		
+		end,
+
 		-- Takes a function and a number of arguments,
 		-- returns a function that applies them individually,
 		-- first to the function, then to each function returned

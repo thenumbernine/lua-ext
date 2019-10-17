@@ -279,4 +279,14 @@ function table:sort(...)
 	return self
 end
 
+-- returns a shuffled duplicate of the ipairs in table 't'
+function table.shuffle(t)
+	t = table(t)
+	local nt = table()
+	while #t > 0 do
+		nt:insert(t:remove(math.random(#t)))
+	end
+	return nt
+end
+
 return table
