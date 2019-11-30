@@ -2,8 +2,9 @@ I found myself recreating so many extensions to the base lua classes over and ov
 I thought I'd just put them in one place.
 I'm sure this will grow out of hand.
 
-Note to users: I often use "require 'ext'" in place of "require 'ext.ext'" in my code.
-This is courtesy of a `LUA_PATH` pattern "foo/?/?.lua" in addition to the typical "foo/?.lua".
+Note to users: The structure of the source code doesn't exactly match the structure in the rock install destination.
+This is because I personally use a `LUA_PATH` pattern of "?/?.lua" in addition to the typical "?.lua".
+To work with compatability of everyone else who does not use this convention, I have the rockspec install `ext/ext.lua` into `ext.lua` and keep `ext/everything_else.lua` at `ext/everything_else.lua`.
 
 Descriptions of the Files:
 - coroutine.lua, io.lua, math.lua, os.lua, string.lua, table.lua: extensions to the Lua builtin tables

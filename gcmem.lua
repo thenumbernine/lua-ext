@@ -29,7 +29,7 @@ frees the ptr and removes it from the gc
 (just in case you want to manually free a pointer)
 --]]
 local function gcfree(ptr)
-	--ffi.C.free(ffi.gc(ptr, nil))
+	ffi.C.free(ffi.gc(ptr, nil))
 end
 
 return {
