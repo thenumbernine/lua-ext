@@ -9,6 +9,9 @@ description = {
 	homepage = 'https://github.com/thenumbernine/lua-ext',
 	license = 'MIT'
 }
+dependencies = {
+   'lua >= 5.1',
+}
 build = {
 	type = 'builtin',
 	modules = {
