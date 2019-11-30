@@ -40,4 +40,4 @@ end
 code = code .. [[
 	}
 ]]
-return assert(load(code))()
+return assert((loadstring or load)(code))()
