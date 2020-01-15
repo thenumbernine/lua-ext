@@ -124,23 +124,23 @@ end
 -- file.__index == file
 -- within meta.lua, simply modifying the file metatable 
 -- but if someone requires ext/io.lua and not lua then io.open and all subsequently created files will need to be modified
-if jit or (not jit and _VERSION < 'Lua 5.2')
-then
+if jit or (not jit and _VERSION < 'Lua 5.2') then
+
+	local function fixfilereadargs(...)
+		if select('#', ...) == 0 then return ... end
+		local fmt = select(1, ...)
+		if fmt == 'a' then fmt = '*a'
+		elseif fmt == 'l' then fmt = '*l'
+		elseif fmt == 'n' then fmt = '*n'
+		end
+		return fmt, fixfilereadargs(select(2, ...))
+	end
+	
 	-- even though io.read is basically the same as file.read, they are still different functions
 	-- so file.read will still have to be separately overridden
 	local oldfileread
 	local function newfileread(...)
-		local n = select('#', ...)	
-		local newargs = {}
-		for i=1,n do
-			local fmt = select(i, ...)
-			if fmt == 'a' then fmt = '*a' 
-			elseif fmt == 'l' then fmt = '*l'
-			elseif fmt == 'n' then fmt = '*n'
-			end
-			newargs[i] = fmt
-		end
-		return oldfileread(...)
+		return oldfileread(fixfilereadargs(...))
 	end
 	io.read = function(...)
 		return newfileread(io.stdout, ...)
@@ -161,11 +161,19 @@ then
 	debug.setmetatable(io.stdout, newfilemeta)
 	debug.setmetatable(io.stderr, newfilemeta)
 
+	local function fixfilemeta(...)
+		if select('#', ...) > 0 then
+			local f = select(1, ...)
+			if f then
+				debug.setmetatable(f, newfilemeta)
+			end
+		end
+		return ...
+	end
+
 	local oldioopen = io.open
 	function io.open(...)
-		local f = oldioopen(...)
-		debug.setmetatable(f, newfilemeta)
-		return f
+		return fixfilemeta(oldioopen(...))
 	end
 end
 

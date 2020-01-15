@@ -9,17 +9,26 @@ for k,v in pairs(require 'string') do string[k] = v end
 
 local table = require 'ext.table'
 
+-- string.concat(string.split(a,b),b) == a
 function string.split(s, exp)
+	exp = exp or ''
 	s = tostring(s)
 	local t = table()
-	local searchpos = 1
-	local start, fin = s:find(exp, searchpos)
-	while start do
-		t:insert(s:sub(searchpos, start-1))
-		searchpos = fin+1
-		start, fin = s:find(exp, searchpos)
+	-- handle the exp='' case
+	if exp == '' then
+		for i=1,#s do
+			t:insert(s:sub(i,i))
+		end
+	else
+		local searchpos = 1
+		local start, fin = s:find(exp, searchpos)
+		while start do
+			t:insert(s:sub(searchpos, start-1))
+			searchpos = fin+1
+			start, fin = s:find(exp, searchpos)
+		end
+		t:insert(s:sub(searchpos))
 	end
-	t:insert(s:sub(searchpos))
 	return t
 end
 

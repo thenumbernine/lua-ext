@@ -7,6 +7,7 @@ math.e = math.exp(1)
 
 -- luajit and lua 5.1 compat ...
 if not math.atan2 then math.atan2 = math.atan end
+-- also note, code that uses math.atan(y,x) in luajit will instead just call math.atan(y) ...
 
 function math.clamp(v,min,max)
 	return math.min(math.max(v,min), max)
@@ -71,5 +72,7 @@ function math.primeFactorization(n)
 	end
 	return f
 end
+
+function math.cbrt(x) return x^(1/3) end
 
 return math

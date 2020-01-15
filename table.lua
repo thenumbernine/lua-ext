@@ -289,4 +289,29 @@ function table.shuffle(t)
 	return nt
 end
 
+-- where to put this ...
+-- I want to convert iterators into tables
+-- it looks like a coroutine but it is made for functions returned from coroutine.wrap
+-- also, what to do with multiple-value iterators (like ipairs)
+-- do I only wrap the first value?
+-- do I wrap both values in a double table?
+-- do I do it optionally based on the # args returned?
+-- how about I ask for a function to convert the iterator to the table?
+-- this is looking very similar to table.map
+-- I'll just wrap it with table.wrap and then let the caller use :mapi to transform the results
+-- usage: table.wrapfor(ipairs(t))
+-- if you want to wrap a for-= loop then just use range(a,b[,c])
+-- ok at this point I should just start using lua-fun ...
+function table.wrapfor(f, s, var)
+	local t = table()
+	while true do
+		local vars = table.wrap(f(s, var))
+		local var_1 = vars[1]
+		if var_1 == nil then break end
+		var = var_1
+		t:insert(vars)
+	end
+	return t
+end
+
 return table
