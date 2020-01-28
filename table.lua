@@ -5,9 +5,12 @@ table.__index = table
 
 function table.new(...)
 	local t = setmetatable({}, table)
-	for _,o in ipairs{...} do
-		for k,v in pairs(o) do
-			t[k] = v
+	for i=1,select('#', ...) do
+		local o = select(i, ...)
+		if o then
+			for k,v in pairs(o) do
+				t[k] = v
+			end
 		end
 	end
 	return t
@@ -55,16 +58,20 @@ end
 -- but append() modifies the current table
 -- for consistency shouldn't append() create a new one as well?
 function table:append(...)
-	for _,u in ipairs{...} do
-		for _,v in ipairs(u) do
-			table.insert(self, v)
+	for i=1,select('#', ...) do
+		local u = select(i, ...)
+		if u then
+			for _,v in ipairs(u) do
+				table.insert(self, v)
+			end
 		end
 	end
 	return self
 end
 
 function table:removeKeys(...)
-	for _,v in ipairs{...} do
+	for i=1,select('#', ...) do
+		local v = select(i, ...)
 		self[v] = nil
 	end
 end
@@ -300,7 +307,7 @@ end
 -- this is looking very similar to table.map
 -- I'll just wrap it with table.wrap and then let the caller use :mapi to transform the results
 -- usage: table.wrapfor(ipairs(t))
--- if you want to wrap a for-= loop then just use range(a,b[,c])
+-- if you want to wrap a 'for=' loop then just use range(a,b[,c])
 -- ok at this point I should just start using lua-fun ...
 function table.wrapfor(f, s, var)
 	local t = table()
