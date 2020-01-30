@@ -46,7 +46,7 @@ local code = symbolscode .. [[
 	-- functions for operators
 	return {
 ]]
-for name,symbol in ipairs(symbols) do
+for name,symbol in pairs(symbols) do
 	if unary[name] then
 		code = code .. [[
 		]]..name..[[ = function(a) return ]]..symbol..[[ a end,
