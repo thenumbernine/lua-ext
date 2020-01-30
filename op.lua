@@ -1,19 +1,63 @@
-local code = [[
+local lua53 = _VERSION >= 'Lua 5.3'
+
+local symbolscode = [[
+	local unary = {
+		unm = true,
+		bnot = true,
+		len = true,
+		lnot = true,
+	}
+	
+	local symbols = {
+		add = '+',
+		sub = '-',
+		mul = '*',
+		div = '/',
+		mod = '%',
+		pow = '^',
+		unm = '-',			-- unary
+		concat = '..',
+		eq = '==',
+		lt = '<',
+		le = '<=',
+		land = 'and',		-- non-overloadable
+		lor = 'or',			-- non-overloadable
+		len = '#',			-- unary
+		lnot = 'not',		-- non-overloadable, unary
+]]
+if lua53 then
+	symbolscode = symbolscode .. [[
+		idiv = '//',		-- 5.3
+		band = '&',			-- 5.3
+		bor = '|',			-- 5.3
+		bxor = '~',			-- 5.3
+		shl = '<<',			-- 5.3
+		shr = '>>',			-- 5.3
+		bnot = '~',			-- 5.3, unary
+]]	
+end
+symbolscode = symbolscode .. [[
+	}
+]]
+
+local symbols, unary = assert((loadstring or load)(symbolscode..' return symbols, unary'))()
+
+local code = symbolscode .. [[
 	-- functions for operators
 	return {
-		-- __index overloadable operators
-		add = function(a,b) return a + b end,
-		sub = function(a,b) return a - b end,
-		mul = function(a,b) return a * b end,
-		div = function(a,b) return a / b end,
-		mod = function(a,b) return a % b end,
-		pow = function(a,b) return a ^ b end,
-		unm = function(f) return -f end,
-		concat = function(a,b) return a .. b end,
-		len = function(f) return #f end,
-		eq = function(a,b) return a == b end,
-		lt = function(a,b) return a < b end,
-		le = function(a,b) return a <= b end,
+]]
+for name,symbol in ipairs(symbols) do
+	if unary[name] then
+		code = code .. [[
+		]]..name..[[ = function(a) return ]]..symbol..[[ a end,
+]]
+	else
+		code = code .. [[
+		]]..name..[[ = function(a,b) return a ]]..symbol..[[ b end,
+]]
+	end
+end
+code = code .. [[
 		index = function(t, k) return t[k] end,
 		newindex = function(t, k, v)
 			t[k] = v
@@ -21,23 +65,7 @@ local code = [[
 		end,
 		call = function(f, ...) return f(...) end,
 		
-		-- non-overloadable operators:
-		land = function(a,b) return a and b end,
-		lor = function(a,b) return a or b end,
-		lnot = function(a) return not a end,
-]]		
-if _VERSION >= 'Lua 5.3' then
-	code = code .. [[
-			idiv = function(a,b) return a // b end,
-			band = function(a,b) return a & b end,
-			bor = function(a,b) return a | b end,
-			bxor = function(a,b) return a ~ b end,
-			bnot = function(a) return ~a end,	
-			shl = function(a,b) return a << b end,
-			shr = function(a,b) return a >> b end,
-	]]
-end
-code = code .. [[
+		symbols = symbols,
 	}
 ]]
 return assert((loadstring or load)(code))()
