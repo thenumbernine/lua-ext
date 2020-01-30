@@ -312,7 +312,7 @@ end
 function table.wrapfor(f, s, var)
 	local t = table()
 	while true do
-		local vars = table.wrap(f(s, var))
+		local vars = table.pack(f(s, var))
 		local var_1 = vars[1]
 		if var_1 == nil then break end
 		var = var_1
