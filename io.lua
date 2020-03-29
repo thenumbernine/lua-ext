@@ -230,7 +230,7 @@ function io.dir(path)
 		return coroutine.wrap(function()
 			for _,k in ipairs(fns) do
 				local fn = k:sub(1,1) == '/' and k or (path..'/'..k)
-				coroutine.yield(k, io.readfile(fn))					
+				coroutine.yield(k)--, io.readfile(fn))					
 			end
 		end)
 	else
@@ -240,7 +240,7 @@ function io.dir(path)
 					local fn = k:sub(1,1) == '/' and k or (path..'/'..k)
 					-- I shouldn't have io.readfile for performance
 					--  but for convenience it is so handy...
-					coroutine.yield(k, io.readfile(fn))
+					coroutine.yield(k)--, io.readfile(fn))
 				end
 			end
 		end)

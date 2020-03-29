@@ -221,7 +221,7 @@ end
 function table:combine(callback)
 	local s
 	for _,v in pairs(self) do
-		if not s then
+		if s == nil then
 			s = v
 		else
 			s = callback(s, v)

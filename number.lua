@@ -118,5 +118,8 @@ number.tostring = function(t, base, maxdigits)
 end
 --]]
 
+-- ('a'):byte():char() == 'a'
+number.char = string.char
+
 -- so the lookup goes: primitive number -> number -> math
 return number

@@ -36,9 +36,12 @@ function string.trim(s)
 	return s:match('^%s*(.-)%s*$')
 end
 
+-- should this wrap in a table?
 function string.bytes(s)
 	return table{s:byte(1,#s)}
 end
+
+string.load = load or loadstring
 
 --[[
 -- drifting further from standards...
