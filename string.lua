@@ -107,4 +107,10 @@ function string.hexdump(d, l, w, c)
 	return s:concat()
 end
 
+-- escape for pattern matching
+local escapeFind = '[' .. ([[^$()%.[]*+-?)]]):gsub('.', '%%%1') .. ']'
+function string.patescape(s)
+	return (s:gsub(escapeFind, '%%%1'))
+end
+
 return string
