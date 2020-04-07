@@ -108,7 +108,7 @@ function string.hexdump(d, l, w, c)
 end
 
 -- escape for pattern matching
-local escapeFind = '[' .. ([[^$()%.[]*+-?)]]):gsub('.', '%%%1') .. ']'
+local escapeFind = '[' .. ([[^$()%.[]*+-?]]):gsub('.', '%%%1') .. ']'
 function string.patescape(s)
 	return (s:gsub(escapeFind, '%%%1'))
 end
