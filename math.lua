@@ -42,6 +42,7 @@ function math.isprime(n)
 end
 
 function math.factors(n)
+	local table = require 'ext.table'
 	local f = table()
 	for i=1,n do
 		if n%i == 0 then 
@@ -53,6 +54,7 @@ end
 
 -- returns a table containing the prime factorization of the number
 function math.primeFactorization(n)
+	local table = require 'ext.table'
 	n = math.floor(n)
 	local f = table()
 	while n > 1 do
