@@ -166,10 +166,10 @@ Don't forget that - just as with vanilla Lua - all of these are operable via Lua
 `string.csub(str, start, size)` = Returns a substring, where `start` is 0-based and `size` is the length of the substring.
 
 `string.hexdump(str, columnLength, hexWordSize, spaceEveryNColumns)` = Returns a hex-dump of the string.
-	`str` = The string to be hex-dumped.
-	`columnLength` = How many columns wide. Default 32.
-	`hexWordSize` = How many bytes per word in the hex dump.  Default 1.
-	`spaceEveryNColumns` = How often to insert an extra 1-character space.  Default every 8 bytes.
+- `str` = The string to be hex-dumped.
+- `columnLength` = How many columns wide. Default 32.
+- `hexWordSize` = How many bytes per word in the hex dump.  Default 1.
+- `spaceEveryNColumns` = How often to insert an extra 1-character space.  Default every 8 bytes.
 
 Example of the output:
 
@@ -262,7 +262,7 @@ This library doesn't assign `tostring` to `__tostring` by default, but you can a
 require 'ext.meta'
 
 -- assign number's tostring to __tostring
-(function(m) m.__tostring = m.tostring end)(debug.getmetatable(0))	
+(function(m) m.__tostring = m.tostring end)(debug.getmetatable(0))
 ```
 
 `number.charfor(digit)` = Returns a character for the specified digit.  This function assumes the digit is within the range of its desired base.
@@ -311,11 +311,11 @@ Metatable changes:
 
 `boolean` metatable also now supports concatenation.  Some infix functions are added to represent primitive boolean operations:
 
-	`and_` = `and`, such that `(true):and_(false)` produces `false`.
-	`or_` = `or`
-	`not_` = `not`
-	`xor` = logical XOR, equivalent to `a ~= b` for booleans a and b.
-	`implies` = logical 'implies', i.e. `not a or b`.
+- `and_` = `and`, such that `(true):and_(false)` produces `false`.
+- `or_` = `or`
+- `not_` = `not`
+- `xor` = logical XOR, equivalent to `a ~= b` for booleans a and b.
+- `implies` = logical 'implies', i.e. `not a or b`.
 
 `number` metatable is assigned to the table in `ext.number` (which is an extension of `ext.math` with some string-serialization additions).
 
