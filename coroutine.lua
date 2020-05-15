@@ -3,10 +3,8 @@ for k,v in pairs(require 'coroutine') do coroutine[k] = v end
 
 local function safehandle(thread, res, ...)
 	if not res then
-		local err = ...
-		io.stderr:write(err,'\n')
-		io.stderr:write(debug.traceback(thread),'\n')
-		return false, ...
+		local err = tostring(...)..'\n'..debug.traceback(thread)
+		return false, err
 	end
 	return true, ...
 end
@@ -17,7 +15,7 @@ end
 -- 	as opposed to assert(coroutine.resume(thread)), which only prints the stack trace of the resume statement
 -- if the thread is alive and resume succeeded, returns true
 function coroutine.assertresume(thread, ...)
-	if coroutine.status(thread) == 'dead' then return false end
+	if coroutine.status(thread) == 'dead' then return false, 'dead' end
 	return safehandle(thread, coroutine.resume(thread, ...))
 end
 
