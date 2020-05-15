@@ -284,7 +284,7 @@ Example with `number` as Lua number metatables:
 100.01022122221121122001111210201211021100300011111010
 ```
 
-Yes, go ahead and sum up those digits scaled by their respective powers of pi, see that it does come out to be nearly 10.
+Yes, go ahead and sum up those digits scaled by their respective powers of pi, see that it does come out to be 10.
 
 Example with `number`, changing the default 
 ```
