@@ -364,7 +364,7 @@ The following infix methods are added to functions:
 `f:o(g1[, g2, ..., gN])` = Returns a function `h` such that `h(x1, x2, ...)` executes `f(g1(g2(...gN( x1, x2, ... ))))`.
 
 `f:compose_n(n, g1[, g2, ..., gM])` 
-`f:o_n(n, g1[, g2, ..., gM])` = ???
+`f:o_n(n, g1[, g2, ..., gM])` = Returns a function 'h' that only replaces the n'th argument with a concatenation of subsequent functions g1...gN.
 
 `f:bind(arg1[, arg2, ..., argN])` = Function curry. Returns a function 'g' that already has arguments arg1 ... argN bound to the first 'n' arguments of 'f'.
 
