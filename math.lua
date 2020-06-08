@@ -9,6 +9,18 @@ math.e = math.exp(1)
 if not math.atan2 then math.atan2 = math.atan end
 -- also note, code that uses math.atan(y,x) in luajit will instead just call math.atan(y) ...
 
+function math.asinh(x)
+	return math.log(x + math.sqrt(x*x + 1))
+end
+
+function math.acosh(x)
+	return math.log(x + math.sqrt(x*x - 1))
+end
+
+function math.atanh(x)
+	return .5 * math.log((1 + x) / (1 - x))
+end
+
 function math.clamp(v,min,max)
 	return math.min(math.max(v,min), max)
 end
@@ -75,6 +87,8 @@ function math.primeFactorization(n)
 	return f
 end
 
-function math.cbrt(x) return x^(1/3) end
+function math.cbrt(x) 
+	return math.sign(x) * math.abs(x)^(1/3) 
+end
 
 return math

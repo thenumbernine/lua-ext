@@ -316,4 +316,27 @@ function table.wrapfor(f, s, var)
 	return t
 end
 
+-- https://www.lua.org/pil/9.3.html
+local function permgen(t, n)
+	if n < 1 then
+		coroutine.yield(t)
+	else
+		for i=n,1,-1 do
+			-- put i-th element as the last one
+			t[n], t[i] = t[i], t[n]
+			-- generate all permutations of the other elements
+			permgen(t, n - 1)
+			-- restore i-th element
+			t[n], t[i] = t[i], t[n]
+		end
+	end
+end
+
+-- return iterator of permutations of the table
+function table.permutations(t)
+	return coroutine.wrap(function()
+		permgen(t, table.maxn(t))
+	end)
+end
+
 return table
