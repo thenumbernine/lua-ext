@@ -378,19 +378,22 @@ The following infix methods are added to functions:
 
 ### range.lua: 
 
+`range = require 'ext.range'`
 `range(a[, b[, c]])` = A very simple function for creating tables of numeric for-loops.
 
 ### reload.lua: 
 
+`reload = require 'ext.reload'`
 `reload(packagename)` = Removes the package from package.loaded, re-requires it, and returns its result.  Useful for live testing of newly developed features.
 
 ### tolua.lua: 
 
+`tolua = require 'ext.tolua'`
 `tolua(obj[, args])` = Serialization from any Lua value to a string.
 
 args can be any of the following:
 - `indent` = Default to 'true', set to 'false' to make results concise.
-- `pairs` = The `pairs()` operator to use when iterating over tables.  This defaults to a form of pairs() which iterates over all fields using next().  Set this to your own custom pairs function, or 'pairs' if you would like serialization to respect the __pairs metatable (which it does not by default).
+- `pairs` = The `pairs()` operator to use when iterating over tables.  This defaults to a form of pairs() which iterates over all fields using next().  Set this to your own custom pairs function, or 'pairs' if you would like serialization to respect the `__pairs` metatable (which it does not by default).
 - `serializeForType` = A table with keys of lua types and values of callbacks for serializing those types.
 - `serializeMetatables` = Set to 'true' to include serialization of metatables.
 - `serializeMetatableFunc` = Function to override the default serialization of metatables.
@@ -398,15 +401,19 @@ args can be any of the following:
 
 ### fromlua.lua: 
 
+`fromlua = require 'ext.fromlua'`
 `fromlua(str)` = De-Serialization from a string to any Lua value.  This is just a small wrapper using `load`.
 
 ### cmdline.lua:
 
-`cmdline = require 'cmdline'` = builds the table `cmdline` from all command-line arguments.  Here are the rules it follows:
+`getCmdline = require 'cmdline'`
+`cmdline = getCmdline(...)` = builds the table `cmdline` from all command-line arguments.  Here are the rules it follows:
 - If a command-line argument `k` has no equals sign then `cmdline[k]` is assigned to `true`.
 - If a command-line argument has an equals sign present, i.e. is of the form `k=v`, then `cmdline[k]` is assigned the value of `v` if it was evaluated in Lua.
 - If evaluating it in Lua produces an error or nil then `cmdline[k]` is assigned the literal string of `v`.
 - Don't forget to wrap your complicated assignments in quotations marks.
+
+Notice that, calling `require 'ext'` will also call `getCmdline` on `arg`, producing the global `cmdline`.
 
 ### file.lua: filesystem-as-table access (WIP)
 ### gcmem.lua: Provides FFI-based functions for manually or automatically allocating and freeing memory.  WIP due to crashing in LuaJIT when you run `ptr = ffi.cast('T*', ptr)` and haven't bound `ptr` anywhere else.

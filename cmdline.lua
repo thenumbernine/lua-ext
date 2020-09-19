@@ -4,18 +4,22 @@
 
 local fromlua = require 'ext.fromlua'
 
-local cmdline = {}
+local function getCmdline(...)
+	local cmdline = {}
 
-for _,w in ipairs(arg or {}) do
-	local k,v = w:match'^(.-)=(.*)$'
-	if k then
-		pcall(function()
-			cmdline[k] = fromlua(v)
-		end)
-		if cmdline[k] == nil then cmdline[k] = v end
-	else
-		cmdline[w] = true
+	for _,w in ipairs{...} do
+		local k,v = w:match'^(.-)=(.*)$'
+		if k then
+			pcall(function()
+				cmdline[k] = fromlua(v)
+			end)
+			if cmdline[k] == nil then cmdline[k] = v end
+		else
+			cmdline[w] = true
+		end
 	end
+
+	return cmdline
 end
 
-return cmdline
+return getCmdline
