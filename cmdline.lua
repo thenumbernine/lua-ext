@@ -4,7 +4,7 @@
 
 local fromlua = require 'ext.fromlua'
 
-local cmdline or {}
+local cmdline = {}
 
 for _,w in ipairs(arg or {}) do
 	local k,v = w:match'^(.-)=(.*)$'

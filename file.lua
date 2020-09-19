@@ -8,13 +8,14 @@ local function ffi()
 end
 
 local io = require 'ext.io'
+local os = require 'ext.os'
 
 local filemeta
 filemeta = {
 	-- directory listing
 	__call = function(t, state, lastfunc)
 		assert(not lastfunc, "make sure to call() the dir")
-		return io.dir(t.path)
+		return os.listdir(t.path)
 	end,
 	
 	-- read file
@@ -26,7 +27,7 @@ filemeta = {
 --			if not ffi then
 				-- if no lfs then no nested read dereferences
 				-- and let directories error
-				if io.isdir(fn) then
+				if os.isdir(fn) then
 					-- is a directory
 					return setmetatable({
 						path = fn,
@@ -63,7 +64,7 @@ filemeta = {
 	__newindex = function(t,k,v)
 		local fn = k:sub(1,1) == '/' and k or (t.path..'/'..k)
 		if not v then
-			if io.fileexists(fn) then
+			if os.fileexists(fn) then
 				-- throws error if something went wrong during the remove
 				assert(os.remove(fn))
 			end

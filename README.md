@@ -93,8 +93,6 @@ assert(obj1 + obj2 == 'abc')
 
 ### io.lua
 
-`io.fileexists(path)` = Returns true/false whether the associated file exists.
-
 `io.readfile(path)` = Returns the contents of the file as a string.  If an error exists, returns `false` and the error.
 
 `io.writefile(path, data)` = Writes the string in `data` to the file.  If an error occurs, returns `false` and the error, otherwise returns true.
@@ -104,19 +102,6 @@ assert(obj1 + obj2 == 'abc')
 `local dirname, filename = io.getfiledir(path)` = Returns the directory and the file name of the file at the specified path.
 
 `local pathWithoutExtension, extension = io.getfileext(path)` = Returns the filename up to the extension (without the dot) and the extension.
-
-`io.isdir(path)` = Returns true if the file at `path` is a directory.
-
-`io.dir(path)` = Return an iterator that iterates through all files in a directory.
-
-Example:
-```
-for fn in io.dir('.') do
-	print(fn)
-end
-```
-
-`io.rdir(path, callback)` = Returns a list of all files from a recursive directory.  If `callback` is specified then it is called for each file, and if the callback returns false then sub-directories are not traversed and files are not inserted.
 
 ### math.lua
 
@@ -149,7 +134,22 @@ end
 
 ### os.lua
 
-Require'ing this file attempts to fix the compatability of `os.execute` for Lua 5.1 to match that of Lua 5.2.
+`os.execute(...)` = Attempts to fix the compatability of `os.execute` for Lua 5.1 to match that of Lua 5.2.
+
+`os.fileexists(path)` = Returns true/false whether the associated file exists.
+
+`os.isdir(path)` = Returns true if the file at `path` is a directory.
+
+`os.listdir(path)` = Return an iterator that iterates through all files in a directory.
+
+Example:
+```
+for fn in os.listdir('.') do
+	print(fn)
+end
+```
+
+`os.rlistdir(path, callback)` = Returns a list of all files from a recursive directory.  If `callback` is specified then it is called for each file, and if the callback returns false then sub-directories are not traversed and files are not inserted.
 
 ### string.lua
 
