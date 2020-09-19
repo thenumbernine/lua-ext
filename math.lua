@@ -21,6 +21,10 @@ function math.atanh(x)
 	return .5 * math.log((1 + x) / (1 - x))
 end
 
+function math.cbrt(x) 
+	return math.sign(x) * math.abs(x)^(1/3) 
+end
+
 function math.clamp(v,min,max)
 	return math.min(math.max(v,min), max)
 end
@@ -87,8 +91,8 @@ function math.primeFactorization(n)
 	return f
 end
 
-function math.cbrt(x) 
-	return math.sign(x) * math.abs(x)^(1/3) 
+function math.gcd(a,b)
+	return b == 0 and a or math.gcd(b, a % b)
 end
 
 return math

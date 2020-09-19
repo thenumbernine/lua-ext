@@ -400,6 +400,14 @@ args can be any of the following:
 
 `fromlua(str)` = De-Serialization from a string to any Lua value.  This is just a small wrapper using `load`.
 
+### cmdline.lua:
+
+`cmdline = require 'cmdline'` = builds the table `cmdline` from all command-line arguments.  Here are the rules it follows:
+- If a command-line argument `k` has no equals sign then `cmdline[k]` is assigned to `true`.
+- If a command-line argument has an equals sign present, i.e. is of the form `k=v`, then `cmdline[k]` is assigned the value of `v` if it was evaluated in Lua.
+- If evaluating it in Lua produces an error or nil then `cmdline[k]` is assigned the literal string of `v`.
+- Don't forget to wrap your complicated assignments in quotations marks.
+
 ### file.lua: filesystem-as-table access (WIP)
 ### gcmem.lua: Provides FFI-based functions for manually or automatically allocating and freeing memory.  WIP due to crashing in LuaJIT when you run `ptr = ffi.cast('T*', ptr)` and haven't bound `ptr` anywhere else.
 
