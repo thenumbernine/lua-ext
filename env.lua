@@ -13,7 +13,7 @@ return function(env)
 	env.reload = require 'ext.reload'
 	env.range = require 'ext.range'
 	env.op = require 'ext.op'
-	env.getCmdline = require 'cmdline'
+	env.getCmdline = require 'ext.cmdline'
 	env.cmdline = env.getCmdline(table.unpack(arg))
 	env._ = os.execute
 	-- requires ffi

@@ -5,6 +5,9 @@ for k,v in pairs(require 'os') do os[k] = v end
 -- don't require os from inside io ...
 local io = require 'ext.io'
 
+-- table.pack
+local table = require 'ext.table'
+
 -- [[ TODO - this block is also in ext/io.lua
 
 local function lfs()
@@ -37,21 +40,34 @@ end
 if _VERSION == 'Lua 5.1' then
 	local execute = os.execute
 	function os.execute(cmd)
+		local results = table.pack(execute(cmd))
+		if #results > 1 then return table.unpack(results, 1, results.n) end
 		local errcode = execute(cmd)
 		local reason = ({
 			[0] = 'exit',
 		})[errcode] or 'unknown'
-		return errcode==0 and true or nil, reason, errcode
+		return errcode == 0 and true or nil, reason, errcode
 	end
 end
 
+-- TODO should this fail if the dir already exists?  or should it succeed?
+-- should it fail if a file is presently there? probably.
 function os.mkdir(dir, makeParents)
 	if windows() then
-		return os.execute('mkdir "'..dir:gsub('/', '\\')..'"')
-	else
-		return os.execute('mkdir "'..dir..'"')
+		dir = dir:gsub('/', '\\')
 	end
+	local cmd = 'mkdir'..(makeParents and ' -p' or '')..' "'..dir..'"'
+	return os.execute(cmd)
 end
+
+function os.rmdir(dir)
+	if windows() then
+		dir = dir:gsub('/', '\\')
+	end
+	local cmd = 'rmdir "'..dir..'"'
+	return os.execute(cmd)
+end
+
 
 function os.isdir(fn)
 	local lfs = lfs()
@@ -160,8 +176,10 @@ end
 args:
 	path = directory to search from
 	callback(filename, isdir) = optional callback to filter each file
+
+should this be in io or os?
+should this be an iterator like os.listdir() is?
 --]]
--- should this be in io or os?
 function os.rlistdir(path, callback, fs)
 	local table = require 'ext.table'
 	fs = fs or table()
