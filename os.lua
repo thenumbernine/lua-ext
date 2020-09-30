@@ -53,10 +53,14 @@ end
 -- TODO should this fail if the dir already exists?  or should it succeed?
 -- should it fail if a file is presently there? probably.
 function os.mkdir(dir, makeParents)
+	local tonull
 	if windows() then
 		dir = dir:gsub('/', '\\')
+		tonull = ' 2> nul'
+	else
+		tonull = ' 2> /dev/null'
 	end
-	local cmd = 'mkdir'..(makeParents and ' -p' or '')..' "'..dir..'"'
+	local cmd = 'mkdir'..(makeParents and ' -p' or '')..' '..('%q'):format(dir)..tonull
 	return os.execute(cmd)
 end
 
