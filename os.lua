@@ -72,6 +72,20 @@ function os.rmdir(dir)
 	return os.execute(cmd)
 end
 
+function os.move(from, to)
+	-- [[
+	-- alternatively I could write this as readfile/writefile and os.remove
+	if windows() then
+		from = from:gsub('/', '\\')
+		to = to:gsub('/', '\\')
+	end
+	local cmd = (windows() and 'move' or 'mv') .. ' "'..from..'" "'..to..'"'
+	return os.execute(cmd)
+	--]]
+	--[[
+	file[from], file[to] = nil, file[from]
+	--]]
+end
 
 function os.isdir(fn)
 	local lfs = lfs()

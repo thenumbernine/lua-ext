@@ -151,6 +151,12 @@ end
 
 `os.rlistdir(path, callback)` = Returns a list of all files from a recursive directory.  If `callback` is specified then it is called for each file, and if the callback returns false then sub-directories are not traversed and files are not inserted.
 
+`os.mkdir(path[, createParents])` = Create directory.  Set createParents to `true` to create parents as well.
+
+`os.rmdir(path)` = Removes directory.
+
+`os.move(src, dst)` = Move file from src to dst.
+
 ### string.lua
 
 Don't forget that - just as with vanilla Lua - all of these are operable via Lua string metamethods: `("a b c"):split(" ")` gives you `{'a', 'b', 'c'}`.
