@@ -8,6 +8,9 @@ local io = require 'ext.io'
 -- table.pack
 local table = require 'ext.table'
 
+-- string.trim
+local string = require 'ext.string'
+
 -- [[ TODO - this block is also in ext/io.lua
 
 local function lfs()
