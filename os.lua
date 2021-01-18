@@ -55,11 +55,13 @@ end
 
 -- TODO should this fail if the dir already exists?  or should it succeed?
 -- should it fail if a file is presently there? probably.
+-- should makeParents be set by default?  it's on by default in Windows.
 function os.mkdir(dir, makeParents)
 	local tonull
 	if windows() then
 		dir = dir:gsub('/', '\\')
 		tonull = ' 2> nul'
+		makeParents = nil -- mkdir in Windows always makes parents, and doesn't need a switch
 	else
 		tonull = ' 2> /dev/null'
 	end
