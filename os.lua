@@ -11,7 +11,7 @@ local table = require 'ext.table'
 -- string.trim
 local string = require 'ext.string'
 
--- [[ TODO - this block is also in ext/io.lua
+-- [[ TODO - this block is also in ext/file.lua
 
 local function lfs()
 	local result, lfs = pcall(require, 'lfs')
