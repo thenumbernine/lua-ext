@@ -29,6 +29,24 @@ end
 local io = require 'ext.io'
 local os = require 'ext.os'
 
+-- append the path if fn is relative, otherwise use fn
+local function appendPath(fn, path)
+	if windows() then
+		fn = fn:gsub('/', '\\')
+		if not (
+			fn:sub(1,1) == '\\' 
+			or fn:match'^[A-Z,a-z]:\\'
+		) then
+			fn = t.path .. '\\' .. fn
+		end
+	else
+		if fn:sub(1,1) ~= '/' then
+			fn = t.path .. '/' .. fn
+		end
+	end
+	return fn
+end
+
 local filemeta
 filemeta = {
 	-- directory listing
@@ -39,31 +57,22 @@ filemeta = {
 	
 	-- read file
 	__index = function(t,k)
-		local fn = k:sub(1,1) == '/' and k or (t.path..'/'..k)
+		local fn = appendPath(k, t.path)
+		
 		local lfs = lfs()
 		if not lfs then
---			local ffi = ffi()
---			if not ffi then
-				-- if no lfs then no nested read dereferences
-				-- and let directories error
-				if os.isdir(fn) then
-					-- is a directory
-					return setmetatable({
-						path = fn,
-					}, filemeta)
-				else
-					return io.readfile(fn)
-				end
---[[
+			-- if no lfs then no nested read dereferences
+			-- and let directories error
+			if os.isdir(fn) then
+				-- is a directory
+				return setmetatable({
+					path = fn,
+				}, filemeta)
 			else
-				if ffi.os == 'Windows' then
-					error('sorry windows')
-				else
-					error('TODO stat() for ffi...')
-				end
+				return io.readfile(fn)
 			end
---]]
 		else
+			-- TODO solely use os.isdir() ?
 			local attr = lfs.attributes(fn)
 			if not attr then
 				return false, "couldn't open file"
@@ -81,31 +90,15 @@ filemeta = {
 	
 	-- write file
 	__newindex = function(t,k,v)
-		local fn = k
-		if windows() then
-			fn = fn:gsub('/', '\\')
-			if not (
-				fn:sub(1,1) == '\\' 
-				or fn:match'^[A-Z,a-z]:\\'
-			) then
-				fn = t.path .. '\\' .. fn
-			end
-		else
-			if fn:sub(1,1) ~= '/' then
-				fn = t.path .. '/' .. fn
-			end
-		end
+		local fn = appendPath(k, t.path)
 		if not v then
 			if os.fileexists(fn) then
 				-- throws error if something went wrong during the remove
 				assert(os.remove(fn))
 			end
 		else
-			local tolua = require 'ext.tolua'
-			print('t.path = '..tolua(t.path))
-			print('k = '..tolua(t.path))
-			print('fn '..tolua(fn))
-			print(io.writefile(fn, v))
+			-- __newindex can't return values, so do we hide errors or do we throw them (raising their severity?) or do we write a warning to stderr?
+			io.writefile(fn, v)
 		end
 	end,
 	
