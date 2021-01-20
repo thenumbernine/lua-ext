@@ -37,11 +37,11 @@ local function appendPath(fn, path)
 			fn:sub(1,1) == '\\' 
 			or fn:match'^[A-Z,a-z]:\\'
 		) then
-			fn = t.path .. '\\' .. fn
+			fn = path .. '\\' .. fn
 		end
 	else
 		if fn:sub(1,1) ~= '/' then
-			fn = t.path .. '/' .. fn
+			fn = path .. '/' .. fn
 		end
 	end
 	return fn
