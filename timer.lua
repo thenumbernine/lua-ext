@@ -23,15 +23,24 @@ else
 	end
 end
 
-function T.timer(name, cb)
-	T.out:write(name..'...\n')
+local depth = 0
+local tab = '='
+
+local function timerReturn(name, startTime, indent, ...)
+	depth = depth - 1
+	local endTime = T.getTime()
+	T.out:write(indent..'...done '..name..' ('..(endTime - startTime)..'s)\n')
+	T.out:flush()
+	return ...
+end
+
+function T.timer(name, cb, ...)
+	local indent = tab:rep(depth)
+	T.out:write(indent..name..'...\n')
 	T.out:flush()
 	local startTime = T.getTime()
-	local result = table.pack(cb())
-	local endTime = T.getTime()
-	T.out:write('...done '..name..' ('..(endTime - startTime)..'s)\n')
-	T.out:flush()
-	return table.unpack(result, 1, result.n)
+	depth = depth + 1
+	return timerReturn(name, startTime, indent, cb(...))
 end
 
 setmetatable(T, {
