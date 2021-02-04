@@ -17,9 +17,12 @@ local classmeta = {
 -- usage: obj:isa(class)
 local function isa(self, cl)
 	assert(cl, "isa expected a class")
+--[[
 	if self.class == cl then return true end
 	if self.class.super then return isa(self.class.super, cl) end
 	return false
+--]]
+	return self.isaKeys[cl] or false
 end
 
 local function class(...)
@@ -30,6 +33,16 @@ local function class(...)
 	cl.super = parents[1]
 	cl.supers = parents
 	
+	cl.isaKeys = {[cl] = true}
+	for _,parent in ipairs(parents) do
+		cl.isaKeys[parent] = true
+		if parent.isaKeys then
+			for k,_ in pairs(parent.isaKeys) do
+				cl.isaKeys[k] = true
+			end
+		end
+	end
+
 	cl.__index = cl
 	cl.new = newmember
 	cl.isa = isa

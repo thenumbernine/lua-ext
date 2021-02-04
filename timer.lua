@@ -23,11 +23,11 @@ else
 	end
 end
 
-local depth = 0
-local tab = '='
+T.depth = 0
+T.tab = '_'
 
 local function timerReturn(name, startTime, indent, ...)
-	depth = depth - 1
+	T.depth = T.depth - 1
 	local endTime = T.getTime()
 	T.out:write(indent..'...done '..name..' ('..(endTime - startTime)..'s)\n')
 	T.out:flush()
@@ -35,17 +35,16 @@ local function timerReturn(name, startTime, indent, ...)
 end
 
 function T.timer(name, cb, ...)
-	local indent = tab:rep(depth)
+	local indent = T.tab:rep(T.depth)
 	T.out:write(indent..name..'...\n')
 	T.out:flush()
 	local startTime = T.getTime()
-	depth = depth + 1
+	T.depth = T.depth + 1
 	return timerReturn(name, startTime, indent, cb(...))
 end
 
 setmetatable(T, {
 	-- call forwards to timer:
-	-- so you override 'getTime' if you want
 	__call = function(T, ...)
 		return T.timer(...)
 	end,
