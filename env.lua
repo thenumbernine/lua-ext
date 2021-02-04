@@ -12,6 +12,7 @@ return function(env)
 	env.class = require 'ext.class'
 	env.reload = require 'ext.reload'
 	env.range = require 'ext.range'
+	env.timer = require 'ext.timer'
 	env.op = require 'ext.op'
 	env.getCmdline = require 'ext.cmdline'
 	env.cmdline = env.getCmdline(table.unpack(arg))
