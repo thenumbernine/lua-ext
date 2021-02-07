@@ -25,6 +25,21 @@ setmetatable(table, {
 -- 5.2 or 5.3 compatible
 table.unpack = table.unpack or unpack
 
+-- [[ how about table.unpack(t) defaults to table.unpack(t, 1, t.n) if t.n is present?  
+-- for cohesion with table.pack?
+-- already table.unpack's default is #t, but this doesn't account for nils
+-- this might break compatability somewhere ...
+local origTableUnpack = table.unpack
+function table.unpack(...)
+	local nargs = select('#', ...)
+	local t, i, j = ...
+	if nargs < 3 and t.n ~= nil then
+		return origTableUnpack(t, i or 1, t.n)
+	end
+	return origTableUnpack(...)
+end
+--]]
+
 -- 5.1 compatible
 if not table.pack then
 	function table.pack(...)

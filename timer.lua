@@ -29,14 +29,20 @@ T.tab = '_'
 local function timerReturn(name, startTime, indent, ...)
 	T.depth = T.depth - 1
 	local endTime = T.getTime()
-	T.out:write(indent..'...done '..name..' ('..(endTime - startTime)..'s)\n')
+	T.out:write(indent..'...done ')
+	if name then
+		T.out:write(name..' ')
+	end
+	T.out:write('('..(endTime - startTime)..'s)\n')
 	T.out:flush()
 	return ...
 end
 
 function T.timer(name, cb, ...)
 	local indent = T.tab:rep(T.depth)
-	T.out:write(indent..name..'...\n')
+	if name then
+		T.out:write(indent..name..'...\n')
+	end
 	T.out:flush()
 	local startTime = T.getTime()
 	T.depth = T.depth + 1
