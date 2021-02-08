@@ -24,7 +24,7 @@ else
 end
 
 T.depth = 0
-T.tab = '_'
+T.tab = ' '
 
 local function timerReturn(name, startTime, indent, ...)
 	T.depth = T.depth - 1
