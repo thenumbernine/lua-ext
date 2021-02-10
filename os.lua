@@ -37,6 +37,12 @@ local function windows()
 	end
 end
 
+os.sep = windows() and '\\' or '/'
+
+function os.path(str)
+	return (str:gsub('/', os.sep))
+end
+
 --]]
 
 -- 5.2 os.execute compat
@@ -59,7 +65,7 @@ end
 function os.mkdir(dir, makeParents)
 	local tonull
 	if windows() then
-		dir = dir:gsub('/', '\\')
+		dir = os.path(dir)
 		tonull = ' 2> nul'
 		makeParents = nil -- mkdir in Windows always makes parents, and doesn't need a switch
 	else
@@ -70,21 +76,14 @@ function os.mkdir(dir, makeParents)
 end
 
 function os.rmdir(dir)
-	if windows() then
-		dir = dir:gsub('/', '\\')
-	end
-	local cmd = 'rmdir "'..dir..'"'
+	local cmd = 'rmdir "'..os.path(dir)..'"'
 	return os.execute(cmd)
 end
 
 function os.move(from, to)
 	-- [[
 	-- alternatively I could write this as readfile/writefile and os.remove
-	if windows() then
-		from = from:gsub('/', '\\')
-		to = to:gsub('/', '\\')
-	end
-	local cmd = (windows() and 'move' or 'mv') .. ' "'..from..'" "'..to..'"'
+	local cmd = (windows() and 'move' or 'mv') .. ' "'..os.path(from)..'" "'..os.path(to)..'"'
 	return os.execute(cmd)
 	--]]
 	--[[
@@ -103,7 +102,7 @@ function os.isdir(fn)
 			return 'yes' == 
 				string.trim(io.readproc(
 					'if exist "'
-					..fn:gsub('/','\\')
+					..os.path(fn)
 					..'\\*" (echo yes) else (echo no)'
 				))
 		else
@@ -141,7 +140,7 @@ function os.listdir(path)
 			local string = require 'ext.string'
 			local cmd
 			if windows() then
-				cmd = 'dir /b "'..path:gsub('/','\\')..'"'
+				cmd = 'dir /b "'..os.path(path)..'"'
 			else
 				cmd = 'ls '..path:gsub('[|&;<>`\"\' \t\r\n#~=%$%(%)%%%[%*%?]', [[\%0]])
 			end
@@ -229,7 +228,7 @@ function os.fileexists(fn)
 	else
 		if windows() then
 			-- Windows reports 'false' to io.open for directories, so I can't use that ...
-			return 'yes' == string.trim(io.readproc('if exist "'..fn:gsub('/','\\')..'" (echo yes) else (echo no)'))
+			return 'yes' == string.trim(io.readproc('if exist "'..os.path(fn)..'" (echo yes) else (echo no)'))
 		else
 			-- here's a version that works for OSX ...
 			local f, err = io.open(fn, 'r')

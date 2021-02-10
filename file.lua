@@ -32,9 +32,9 @@ local os = require 'ext.os'
 -- append the path if fn is relative, otherwise use fn
 local function appendPath(fn, path)
 	if windows() then
-		fn = fn:gsub('/', '\\')
+		fn = os.path(fn)
 		if not (
-			fn:sub(1,1) == '\\' 
+			fn:sub(1,1) == '\\'
 			or fn:match'^[A-Z,a-z]:\\'
 		) then
 			fn = path .. '\\' .. fn
