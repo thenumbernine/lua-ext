@@ -1,7 +1,8 @@
+local table = require 'ext.table'
 return function(env)
 	env = env or _G
 	env.math = require 'ext.math'
-	env.table = require 'ext.table'
+	env.table = table
 	env.string = require 'ext.string'
 	env.coroutine = require 'ext.coroutine'
 	env.io = require 'ext.io'
@@ -15,7 +16,7 @@ return function(env)
 	env.timer = require 'ext.timer'
 	env.op = require 'ext.op'
 	env.getCmdline = require 'ext.cmdline'
-	env.cmdline = env.getCmdline(table.unpack(arg))
+	env.cmdline = env.getCmdline(table.unpack(arg or {}))
 	env._ = os.execute
 	-- requires ffi
 	--env.gcnew = require 'ext.gcmem'.new
