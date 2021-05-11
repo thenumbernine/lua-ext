@@ -229,6 +229,7 @@ function os.rlistdir(path, callback, fs)
 end
 
 function os.fileexists(fn)
+	assert(fn, "expected filename")
 	local lfs = lfs()
 	if lfs then
 		return lfs.attributes(fn) ~= nil
