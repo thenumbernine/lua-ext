@@ -1,5 +1,11 @@
 -- [[ TODO - this block is also in ext/io.lua and ext/file.lua
 
+local function asserttype(x, t)
+	local xt = type(x)
+	assert(xt == t, "expected "..t.." found "..xt)
+	return x
+end
+
 local function lfs()
 	local result, lfs = pcall(require, 'lfs')
 	return result and lfs
@@ -31,6 +37,8 @@ local os = require 'ext.os'
 
 -- append the path if fn is relative, otherwise use fn
 local function appendPath(fn, path)
+	asserttype(fn, 'string')
+	asserttype(path, 'string')
 	if windows() then
 		fn = os.path(fn)
 		if not (
@@ -57,7 +65,7 @@ filemeta = {
 	
 	-- read file
 	__index = function(t,k)
-		local fn = appendPath(k, t.path)
+		local fn = asserttype(appendPath(k, t.path), 'string')
 		
 		local lfs = lfs()
 		if not lfs then
@@ -66,7 +74,7 @@ filemeta = {
 			if os.isdir(fn) then
 				-- is a directory
 				return setmetatable({
-					path = fn,
+					path = asserttype(fn, 'string')
 				}, filemeta)
 			else
 				return io.readfile(fn)
@@ -79,7 +87,7 @@ filemeta = {
 			end
 			if attr.mode == 'directory' then
 				return setmetatable({
-					path = fn,
+					path = asserttype(fn, 'string')
 				}, filemeta)
 			elseif attr.mode == 'file' then
 				return io.readfile(fn)
@@ -90,6 +98,7 @@ filemeta = {
 	
 	-- write file
 	__newindex = function(t,k,v)
+		asserttype(k, 'string')
 		local fn = appendPath(k, t.path)
 		if not v then
 			if os.fileexists(fn) then

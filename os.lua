@@ -13,6 +13,12 @@ local string = require 'ext.string'
 
 -- [[ TODO - this block is also in ext/file.lua
 
+local function asserttype(x, t)
+	local xt = type(x)
+	assert(xt == t, "expected "..t.." found "..xt)
+	return x
+end
+
 local function lfs()
 	local result, lfs = pcall(require, 'lfs')
 	return result and lfs
@@ -40,6 +46,7 @@ end
 os.sep = windows() and '\\' or '/'
 
 function os.path(str)
+	asserttype(str, 'string')
 	return (str:gsub('/', os.sep))
 end
 

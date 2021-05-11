@@ -289,8 +289,8 @@ local function tolua(x, args)
 		state.skipRecursiveReferences = args.skipRecursiveReferences 
 	end	
 	if indent then
-			state.indentChar = '\t'
-			state.newlineChar = '\n'
+		state.indentChar = '\t'
+		state.newlineChar = '\n'
 	end
 	state.pairs = builtinPairs
 
