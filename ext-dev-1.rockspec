@@ -1,7 +1,7 @@
 package = 'ext'
 version = 'dev-1'
 source = {
-	url = 'git+https://github.com/thenumbernine/lua-ext.git',
+	url = 'git+https://github.com/thenumbernine/lua-ext',
 }
 description = {
 	summary = 'Commonly used extensions to the Lua default libraries.',
@@ -15,12 +15,13 @@ To work with compatability of everyone else who does not use this convention, I 
 	license = 'MIT',
 }
 dependencies = {
-   'lua >= 5.1',
+	'lua >= 5.1',
 }
 build = {
 	type = 'builtin',
 	modules = {
 		['ext.class'] = 'class.lua',
+		['ext.cmdline'] = 'cmdline.lua',
 		['ext.coroutine'] = 'coroutine.lua',
 		['ext.env'] = 'env.lua',
 		['ext'] = 'ext.lua',
@@ -37,6 +38,7 @@ build = {
 		['ext.reload'] = 'reload.lua',
 		['ext.string'] = 'string.lua',
 		['ext.table'] = 'table.lua',
+		['ext.timer'] = 'timer.lua',
 		['ext.tolua'] = 'tolua.lua',
 	}
 }
