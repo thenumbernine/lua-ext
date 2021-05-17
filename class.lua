@@ -10,11 +10,19 @@ end
 
 local classmeta = {
 	__call = function(self, ...)
+-- [[ normally:
 		return self:new(...)
+--]]
+--[[ if you want to keep track of all instances
+		local results = table.pack(self:new(...))
+		local obj = results[1]
+		table.insert(self.instances, obj)
+		return results:unpack()
+--]]
 	end,
 }
 
--- usage: class:isa(obj) 
+-- usage: class:isa(obj)
 --  so it's not really a member method, since the object doesn't come first, but this way we can use it as Class:isa(obj) and not worry about nils or local closures
 local function isa(cl, obj)
 	assert(cl, "isa: argument 1 is nil, should be the class object")	-- isa(nil, anything) errors, because it should always have a class in the 1st arg
@@ -54,10 +62,14 @@ local function class(...)
 	
 	cl.isa = isa	-- usage: Class:isa(obj)
 	
-	-- Class.is(object) 
-	-- requires closure & is a local function (which goes much slower) 
+	-- Class.is(object)
+	-- requires closure & is a local function (which goes much slower)
 	-- ... so I'm leaning away from this, but I already use it everywhere
 	cl.is = function(x) return cl:isa(x) end
+
+--[[ if you want to keep track of all instances
+	cl.instances = setmetatable({}, {__mode = 'v'})
+--]]
 
 	setmetatable(cl, classmeta)
 	return cl
