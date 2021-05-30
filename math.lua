@@ -9,6 +9,43 @@ math.e = math.exp(1)
 if not math.atan2 then math.atan2 = math.atan end
 -- also note, code that uses math.atan(y,x) in luajit will instead just call math.atan(y) ...
 
+-- some luas don't have hyperbolic trigonometric functions
+
+if not math.sinh then
+	function math.sinh(x)
+		local ex = math.exp(x)
+		return .5 * (ex - 1/ex) 
+	end
+end
+
+if not math.cosh then
+	function math.cosh(x)
+		local ex = math.exp(x)
+		return .5 * (ex + 1/ex) 
+	end
+end
+
+if not math.tanh then
+	function math.tanh(x)
+--[[ this isn't so stable.
+		local ex = math.exp(x)
+		return (ex - 1/ex) / (ex + 1/ex) 
+--]]
+-- [[ instead...
+-- if e^-2x < smallest float epsilon
+-- then consider (e^x  - e^-x) ~ e^x .. well, it turns out to be 1
+-- and if e^2x < smallest float epsilon then -1
+		if x < 0 then
+			local e2x = math.exp(2*x)
+			return (e2x - 1) / (e2x + 1)
+		else
+			local em2x = math.exp(-2*x)
+			return (1 - em2x) / (1 + em2x)
+		end
+--]]
+	end
+end
+
 function math.asinh(x)
 	return math.log(x + math.sqrt(x*x + 1))
 end
