@@ -354,4 +354,9 @@ function table.permutations(t)
 	end)
 end
 
+-- I won't add table.getmetatable because, as a member method, that will always return 'table'
+
+-- if you use this as a member method then know that you can't use it a second time (unless the metatable you set it to has a __index that has 'setmetatable' defined)
+table.setmetatable = setmetatable
+
 return table
