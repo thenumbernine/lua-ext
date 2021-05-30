@@ -4,16 +4,7 @@ for k,v in pairs(require 'table') do table[k] = v end
 table.__index = table
 
 function table.new(...)
-	local t = setmetatable({}, table)
-	for i=1,select('#', ...) do
-		local o = select(i, ...)
-		if o then
-			for k,v in pairs(o) do
-				t[k] = v
-			end
-		end
-	end
-	return t
+	return setmetatable({}, table):union(...)
 end
 
 setmetatable(table, {
@@ -67,6 +58,19 @@ if not table.maxn then
 	end
 end
 
+-- applies to the 'self' table
+-- same behavior as new
+function table:union(...)
+	for i=1,select('#', ...) do
+		local o = select(i, ...)
+		if o then
+			for k,v in pairs(o) do
+				self[k] = v
+			end
+		end
+	end
+	return self
+end
 
 -- something to consider:
 -- mapvalue() returns a new table
