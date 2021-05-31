@@ -16,7 +16,7 @@ local classmeta = {
 --[[ if you want to keep track of all instances
 		local results = table.pack(self:new(...))
 		local obj = results[1]
-		table.insert(self.instances, obj)
+		self.instances[obj] = true
 		return results:unpack()
 --]]
 	end,
@@ -68,7 +68,7 @@ local function class(...)
 	cl.is = function(x) return cl:isa(x) end
 
 --[[ if you want to keep track of all instances
-	cl.instances = setmetatable({}, {__mode = 'v'})
+	cl.instances = setmetatable({}, {__mode = 'k'})
 --]]
 
 	setmetatable(cl, classmeta)
