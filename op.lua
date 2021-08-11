@@ -9,98 +9,143 @@ useful for using Lua as a functional language.
 -- and honestly I should be defaulting to the 'bit' library anyways, esp in the case of luajit where it is translated to an asm opcode
 local lua53 = _VERSION >= 'Lua 5.3'
 
-local symbolscode = [[
-	
-	-- which fields are unary operators
-	local unary = {
-		unm = true,
-		bnot = true,
-		len = true,
-		lnot = true,
-	}
-	
-	local symbols = {
-		add = '+',
-		sub = '-',
-		mul = '*',
-		div = '/',
-		mod = '%',
-		pow = '^',
-		unm = '-',			-- unary
-		concat = '..',
-		eq = '==',
-		lt = '<',
-		le = '<=',
-		land = 'and',		-- non-overloadable
-		lor = 'or',			-- non-overloadable
-		len = '#',			-- unary
-		lnot = 'not',		-- non-overloadable, unary
-]]
-if lua53 then
-	symbolscode = symbolscode .. [[
-		idiv = '//',		-- 5.3
-		band = '&',			-- 5.3
-		bor = '|',			-- 5.3
-		bxor = '~',			-- 5.3
-		shl = '<<',			-- 5.3
-		shr = '>>',			-- 5.3
-		bnot = '~',			-- 5.3, unary
-]]
---[[ alternatively, luajit 'bit' library:
-I should probably include all of these instead
-would there be a perf hit from directly assigning these functions to my own table,
- as there is a perf hit for assigning from ffi.C func ptrs to other variables?  probably.
- how about as a tail call / vararg forwarding?
-I wonder if luajit adds extra metamethods
-
-luajit 2.0		lua 5.2		lua 5.3
-band			band		&
-bnot			bnot		~
-bor				bor			|
-bxor			bxor		~
-lshift			lshift		<<
-rshift			rshift		>>
-arshift			arshift
-rol				lrotate
-ror				rrotate
-bswap (reverses 32-bit integer endian-ness of bytes)
-tobit (converts from lua number to its signed 32-bit value) 
-tohex (string conversion)
-				btest (does some bitflag stuff)
-				extract (same)
-				replace (same)
---]]
-end
-symbolscode = symbolscode .. [[
-	}
-]]
-
-local symbols, unary = assert((loadstring or load)(symbolscode..' return symbols, unary'))()
-
-local code = symbolscode .. [[
-	-- functions for operators
+if ( not load and not loadstring and not lua53) then
+	-- restricted environment.
 	return {
-]]
-for name,symbol in pairs(symbols) do
-	if unary[name] then
-		code = code .. [[
-		]]..name..[[ = function(a) return ]]..symbol..[[ a end,
-]]
-	else
-		code = code .. [[
-		]]..name..[[ = function(a,b) return a ]]..symbol..[[ b end,
-]]
-	end
-end
-code = code .. [[
-		index = function(t, k) return t[k] end,
-		newindex = function(t, k, v)
+		symbols = {
+			add		= '+',
+			sub		= '-',
+			mul		= '*',
+			div		= '/',
+			mod		= '%',
+			pow		= '^',
+			unm		= '-',
+			eq		= '==',
+			le		= '<=',
+			lt		= '<',
+			lor		= 'or',
+			land	= 'and',
+			lnot	= 'not',
+			len		= '#',
+			concat	= '..',
+		},
+		add			= function(a, b) return a + b end,
+		sub			= function(a, b) return a - b end,
+		mul			= function(a, b) return a * b end,
+		div			= function(a, b) return a / b end,
+		mod			= function(a, b) return a % b end,
+		pow			= function(a, b) return a ^ b end,
+		unm			= function(a) return -a end,
+		eq			= function(a, b) return a == b end,
+		lt			= function(a, b) return a < b end,
+		le			= function(a, b) return a <= b end,
+		land		= function(a, b) return a and b end,
+		lor			= function(a, b) return a or b end,
+		lnot		= function(a) return not a end,
+		concat		= function(a, b) return a .. b end,
+		len			= function(a) return #a end,
+		index 		= function(t, k) return t[k] end,
+		newindex	= function(t, k, v)
 			t[k] = v
 			return t, k, v	-- ? should it return anything ?
 		end,
-		call = function(f, ...) return f(...) end,
-		
-		symbols = symbols,
+		call		= function(f, ...) return f(...) end,
 	}
-]]
-return assert((loadstring or load)(code))()
+else
+	local symbolscode = [[
+
+		-- which fields are unary operators
+		local unary = {
+			unm = true,
+			bnot = true,
+			len = true,
+			lnot = true,
+		}
+
+		local symbols = {
+			add = '+',
+			sub = '-',
+			mul = '*',
+			div = '/',
+			mod = '%',
+			pow = '^',
+			unm = '-',			-- unary
+			concat = '..',
+			eq = '==',
+			lt = '<',
+			le = '<=',
+			land = 'and',		-- non-overloadable
+			lor = 'or',			-- non-overloadable
+			len = '#',			-- unary
+			lnot = 'not',		-- non-overloadable, unary
+	]]
+	if lua53 then
+		symbolscode = symbolscode .. [[
+			idiv = '//',		-- 5.3
+			band = '&',			-- 5.3
+			bor = '|',			-- 5.3
+			bxor = '~',			-- 5.3
+			shl = '<<',			-- 5.3
+			shr = '>>',			-- 5.3
+			bnot = '~',			-- 5.3, unary
+	]]
+	--[[ alternatively, luajit 'bit' library:
+	I should probably include all of these instead
+	would there be a perf hit from directly assigning these functions to my own table,
+	 as there is a perf hit for assigning from ffi.C func ptrs to other variables?  probably.
+	 how about as a tail call / vararg forwarding?
+	I wonder if luajit adds extra metamethods
+
+	luajit 2.0		lua 5.2		lua 5.3
+	band			band		&
+	bnot			bnot		~
+	bor				bor			|
+	bxor			bxor		~
+	lshift			lshift		<<
+	rshift			rshift		>>
+	arshift			arshift
+	rol				lrotate
+	ror				rrotate
+	bswap (reverses 32-bit integer endian-ness of bytes)
+	tobit (converts from lua number to its signed 32-bit value)
+	tohex (string conversion)
+					btest (does some bitflag stuff)
+					extract (same)
+					replace (same)
+	--]]
+	end
+	symbolscode = symbolscode .. [[
+		}
+	]]
+
+	local symbols, unary = assert((loadstring or load)(symbolscode..' return symbols, unary'))()
+
+	local code = symbolscode .. [[
+		-- functions for operators
+		return {
+	]]
+	for name,symbol in pairs(symbols) do
+		if unary[name] then
+			code = code .. [[
+			]]..name..[[ = function(a) return ]]..symbol..[[ a end,
+	]]
+		else
+			code = code .. [[
+			]]..name..[[ = function(a,b) return a ]]..symbol..[[ b end,
+	]]
+		end
+	end
+	code = code .. [[
+			index = function(t, k) return t[k] end,
+			newindex = function(t, k, v)
+				t[k] = v
+				return t, k, v	-- ? should it return anything ?
+			end,
+			call = function(f, ...) return f(...) end,
+
+			symbols = symbols,
+		}
+	]]
+	return assert((loadstring or load)(code))()
+end
+
