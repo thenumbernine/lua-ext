@@ -36,6 +36,7 @@ local function windows()
 	if ffi then
 		return ffi.os == 'Windows'
 	else
+		-- TODO what if uname doesn't exist? does it exist in Windows?
 		return ({
 			msys = true,
 			ming = true,
