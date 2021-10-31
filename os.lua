@@ -40,7 +40,7 @@ local function windows()
 		return ({
 			msys = true,
 			ming = true,
-		})[(io.popen'uname 2> NIL':read'*a'):sub(1,4):lower()]
+		})[(io.popen'uname 2> NUL':read'*a'):sub(1,4):lower()]
 	end
 end
 
