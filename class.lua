@@ -59,14 +59,8 @@ local function class(...)
 
 	cl.__index = cl
 	cl.new = newmember
-	
 	cl.isa = isa	-- usage: Class:isa(obj)
 	
-	-- Class.is(object)
-	-- requires closure & is a local function (which goes much slower)
-	-- ... so I'm leaning away from this, but I already use it everywhere
-	cl.is = function(x) return cl:isa(x) end
-
 --[[ if you want to keep track of all instances
 	cl.instances = setmetatable({}, {__mode = 'k'})
 --]]

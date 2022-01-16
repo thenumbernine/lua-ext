@@ -70,11 +70,7 @@ Class tables have the following fields:
 
 Class tables have the following methods:
 
-- `Cl.is(obj)` = returns `true` if obj is a table, and is an instance of class `Cl`.
-
-Objects have the following methods:
-
-- `obj:isa(Cl)` = returns `true` if obj is an instance of class `Cl`.  This is similar to `Cl.is(obj)` but not preferrable, since `Cl.is(obj)` contains testing of the Lua type of obj.
+- `Cl:isa(obj)` = returns `true` if obj is a table, and is an instance of class `Cl`.
 
 Notice that the object's metatable is the class table.  This means that any metamethods defined in the class table are functional in the object table:
 
