@@ -1,3 +1,3 @@
-return function(str)
-	return assert(load('return '..str))()
+return function(str, ...)
+	return assert(load('return '..str, ...))()
 end
