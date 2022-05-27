@@ -4,6 +4,8 @@ for k,v in pairs(require 'coroutine') do coroutine[k] = v end
 local function safehandle(thread, res, ...)
 	if not res then
 		local err = tostring(...)..'\n'..debug.traceback(thread)
+		io.stderr:write(err..'\n')
+		io.stderr:flush()
 		return false, err
 	end
 	return true, ...
