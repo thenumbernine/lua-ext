@@ -94,6 +94,15 @@ function math.isprime(n)
 	return true
 end
 
+-- assumes n is a non-negative integer.  this isn't the Gamma function
+function math.factorial(n)
+	local prod = 1
+	for i=1,n do
+		prod = prod * i
+	end
+	return prod
+end
+
 function math.factors(n)
 	local table = require 'ext.table'
 	local f = table()
