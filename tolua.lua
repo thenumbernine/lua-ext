@@ -30,9 +30,35 @@ local function escapeString(s)
 	return (('%q'):format(s):gsub('\\\n','\\n'))
 end
 
--- returns 'true' if k is a valid variable name
+-- as of 5.4.  I could modify this based on the Lua version (like removing 'goto') but misfiring just means wrapping in quotes, so meh.
+local reserved = {
+	["and"] = true,
+	["break"] = true,
+	["do"] = true,
+	["else"] = true,
+	["elseif"] = true,
+	["end"] = true,
+	["false"] = true,
+	["for"] = true,
+	["function"] = true,
+	["goto"] = true,
+	["if"] = true,
+	["in"] = true,
+	["local"] = true,
+	["nil"] = true,
+	["not"] = true,
+	["or"] = true,
+	["repeat"] = true,
+	["return"] = true,
+	["then"] = true,
+	["true"] = true,
+	["until"] = true,
+	["while"] = true,
+}
+
+-- returns 'true' if k is a valid variable name, but not a reserved keyword 
 local function isVarName(k)
-	return type(k) == 'string' and k:match('^[_a-zA-Z][_a-zA-Z0-9]*$')
+	return type(k) == 'string' and k:match('^[_a-zA-Z][_a-zA-Z0-9]*$') and not reserved[k]
 end
 
 local toLuaRecurse

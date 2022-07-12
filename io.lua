@@ -105,29 +105,4 @@ if jit or (not jit and _VERSION < 'Lua 5.2') then
 	end
 end
 
-
--- deprecated - moved to os.fileexists
-function io.fileexists(...)
-	io.stderr:write('io.fileexists deprecated - use os.fileexists\n')
-	return require 'ext.os'.fileexists(...)
-end
-
--- deprecated - moved to os.isdir
-function io.isdir(...)
-	io.stderr:write('io.isdir deprecated - use os.isdir\n')
-	return require 'ext.os'.isdir(...)
-end
-
--- deprecated - moved to os.listdir
-function io.dir(...)
-	io.stderr:write('io.dir deprecated - use os.listdir\n')
-	return require 'ext.os'.listdir(...)
-end
-
--- deprecated - moved to os.rlistdir
-function io.rdir(...)
-	io.stderr:write('io.rdir deprecated - use os.rlistdir\n')
-	return require 'ext.os'.rlistdir(...)
-end
-
 return io

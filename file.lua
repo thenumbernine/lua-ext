@@ -28,7 +28,16 @@ local function windows()
 		})[io.popen'uname':read'*l':sub(1,4):lower()]
 	end
 end
+--]]
 
+--[[
+TODO how about a new 'file' object that is more flexible?
+and should this be 'file' or should it be 'path' or 'filesystem' or 'fs' ?
+file[path]:open(mode) - to get a file handle
+file[path]:read() - to read a file in entirety
+file[path] = string - to write to a file
+file[path]:dir() - to iterate through a directory listing
+file[path]:attr() - to get file attributes
 --]]
 
 
