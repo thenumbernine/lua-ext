@@ -1,3 +1,5 @@
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=KYWUWS86GSFGL)
+
 I found myself recreating so many extensions to the base lua classes over and over again.
 I thought I'd just put them in one place.
 I'm sure this will grow out of hand.
