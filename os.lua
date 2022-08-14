@@ -62,8 +62,8 @@ if _VERSION == 'Lua 5.1' then
 	local execute = os.execute
 	function os.execute(cmd)
 		local results = table.pack(execute(cmd))
-		if #results > 1 then return table.unpack(results, 1, results.n) end
-		local errcode = execute(cmd)
+		if #results > 1 then return results:unpack() end	-- >5.1 API
+		local errcode = results[1]
 		local reason = ({
 			[0] = 'exit',
 		})[errcode] or 'unknown'
