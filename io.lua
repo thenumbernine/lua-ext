@@ -52,9 +52,11 @@ end
 -- file.__index == file
 -- within meta.lua, simply modifying the file metatable 
 -- but if someone requires ext/io.lua and not lua then io.open and all subsequently created files will need to be modified
+--[[ TODO FIXME 
 if jit or (not jit and _VERSION < 'Lua 5.2') then
 
 	local function fixfilereadargs(...)
+		print(...)
 		if select('#', ...) == 0 then return ... end
 		local fmt = select(1, ...)
 		if fmt == 'a' then fmt = '*a'
@@ -104,5 +106,6 @@ if jit or (not jit and _VERSION < 'Lua 5.2') then
 		return fixfilemeta(oldioopen(...))
 	end
 end
+--]]
 
 return io
