@@ -310,6 +310,10 @@ function table.shuffle(t)
 	return nt
 end
 
+function table.pickRandom(t)
+	return t[math.random(#t)]
+end
+
 -- where to put this ...
 -- I want to convert iterators into tables
 -- it looks like a coroutine but it is made for functions returned from coroutine.wrap
