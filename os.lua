@@ -10,52 +10,16 @@ local table = require 'ext.table'
 
 -- string.trim
 local string = require 'ext.string'
+local asserttype = require 'ext.asserttype'
+local detect_lfs = require 'ext.detect_lfs'
+local detect_os = require 'ext.detect_os'
 
--- [[ TODO - this block is also in ext/file.lua
-
-local function asserttype(x, t)
-	local xt = type(x)
-	assert(xt == t, "expected "..t.." found "..xt)
-	return x
-end
-
-local function lfs()
-	local result, lfs = pcall(require, 'lfs')
-	return result and lfs
-end
-
-
-local function ffi()
-	local result, ffi = pcall(require, 'ffi')
-	return result and ffi
-end
-
--- TODO only detect this once?
-local function windows()
-	local ffi = ffi()
-	if ffi then
-		return ffi.os == 'Windows'
-	else
-		-- TODO what if uname doesn't exist? then this will output to stderr.  does it exist in Windows?
-		-- to get around that on Windows I can pipe to > NUL
-		-- TODO what if it's not Windows?  then this will create a NUL file ...
-		-- honestly I could just use the existence of piping to NUL vs /dev/null to determine Windows vs Unix ...
-		return ({
-			msys = true,
-			ming = true,
-		--})[(io.popen'uname 2> NUL':read'*a'):sub(1,4):lower()]
-		})[(io.popen'uname':read'*a'):sub(1,4):lower()]
-	end
-end
-
-os.sep = windows() and '\\' or '/'
+os.sep = detect_os() and '\\' or '/'
 
 function os.path(str)
 	asserttype(str, 'string')
 	return (str:gsub('/', os.sep))
 end
-
---]]
 
 -- 5.2 os.execute compat
 if _VERSION == 'Lua 5.1' then
@@ -76,7 +40,7 @@ end
 -- should makeParents be set by default?  it's on by default in Windows.
 function os.mkdir(dir, makeParents)
 	local tonull
-	if windows() then
+	if detect_os() then
 		dir = os.path(dir)
 		tonull = ' 2> nul'
 		makeParents = nil -- mkdir in Windows always makes parents, and doesn't need a switch
@@ -95,7 +59,7 @@ end
 function os.move(from, to)
 	-- [[
 	-- alternatively I could write this as readfile/writefile and os.remove
-	local cmd = (windows() and 'move' or 'mv') .. ' "'..os.path(from)..'" "'..os.path(to)..'"'
+	local cmd = (detect_os() and 'move' or 'mv') .. ' "'..os.path(from)..'" "'..os.path(to)..'"'
 	return os.execute(cmd)
 	--]]
 	--[[
@@ -104,13 +68,13 @@ function os.move(from, to)
 end
 
 function os.isdir(fn)
-	local lfs = lfs()
+	local lfs = detect_lfs()
 	if lfs then
 		local attr = lfs.attributes(fn)
 		if not attr then return false end
 		return attr.mode == 'directory'
 	else
-		if windows() then
+		if detect_os() then
 			return 'yes' == 
 				string.trim(io.readproc(
 					'if exist "'
@@ -137,12 +101,13 @@ function os.isdir(fn)
 end
 
 function os.listdir(path)
-	local lfs = lfs()
+	local lfs = detect_lfs()
 	if not lfs then
 		-- no lfs?  use a fallback of shell ls or dir (based on OS)
 		local fns
 		-- all I'm using ffi for is reading the OS ...
---			local ffi = ffi()	-- no lfs?  are you using luajit?
+--			local detect_ffi = require 'ext.detect_ffi'
+--			local ffi = detect_ffi()	-- no lfs?  are you using luajit?
 --			if not ffi then
 			-- if 'dir' exists ...
 			--	local filestr = io.readproc('dir "'..path..'"')
@@ -151,7 +116,7 @@ function os.listdir(path)
 			
 			local string = require 'ext.string'
 			local cmd
-			if windows() then
+			if detect_os() then
 				cmd = 'dir /b "'..os.path(path)..'"'
 			else
 				cmd = 'ls '..path:gsub('[|&;<>`\"\' \t\r\n#~=%$%(%)%%%[%*%?]', [[\%0]])
@@ -235,11 +200,11 @@ end
 
 function os.fileexists(fn)
 	assert(fn, "expected filename")
-	local lfs = lfs()
+	local lfs = detect_lfs()
 	if lfs then
 		return lfs.attributes(fn) ~= nil
 	else
-		if windows() then
+		if detect_os() then
 			-- Windows reports 'false' to io.open for directories, so I can't use that ...
 			return 'yes' == string.trim(io.readproc('if exist "'..os.path(fn)..'" (echo yes) else (echo no)'))
 		else

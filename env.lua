@@ -8,6 +8,7 @@ return function(env)
 	env.io = require 'ext.io'
 	env.os = require 'ext.os'
 	env.file = require 'ext.file'
+	env.fs = require 'ext.fs'
 	env.tolua = require 'ext.tolua'
 	env.fromlua = require 'ext.fromlua'
 	env.class = require 'ext.class'
