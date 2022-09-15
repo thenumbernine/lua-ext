@@ -44,6 +44,8 @@ end
 
 local FileSys = class()
 
+--FileSys.sep = os.sep	-- TOO redundant?
+
 function FileSys:init(args)
 	self.path = asserttype(asserttype(args, 'table').path, 'string')
 	assert(self.path ~= nil)
@@ -103,6 +105,14 @@ function FileSys:cwd()
 	if lfs then
 		return lfs.currentdir()
 	else
+		--[=[ TODO should I even bother with the non-lfs fallback?
+		-- if so then use this:
+		require 'ffi.c.stdlib'
+		local dirp = unistd.getcwd(nil, 0)
+		local dir = ffi.string(dirp)
+		ffi.C.free(dirp)
+		return dir 
+		--]=]
 		if detect_os() then
 			return string.trim(io.readproc'cd')
 		else
