@@ -9,7 +9,7 @@ function io.readfile(fn)
 	if not f then return false, err end
 
 	-- file.read compat (tested on Windows)
-	-- 						*a	a	*l	l 
+	-- 						*a	a	*l	l
 	-- lua-5.3.5:			yes	yes	yes	yes		jit == nil and _VERSION == 'Lua 5.3'
 	-- lua-5.2.4:			yes	no	yes	no		jit == nil and _VERSION == 'Lua 5.2'
 	-- lua-5.1.5:			yes	no	yes	no		jit == nil and _VERSION == 'Lua 5.1'
@@ -50,9 +50,9 @@ end
 -- (for file = getmetatable(io.open(something)))
 -- io.read ~= file.read
 -- file.__index == file
--- within meta.lua, simply modifying the file metatable 
+-- within meta.lua, simply modifying the file metatable
 -- but if someone requires ext/io.lua and not lua then io.open and all subsequently created files will need to be modified
---[[ TODO FIXME 
+--[[ TODO FIXME
 if jit or (not jit and _VERSION < 'Lua 5.2') then
 
 	local function fixfilereadargs(...)
@@ -84,7 +84,7 @@ if jit or (not jit and _VERSION < 'Lua 5.2') then
 
 	-- override file:read
 	oldfileread = oldfilemeta.read
-	newfilemeta.read = newfileread 
+	newfilemeta.read = newfileread
 
 	-- should these be overridden in this case, or only when running ext/meta.lua?
 	debug.setmetatable(io.stdin, newfilemeta)
@@ -104,6 +104,19 @@ if jit or (not jit and _VERSION < 'Lua 5.2') then
 	local oldioopen = io.open
 	function io.open(...)
 		return fixfilemeta(oldioopen(...))
+	end
+end
+--]]
+
+-- [[ add lfs lock/unlock to files
+do
+	local detect_lfs = require 'ext.detect_lfs'
+	local lfs = detect_lfs()
+	if lfs then
+		-- can I do this? yes on Lua 5.3.  Yes on LuaJIT 2.1.0-beta3
+		local filemeta = debug.getmetatable(io.stdout)
+		filemeta.lock = lfs.lock
+		filemeta.unlock = lfs.unlock
 	end
 end
 --]]

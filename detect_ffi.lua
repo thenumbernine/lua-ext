@@ -1,9 +1,10 @@
 -- this runs just once and then gets cached in package.path
 -- but return the function, not the value, because the value could be false, which (I don't believe) package.path will cache
-local result, ffi
+local ffi
 local function detect_ffi()
-	if result == nil then
+	if ffi == nil then
 		result, ffi = pcall(require, 'ffi')
+		ffi = result and ffi
 	end
 	return ffi
 end

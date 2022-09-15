@@ -31,10 +31,10 @@ It also sets _ to os.execute for shorthand shell scripting.
 
 `class(parent1, parent2, ...)` = create a 'class' table, fill it with the union of the table 'parent1', 'parent2', etc.
 
-Class tables can instanciate object tables using the `__call` operator:
+Class tables can instanciate object tables using the `\_\_call` operator:
 
 ```
-Cl = class() 
+Cl = class()
 obj = Cl(arg1, arg2, ...)
 ```
 
@@ -100,6 +100,10 @@ assert(obj1 + obj2 == 'abc')
 `local dirname, filename = io.getfiledir(path)` = Returns the directory and the file name of the file at the specified path.
 
 `local pathWithoutExtension, extension = io.getfileext(path)` = Returns the filename up to the extension (without the dot) and the extension.
+
+`file:lock()` = Shorthand for `lfs.lock(filehandle)`.
+
+`file:unlock()` = Shorthand for `lfs.unlock(filehandle)`.
 
 ### math.lua
 
@@ -196,7 +200,7 @@ Example of the output:
 `table.new([table1, table2, ...])`
 `table([table1, table2, ...])` = Returns a new table with `table` as its metatable.  If any tables are passed as arguments then this performs a shallow-union of them into the resulting table.
 
-Notice that tables created with `table()` / `table.new()`, i.e. tables with `table` as a metatable, also have `table` as their metatable's `__index` and can use infix notation to call any `table` methods.
+Notice that tables created with `table()` / `table.new()`, i.e. tables with `table` as a metatable, also have `table` as their metatable's `\_\_index` and can use infix notation to call any `table` methods.
 
 `table.unpack(t[, start[, end]])` is assigned to `unpack` for compatability with Lua <5.2.
 
@@ -260,7 +264,7 @@ The major contribution of this file is `number.tostring`:
 `number.base` = A number value specifying the default base.  This is initialized to 10.
 `number.maxdigits` = A number value specifying the default max digts.  This is initialized to 50.
 
-This library doesn't assign `tostring` to `__tostring` by default, but you can accomplish this using the following code:
+This library doesn't assign `tostring` to `\_\_tostring` by default, but you can accomplish this using the following code:
 ```
 -- assign number to the Lua number metatable
 require 'ext.meta'
@@ -290,7 +294,7 @@ Example with `number` as Lua number metatables:
 
 Yes, go ahead and sum up those digits scaled by their respective powers of pi, see that it does come out to be 10.
 
-Example with `number`, changing the default 
+Example with `number`, changing the default
 ```
 > require 'ext.meta'
 > debug.getmetatable(0).base = 3
@@ -331,8 +335,8 @@ Metatable changes:
 
 	Default `tostring` concatenation.
 
-	The following binary operators will now work on functions: + - * / % ^ 
-	Example: 
+	The following binary operators will now work on functions: + - * / % ^
+	Example:
 
 ```
 > function f(x) return 2*x end
@@ -367,7 +371,7 @@ The following infix methods are added to functions:
 `f:compose(g1[, g2, ..., gN])`
 `f:o(g1[, g2, ..., gN])` = Returns a function `h` such that `h(x1, x2, ...)` executes `f(g1(g2(...gN( x1, x2, ... ))))`.
 
-`f:compose_n(n, g1[, g2, ..., gM])` 
+`f:compose_n(n, g1[, g2, ..., gM])`
 `f:o_n(n, g1[, g2, ..., gM])` = Returns a function 'h' that only replaces the n'th argument with a concatenation of subsequent functions g1...gN.
 
 `f:bind(arg1[, arg2, ..., argN])` = Function curry. Returns a function 'g' that already has arguments arg1 ... argN bound to the first 'n' arguments of 'f'.
@@ -380,30 +384,31 @@ The following infix methods are added to functions:
 
 `f:swap()` = Returns a new function with the first two parameters swapped.
 
-### range.lua: 
+### range.lua:
 
 `range = require 'ext.range'`
 `range(a[, b[, c]])` = A very simple function for creating tables of numeric for-loops.
 
-### reload.lua: 
+### reload.lua:
 
 `reload = require 'ext.reload'`
 `reload(packagename)` = Removes the package from package.loaded, re-requires it, and returns its result.  Useful for live testing of newly developed features.
 
-### tolua.lua: 
+### tolua.lua:
 
 `tolua = require 'ext.tolua'`
 `tolua(obj[, args])` = Serialization from any Lua value to a string.
 
 args can be any of the following:
 - `indent` = Default to 'true', set to 'false' to make results concise.
-- `pairs` = The `pairs()` operator to use when iterating over tables.  This defaults to a form of pairs() which iterates over all fields using next().  Set this to your own custom pairs function, or 'pairs' if you would like serialization to respect the `__pairs` metatable (which it does not by default).
+- `pairs` = The `pairs()` operator to use when iterating over tables.  This defaults to a form of pairs() which iterates over all fields using next().
+Set this to your own custom pairs function, or 'pairs' if you would like serialization to respect the `_ _ pairs` metatable (which it does not by default).
 - `serializeForType` = A table with keys of lua types and values of callbacks for serializing those types.
 - `serializeMetatables` = Set to 'true' to include serialization of metatables.
 - `serializeMetatableFunc` = Function to override the default serialization of metatables.
 - `skipRecursiveReferences` = Default to 'false', set this to 'true' to not include serialization of recursive references.
 
-### fromlua.lua: 
+### fromlua.lua:
 
 `fromlua = require 'ext.fromlua'`
 `fromlua(str)` = De-Serialization from a string to any Lua value.  This is just a small wrapper using `load`.
@@ -419,7 +424,34 @@ args can be any of the following:
 
 Notice that, calling `require 'ext'` will also call `getCmdline` on `arg`, producing the global `cmdline`.
 
-### file.lua: filesystem-as-table access (WIP)
+### file.lua: filesystem-as-table access
+
+`file = require 'ext.file'`
+`file` = represents an object representing the cwd.
+`file(path)` returns a new `file` object representing the path at `path`.  Relative paths are appended from the previous `file` object's path.
+
+`file:open(...)` is an alias of `io.open(file.path, ...)`.
+`file:read(...)` is an alias of `io.readfile(file.path, ...)`.
+`file:write(...)` is an alias of `io.writefile(file.path, ...)`.
+
+`file:remove(...)` is an alias of `os.remove(file.path, ...)`.
+`file:mkdir(...)` is an alias of `os.mkdir(file.path, ...)`.
+`file:listdir(...)` is an alias of `os.listdir(file.path, ...)`.
+`file:exists(...)` is an alias of `os.fileexists(file.path, ...)`.
+`file:isdir(...)` is an alias of `os.isdir(file.path, ...)`.
+`file:rdir(...)` is an alias of `os.rlistdir(file.path, ...)`.
+
+`file:attr(...)` is an alias of `lfs.attributes(file.path, ...)`.
+`file:symattr(...)` is an alias of `lfs.symlinkattributes(file.path, ...)`.
+`file:cd(...)` is an alias of `lfs.chdir(file.path, ...)`.
+`file:link(...)` is an alias of `lfs.link(file.path, ...)`.
+`file:setmode(...)` is an alias of `lfs.setmode(file.path, ...)`.
+`file:touch(...)` is an alias of `lfs.touch(file.path, ...)`.
+`file:lockdir(...)` is an alias of `lfs.lock_dir(file.path, ...)`.
+
+`file:dir()` is an alias of `os.listdir(file.path)`.
+`file:cwd()` is an alias of `lfs.currendir()` if available, or `io.readproc'pwd'` on Linux or `io.readproc'cd'` on Windows.
+
 ### gcmem.lua: Provides FFI-based functions for manually or automatically allocating and freeing memory.  WIP due to crashing in LuaJIT when you run `ptr = ffi.cast('T*', ptr)` and haven't bound `ptr` anywhere else.
 
 NOTICE:

@@ -39,6 +39,12 @@ end
 -- should it fail if a file is presently there? probably.
 -- should makeParents be set by default?  it's on by default in Windows.
 function os.mkdir(dir, makeParents)
+	--[[ should I use the lfs option?  it doesn't have a 'makeParent' option so.....
+	local lfs = detect_lfs()
+	if lfs then
+		return lfs.mkdir(dir)
+	end
+	--]]
 	local tonull
 	if detect_os() then
 		dir = os.path(dir)
@@ -75,7 +81,7 @@ function os.isdir(fn)
 		return attr.mode == 'directory'
 	else
 		if detect_os() then
-			return 'yes' == 
+			return 'yes' ==
 				string.trim(io.readproc(
 					'if exist "'
 					..os.path(fn)
@@ -83,7 +89,7 @@ function os.isdir(fn)
 				))
 		else
 			-- for OSX:
-			-- TODO you could work around this for directories: 
+			-- TODO you could work around this for directories:
 			-- f:read(1) for 5.1,jit,5.2,5.3 returns nil, 'Is a directory', 21
 			local f = io.open(fn,'rb')
 			if not f then return false end
@@ -154,7 +160,7 @@ function os.listdir(path)
 		return coroutine.wrap(function()
 			for _,k in ipairs(fns) do
 				local fn = k:sub(1,1) == '/' and k or (path..'/'..k)
-				coroutine.yield(k)--, io.readfile(fn))					
+				coroutine.yield(k)--, io.readfile(fn))
 			end
 		end)
 	else
