@@ -37,7 +37,9 @@ function io.readproc(cmd)
 end
 
 function io.getfiledir(fn)
-	return fn:match('^(.*)/([^/]-)$')
+	local dir, name = fn:match('^(.*)/([^/]-)$')
+	if not dir then return '.', fn end
+	return dir, name
 end
 
 -- this should really return the extension first.

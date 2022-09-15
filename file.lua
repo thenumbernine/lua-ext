@@ -101,7 +101,7 @@ end
 
 function FileSys:cwd()
 	if lfs then
-		return lfs.currendir()
+		return lfs.currentdir()
 	else
 		if detect_os() then
 			return string.trim(io.readproc'cd')
