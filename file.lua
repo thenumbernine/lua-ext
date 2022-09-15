@@ -55,6 +55,8 @@ local mappings = {
 		open = 'open',
 		read = 'readfile',
 		write = 'writefile',
+		getdir = 'getfiledir',
+		getext = 'getfileext',
 	},
 	[os] = {
 		-- vanilla

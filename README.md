@@ -433,6 +433,8 @@ Notice that, calling `require 'ext'` will also call `getCmdline` on `arg`, produ
 `file:open(...)` is an alias of `io.open(file.path, ...)`.
 `file:read(...)` is an alias of `io.readfile(file.path, ...)`.
 `file:write(...)` is an alias of `io.writefile(file.path, ...)`.
+`file:getdir(...)` is an alias of `io.getfiledir(file.path, ...)`.
+`file:getext(...)` is an alias of `io.getfileext(file.path, ...)`.
 
 `file:remove(...)` is an alias of `os.remove(file.path, ...)`.
 `file:mkdir(...)` is an alias of `os.mkdir(file.path, ...)`.
