@@ -21,7 +21,9 @@ local os = require 'ext.os'
 local string = require 'ext.string'
 local class = require 'ext.class'
 
--- append the path if fn is relative, otherwise use fn
+-- PREPEND the path if fn is relative, otherwise use fn
+-- I should reverse these arguments
+-- but this function is really specific to the FileSys path state variable
 local function appendPath(fn, path)
 	asserttype(fn, 'string')
 	asserttype(path, 'string')
@@ -37,6 +39,11 @@ local function appendPath(fn, path)
 		if fn:sub(1,1) ~= '/' then
 			fn = path .. '/' .. fn
 		end
+	end
+	fn = fn:gsub('/%./', '/')
+	fn = fn:gsub('/+', '/')
+	if #fn > 2 and fn:sub(1,2) == './' then
+		fn = fn:sub(3)
 	end
 	return fn
 end
@@ -152,9 +159,7 @@ function FileSys:__call(k)
 end
 
 function FileSys:__tostring()
-	local s = self.path
-	if #s > 2 and s:sub(1,2) == './' then s = s:sub(3) end
-	return 'FileSys['..s..']'
+	return 'FileSys['..self.path..']'
 end
 
 
