@@ -192,10 +192,8 @@ function os.rlistdir(path, callback, fs)
 	fs = fs or table()
 	for f in os.listdir(path) do
 		if os.isdir(path..'/'..f) then
-			if f ~= '.' and f ~= '..' then
-				if not callback or callback(f, true) then
-					os.rlistdir(path..'/'..f, callback, fs)
-				end
+			if not callback or callback(f, true) then
+				os.rlistdir(path..'/'..f, callback, fs)
 			end
 		else
 			if not callback or callback(f, false) then
