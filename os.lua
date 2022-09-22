@@ -199,7 +199,9 @@ function os.rlistdir(path, callback, fs)
 			end
 		else
 			if not callback or callback(f, false) then
-				fs:insert(path..'/'..f)
+				local fn = path..'/'..f
+				if #fn > 2 and fn:sub(1,2) == './' then fn = fn:sub(3) end
+				fs:insert(fn)
 			end
 		end
 	end
