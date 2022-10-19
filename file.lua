@@ -27,6 +27,7 @@ local class = require 'ext.class'
 local function appendPath(fn, path)
 	asserttype(fn, 'string')
 	asserttype(path, 'string')
+	--[[ dont change to path sep ... always use / internally
 	if detect_os() then
 		fn = os.path(fn)
 		if not (
@@ -36,10 +37,11 @@ local function appendPath(fn, path)
 			fn = path .. '\\' .. fn
 		end
 	else
+	--]]
 		if fn:sub(1,1) ~= '/' then
 			fn = path .. '/' .. fn
 		end
-	end
+	--end
 	fn = fn:gsub('/%./', '/')
 	fn = fn:gsub('/+', '/')
 	if #fn > 2 and fn:sub(1,2) == './' then
