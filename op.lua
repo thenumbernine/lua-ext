@@ -31,6 +31,8 @@ local symbolscode = [[
 		eq = '==',
 		lt = '<',
 		le = '<=',
+		gt = '>',
+		ge = '>=',
 		land = 'and',		-- non-overloadable
 		lor = 'or',			-- non-overloadable
 		len = '#',			-- unary
