@@ -28,6 +28,14 @@ function io.writefile(fn, d)
 	return true
 end
 
+function io.appendfile(fn, d)
+	local f, err = io.open(fn, 'ab')
+	if not f then return false, err end
+	if d then f:write(d) end
+	f:close()
+	return true
+end
+
 function io.readproc(cmd)
 	local f, err = io.popen(cmd)
 	if not f then return false, err end

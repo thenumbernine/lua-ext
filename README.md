@@ -98,6 +98,8 @@ assert(obj1 + obj2 == 'abc')
 
 `io.writefile(path, data)` = Writes the string in `data` to the file.  If an error occurs, returns `false` and the error, otherwise returns true.
 
+`io.appendfile(path, data)` = Appends the string in `data` to the file.  If an error occurs, returns `false` and the error, otherwise returns true.
+
 `io.readproc(command)` = Runs a process, reads the entirety of its output, returns the output.  If an error occurs, returns `false` and the error.
 
 `local dirname, filename = io.getfiledir(path)` = Returns the directory and the file name of the file at the specified path.
@@ -436,6 +438,7 @@ Notice that, calling `require 'ext'` will also call `getCmdline` on `arg`, produ
 `file:open(...)` is an alias of `io.open(file.path, ...)`.
 `file:read(...)` is an alias of `io.readfile(file.path, ...)`.
 `file:write(...)` is an alias of `io.writefile(file.path, ...)`.
+`file:append(...)` is an alias of `io.appendfile(file.path, ...)`.
 `file:getdir(...)` is an alias of `io.getfiledir(file.path, ...)`.
 `file:getext(...)` is an alias of `io.getfileext(file.path, ...)`.
 

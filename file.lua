@@ -66,6 +66,7 @@ local mappings = {
 		open = 'open',
 		read = 'readfile',
 		write = 'writefile',
+		append = 'appendfile',
 		getdir = 'getfiledir',
 		getext = 'getfileext',
 	},
