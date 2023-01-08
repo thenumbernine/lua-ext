@@ -21,6 +21,32 @@ local os = require 'ext.os'
 local string = require 'ext.string'
 local class = require 'ext.class'
 
+
+-- TODO this goes in file or os or somewhere in ext
+local function fixpath(p)
+	p = string.split(p, '/')
+	for i=#p-1,1,-1 do
+		-- convert //'s to nothing
+		if i > 1 then	-- don't remove empty '' as the first entry - this signifies a root path
+			while p[i] == '' do p:remove(i) end
+		end
+		-- convert /./'s to nothing
+		while p[i] == '.' do p:remove(i) end
+		-- convert Somewhere/..'s to nothing
+		if p[i+1] == '..' 
+		and p[i] ~= '..'
+		then
+			if i == 1 and p[1] == '' then
+				error("/.. absolute + previous doesn't make sense")	-- don't allow /../ to remove the base / ... btw this is invalid anyways ...
+			end
+			p:remove(i)
+			p:remove(i)
+		end
+	end
+	return p:concat'/'
+end
+
+
 -- PREPEND the path if fn is relative, otherwise use fn
 -- I should reverse these arguments
 -- but this function is really specific to the FileSys path state variable
@@ -152,7 +178,9 @@ instead of __newindex for writing new files, how about file(path):write()
 function FileSys:__call(k)
 	assert(self.path ~= nil)
 	local fn = asserttype(appendPath(k, self.path), 'string')
-	
+	-- is this safe?
+	fn = fixpath(fn)
+
 	-- one option is checking existence and returning nil if no file
 	-- but then how about file writing?
 
