@@ -16,7 +16,7 @@ setmetatable(table, {
 -- 5.2 or 5.3 compatible
 table.unpack = table.unpack or unpack
 
--- [[ how about table.unpack(t) defaults to table.unpack(t, 1, t.n) if t.n is present?  
+-- [[ how about table.unpack(t) defaults to table.unpack(t, 1, t.n) if t.n is present?
 -- for cohesion with table.pack?
 -- already table.unpack's default is #t, but this doesn't account for nils
 -- this might break compatability somewhere ...
@@ -122,11 +122,11 @@ end
 
 -- this excludes keys that don't pass the callback function
 -- if the key is an ineteger then it is table.remove'd
--- currently the handling of integer keys is the only difference between this 
--- and calling table.map and returning nil kills on filtered items 
+-- currently the handling of integer keys is the only difference between this
+-- and calling table.map and returning nil kills on filtered items
 function table:filter(f)
 	local t = table()
-	if type(f) == 'function' then 
+	if type(f) == 'function' then
 		for k,v in pairs(self) do
 			if f(v,k) then
 				if type(k) == 'string' then

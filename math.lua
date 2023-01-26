@@ -14,14 +14,14 @@ if not math.atan2 then math.atan2 = math.atan end
 if not math.sinh then
 	function math.sinh(x)
 		local ex = math.exp(x)
-		return .5 * (ex - 1/ex) 
+		return .5 * (ex - 1/ex)
 	end
 end
 
 if not math.cosh then
 	function math.cosh(x)
 		local ex = math.exp(x)
-		return .5 * (ex + 1/ex) 
+		return .5 * (ex + 1/ex)
 	end
 end
 
@@ -29,7 +29,7 @@ if not math.tanh then
 	function math.tanh(x)
 --[[ this isn't so stable.
 		local ex = math.exp(x)
-		return (ex - 1/ex) / (ex + 1/ex) 
+		return (ex - 1/ex) / (ex + 1/ex)
 --]]
 -- [[ instead...
 -- if e^-2x < smallest float epsilon
@@ -58,8 +58,8 @@ function math.atanh(x)
 	return .5 * math.log((1 + x) / (1 - x))
 end
 
-function math.cbrt(x) 
-	return math.sign(x) * math.abs(x)^(1/3) 
+function math.cbrt(x)
+	return math.sign(x) * math.abs(x)^(1/3)
 end
 
 function math.clamp(v,min,max)
@@ -107,7 +107,7 @@ function math.factors(n)
 	local table = require 'ext.table'
 	local f = table()
 	for i=1,n do
-		if n%i == 0 then 
+		if n%i == 0 then
 			f:insert(i)
 		end
 	end

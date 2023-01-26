@@ -2,7 +2,7 @@ local ffi = require 'ffi'
 require 'ffi.c.stdlib'
 
 --[[
-uses C malloc paired with ffi-based garbage collection 
+uses C malloc paired with ffi-based garbage collection
 typecasts correctly
 and retains the ability to manually free
 (so you don't have to manually free it)
@@ -17,7 +17,7 @@ local function gcnew(T, n)
 	ptr = ffi.cast(T..'*', ptr)
 	ptr = ffi.gc(ptr, ffi.C.free)
 	--]]
-	--[[ 
+	--[[
 	local ptr = ffi.new(T..'['..n..']')
 	--]]
 	return ptr
@@ -25,7 +25,7 @@ end
 
 --[[
 manual free of a pointer
-frees the ptr and removes it from the gc 
+frees the ptr and removes it from the gc
 (just in case you want to manually free a pointer)
 --]]
 local function gcfree(ptr)

@@ -3,6 +3,7 @@
 local ffi
 local function detect_ffi()
 	if ffi == nil then
+		local result
 		result, ffi = pcall(require, 'ffi')
 		ffi = result and ffi
 	end

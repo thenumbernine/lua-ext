@@ -121,8 +121,7 @@ function os.listdir(path)
 			--	local filestr = io.readproc('dir "'..path..'"')
 			--	error('you are here: '..filestr)
 			-- if 'ls' exists ...
-			
-			local string = require 'ext.string'
+
 			local cmd
 			if detect_os() then
 				cmd = 'dir /b "'..os.path(path)..'"'
@@ -161,7 +160,7 @@ function os.listdir(path)
 --]]
 		return coroutine.wrap(function()
 			for _,k in ipairs(fns) do
-				local fn = k:sub(1,1) == '/' and k or (path..'/'..k)
+				--local fn = k:sub(1,1) == '/' and k or (path..'/'..k)
 				coroutine.yield(k)--, io.readfile(fn))
 			end
 		end)
@@ -169,7 +168,7 @@ function os.listdir(path)
 		return coroutine.wrap(function()
 			for k in lfs.dir(path) do
 				if k ~= '.' and k ~= '..' then
-					local fn = k:sub(1,1) == '/' and k or (path..'/'..k)
+					--local fn = k:sub(1,1) == '/' and k or (path..'/'..k)
 					-- I shouldn't have io.readfile for performance
 					--  but for convenience it is so handy...
 					coroutine.yield(k)--, io.readfile(fn))
@@ -188,7 +187,6 @@ should this be in io or os?
 should this be an iterator like os.listdir() is?
 --]]
 function os.rlistdir(path, callback, fs)
-	local table = require 'ext.table'
 	fs = fs or table()
 	for f in os.listdir(path) do
 		if os.isdir(path..'/'..f) then

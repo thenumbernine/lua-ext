@@ -67,11 +67,11 @@ number.maxdigits = 50
 -- feel free to use it with a line something like (function(m)m.__tostring=m.tostring end)(debug.getmetatable(0))
 number.tostring = function(t, base, maxdigits)
 	local s = {}
-	if t < 0 then 
-		t = -t 
+	if t < 0 then
+		t = -t
 		table.insert(s, '-')
 	end
-	if t == 0 then 
+	if t == 0 then
 		table.insert(s, '0.')
 	else
 		--print('t',t)
@@ -80,12 +80,12 @@ number.tostring = function(t, base, maxdigits)
 		--print('base',base)
 		local i = math.floor(math.log(t,base))+1
 		if i == math.huge then error'infinite number of digits' end
-		--print('i',i)	
+		--print('i',i)
 		t = t / base^i
 		--print('t',t)
 		local dot
 		while true do
-			if i < 1 then 
+			if i < 1 then
 				if not dot then
 					dot = true
 					table.insert(s, '.')
@@ -93,7 +93,7 @@ number.tostring = function(t, base, maxdigits)
 				end
 				if t == 0 then break end
 				if i <= -maxdigits then break end
-			end		
+			end
 			t = t * base
 			local digit = math.floor(t)
 			t = t - digit
@@ -107,11 +107,11 @@ number.tostring = function(t, base, maxdigits)
 			--		therefore the value 2.2b would represent 2.8, which is also represetned by 10.0112210002002002...
 			-- so as long as the span between digits can represent fractions of base^i rather than whole base^i's
 			--	we can have multiple representations of numbers
-			-- 2) stretched.  in this case a fractional span, such as from 2b to 10b in base 2.5, would be stretched 
+			-- 2) stretched.  in this case a fractional span, such as from 2b to 10b in base 2.5, would be stretched
 			-- 		this is harder to convey when descibing the number system
 			table.insert(s, number.charfor(digit))
 			i = i - 1
-			--print('t',t,'i',i,'digit',digit)	
+			--print('t',t,'i',i,'digit',digit)
 		end
 	end
 	return table.concat(s)

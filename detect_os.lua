@@ -16,7 +16,7 @@ local function detect_os()
 		--})[(io.popen'uname 2> NUL':read'*a'):sub(1,4):lower()]
 		})[(io.popen'uname':read'*a'):sub(1,4):lower()] or false
 	end
-	
+
 	-- right now just true/value for windows/not
 	return result
 end

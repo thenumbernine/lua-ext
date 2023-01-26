@@ -15,10 +15,15 @@ if not hasffi or ffi.os == 'Windows' then
 	-- in linux this is the live time, or something other than the actual time
 	T.getTime = os.clock
 else
-	require 'ffi.c.sys.time'
+	require 'ffi.c.sys.time'	-- gettimeofday
+	require 'ffi.c.string'		-- strerror
+	local errno = require 'ffi.c.errno'
 	local gettimeofday_tv = ffi.new'struct timeval[1]'
 	function T.getTime()
-		local results = ffi.C.gettimeofday(gettimeofday_tv, nil)
+		local result = ffi.C.gettimeofday(gettimeofday_tv, nil)
+		if result ~= 0 then
+			error(ffi.string(ffi.C.strerror(errno.errno())))
+		end
 		return tonumber(gettimeofday_tv[0].tv_sec) + tonumber(gettimeofday_tv[0].tv_usec) / 1000000
 	end
 end
@@ -51,8 +56,8 @@ end
 
 setmetatable(T, {
 	-- call forwards to timer:
-	__call = function(T, ...)
-		return T.timer(...)
+	__call = function(self, ...)
+		return self.timer(...)
 	end,
 })
 

@@ -34,7 +34,7 @@ end
 local function class(...)
 	local cl = table(...)
 	cl.class = cl
-	
+
 	cl.super = ...	-- .super only stores the first.  the rest can be accessed by iterating .isaSet's keys
 
 	-- I was thinking of calling this '.superSet', but it is used for 'isa' which is true for its own class, so this is 'isaSet'
@@ -50,7 +50,7 @@ local function class(...)
 			end
 		end
 	end
-	
+
 	-- store 'descendantSet' as well that gets appended when we call class() on this obj?
 	for ancestor,_ in pairs(cl.isaSet) do
 		ancestor.descendantSet = ancestor.descendantSet or {}
@@ -60,7 +60,7 @@ local function class(...)
 	cl.__index = cl
 	cl.new = newmember
 	cl.isa = isa	-- usage: Class:isa(obj)
-	
+
 --[[ if you want to keep track of all instances
 	cl.instances = setmetatable({}, {__mode = 'k'})
 --]]

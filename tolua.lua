@@ -56,7 +56,7 @@ local reserved = {
 	["while"] = true,
 }
 
--- returns 'true' if k is a valid variable name, but not a reserved keyword 
+-- returns 'true' if k is a valid variable name, but not a reserved keyword
 local function isVarName(k)
 	return type(k) == 'string' and k:match('^[_a-zA-Z][_a-zA-Z0-9]*$') and not reserved[k]
 end
@@ -77,8 +77,8 @@ local function toLuaKey(state, k, path)
 end
 
 
--- another copy of maxn, with custom pairs 
-function maxn(t, state)
+-- another copy of maxn, with custom pairs
+local function maxn(t, state)
 	local max = 0
 	for k,v in state.pairs(t) do
 		if type(k) == 'number' then
@@ -90,23 +90,23 @@ end
 
 
 local defaultSerializeForType = {
-	number = function(state,x) 
+	number = function(state,x)
 		if x == math.huge then return 'math.huge' end
 		if x == -math.huge then return '-math.huge' end
 		if x ~= x then return '0/0' end
-		return tostring(x) 
+		return tostring(x)
 	end,
 	boolean = function(state,x) return tostring(x) end,
 	['nil'] = function(state,x) return tostring(x) end,
 	string = function(state,x) return escapeString(x) end,
 	['function'] = function(state, x)
 		local result, s = pcall(string.dump, x)
-		
+
 		if result then
 			s = 'load('..escapeString(s)..')'
 		else
 			-- if string.dump failed then check the builtins
-			-- check the global object and one table deep 
+			-- check the global object and one table deep
 			-- todo maybe, check against a predefined set of functions?
 			if s == "unable to dump given function" then
 				local found
@@ -134,7 +134,7 @@ local defaultSerializeForType = {
 				return "error('got a function I could neither dump nor lookup in the global namespace nor one level deep')"
 			end
 		end
-			
+
 		return s
 	end,
 	table = function(state, x, tab, path, keyRef)
@@ -142,14 +142,14 @@ local defaultSerializeForType = {
 
 		local newtab = tab .. state.indentChar
 		-- TODO override for specific metatables?  as I'm doing for types?
-		
+
 		if state.touchedTables[x] then
 			if state.skipRecursiveReferences then
 				result = 'error("recursive reference")'
 			else
 				result = false	-- false is used internally and means recursive reference
 				state.wrapWithFunction = true
-				
+
 				-- we're serializing *something*
 				-- is it a value?  if so, use the 'path' to dereference the key
 				-- is it a key?  if so the what's the value ..
@@ -157,16 +157,16 @@ local defaultSerializeForType = {
 				-- maybe the caller should be responsible for populating this table ...
 				if keyRef then
 					state.recursiveReferences:insert('root'..path..'['..state.touchedTables[x]..'] = error("can\'t handle recursive references in keys")')
-				else 
+				else
 					state.recursiveReferences:insert('root'..path..' = '..state.touchedTables[x])
 				end
 			end
 		else
 			state.touchedTables[x] = 'root'..path
-			
+
 			-- prelim see if we can write it as an indexed table
 			local numx = maxn(x, state)
-			local intNilKeys, intNonNilKeys = 0, 0				
+			local intNilKeys, intNonNilKeys = 0, 0
 			for i=1,numx do
 				if x[i] == nil then
 					intNilKeys = intNilKeys + 1
@@ -178,7 +178,7 @@ local defaultSerializeForType = {
 			local hasSubTable
 
 			local s = table()
-			
+
 			-- add integer keys without keys explicitly. nil-padded so long as there are 2x values than nils
 			local addedIntKeys = {}
 			if intNonNilKeys >= intNilKeys * 2 then	-- some metric
@@ -187,7 +187,7 @@ local defaultSerializeForType = {
 					local nextResult = toLuaRecurse(state, x[k], newtab, path and path..'['..k..']')
 					if nextResult then
 						s:insert(nextResult)
-					-- else x[k] is a recursive reference 
+					-- else x[k] is a recursive reference
 					end
 					addedIntKeys[k] = true
 				end
@@ -202,7 +202,7 @@ local defaultSerializeForType = {
 					if keyStr then
 						local newpath
 						if path then
-							newpath = path 
+							newpath = path
 							if usesDot then newpath = newpath .. '.' end
 							newpath = newpath .. keyStr
 						end
@@ -230,13 +230,13 @@ local defaultSerializeForType = {
 				thisTab = tab
 				thisNewTab = newtab
 			end
-		
+
 			local rs = '{'..thisNewLineChar
 			if #s > 0 then
 				rs = rs .. thisNewTab .. s:concat(','..thisNewLineSepChar..thisNewTab) .. thisNewLineChar
 			end
 			rs = rs .. thisTab .. '}'
-			
+
 			result = rs
 		end
 		return result
@@ -252,7 +252,7 @@ end
 
 toLuaRecurse = function(state, x, tab, path, keyRef)
 	if not tab then tab = '' end
-	
+
 	local xtype = type(x)
 	local serializeFunction
 	if state.serializeForType then
@@ -261,7 +261,7 @@ toLuaRecurse = function(state, x, tab, path, keyRef)
 	if not serializeFunction then
 		serializeFunction = defaultSerializeForType[xtype]
 	end
-	
+
 	local result
 	if serializeFunction then
 		result = serializeFunction(state, x, tab, path, keyRef)
@@ -269,7 +269,7 @@ toLuaRecurse = function(state, x, tab, path, keyRef)
 		result = '['..type(x)..':'..tostring(x)..']'
 	end
 	assert(result ~= nil)
-	
+
 	if state.serializeMetatables then
 		local m = getmetatable(x)
 		if m ~= nil then
@@ -279,13 +279,13 @@ toLuaRecurse = function(state, x, tab, path, keyRef)
 			assert(mstr ~= nil)
 			-- but if that something is nil, i.e. setmetatable(something newly created with a nil metatable, nil), then don't bother modifing the code
 			if mstr ~= 'nil' and mstr ~= false then
-				-- if this is false then the result was deferred and we need to add this line to wherever else... 
+				-- if this is false then the result was deferred and we need to add this line to wherever else...
 				assert(result ~= false)
 				result = 'setmetatable('..result..', '..mstr..')'
 			end
 		end
 	end
-	
+
 	return result
 end
 
@@ -309,11 +309,11 @@ local function tolua(x, args)
 	local indent = true
 	if args then
 		if args.indent == false then indent = false end
-		state.serializeForType = args.serializeForType 
+		state.serializeForType = args.serializeForType
 		state.serializeMetatables = args.serializeMetatables
 		state.serializeMetatableFunc = args.serializeMetatableFunc
-		state.skipRecursiveReferences = args.skipRecursiveReferences 
-	end	
+		state.skipRecursiveReferences = args.skipRecursiveReferences
+	end
 	if indent then
 		state.indentChar = '\t'
 		state.newlineChar = '\n'
@@ -321,7 +321,7 @@ local function tolua(x, args)
 	state.pairs = builtinPairs
 
 	local str = toLuaRecurse(state, x, nil, '')
-	
+
 	if state.wrapWithFunction then
 		str = '(function()' .. state.newlineChar
 			.. state.indentChar .. 'local root = '..str .. ' ' .. state.newlineChar
@@ -330,7 +330,7 @@ local function tolua(x, args)
 			.. state.indentChar .. 'return root ' .. state.newlineChar
 			.. 'end)()'
 	end
-	
+
 	return str
 end
 

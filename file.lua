@@ -33,7 +33,7 @@ local function fixpath(p)
 		-- convert /./'s to nothing
 		while p[i] == '.' do p:remove(i) end
 		-- convert Somewhere/..'s to nothing
-		if p[i+1] == '..' 
+		if p[i+1] == '..'
 		and p[i] ~= '..'
 		then
 			if i == 1 and p[1] == '' then
@@ -147,7 +147,7 @@ function FileSys:cwd()
 		local dirp = unistd.getcwd(nil, 0)
 		local dir = ffi.string(dirp)
 		ffi.C.free(dirp)
-		return dir 
+		return dir
 		--]=]
 		if detect_os() then
 			return string.trim(io.readproc'cd')

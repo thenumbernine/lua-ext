@@ -10,7 +10,7 @@ useful for using Lua as a functional language.
 local lua53 = _VERSION >= 'Lua 5.3'
 
 local symbolscode = [[
-	
+
 	-- which fields are unary operators
 	local unary = {
 		unm = true,
@@ -18,7 +18,7 @@ local symbolscode = [[
 		len = true,
 		lnot = true,
 	}
-	
+
 	local symbols = {
 		add = '+',
 		sub = '-',
@@ -66,7 +66,7 @@ arshift			arshift
 rol				lrotate
 ror				rrotate
 bswap (reverses 32-bit integer endian-ness of bytes)
-tobit (converts from lua number to its signed 32-bit value) 
+tobit (converts from lua number to its signed 32-bit value)
 tohex (string conversion)
 				btest (does some bitflag stuff)
 				extract (same)
@@ -101,7 +101,7 @@ code = code .. [[
 			return t, k, v	-- ? should it return anything ?
 		end,
 		call = function(f, ...) return f(...) end,
-		
+
 		symbols = symbols,
 	}
 ]]

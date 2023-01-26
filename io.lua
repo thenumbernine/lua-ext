@@ -1,5 +1,3 @@
-local string = require 'ext.string'
-
 local io = {}
 for k,v in pairs(require 'io') do io[k] = v end
 
@@ -75,7 +73,7 @@ if jit or (not jit and _VERSION < 'Lua 5.2') then
 		end
 		return fmt, fixfilereadargs(select(2, ...))
 	end
-	
+
 	-- even though io.read is basically the same as file.read, they are still different functions
 	-- so file.read will still have to be separately overridden
 	local oldfileread
@@ -85,7 +83,7 @@ if jit or (not jit and _VERSION < 'Lua 5.2') then
 	io.read = function(...)
 		return newfileread(io.stdout, ...)
 	end
-	
+
 	local oldfilemeta = debug.getmetatable(io.stdout)
 	local newfilemeta = {}
 	for k,v in pairs(oldfilemeta) do
