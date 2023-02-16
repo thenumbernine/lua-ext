@@ -107,6 +107,11 @@ local mappings = {
 		isdir = 'isdir',
 		--dir = 'listdir',
 		rdir = 'rlistdir',
+
+		-- TODO what about the 'fixpath' that removes extra /'s also?
+		-- make that also replace with :sep()?
+		-- or make that into simplifypath() and this into fixpathsep() ?
+		fixpathsep = 'path',
 	},
 }
 local lfs = detect_lfs()
