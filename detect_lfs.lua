@@ -1,10 +1,17 @@
-local detect_ffi = require 'ext.detect_ffi'
 local lfs
 local function detect_lfs()
 	if lfs == nil then
-		local result
-		result, lfs = pcall(require, detect_ffi() and 'lfs_ffi' or 'lfs')
-		lfs = result and lfs
+		-- ok in a naive world luajit => lfs_ffi and lua => lfs
+		-- esp in a windows world where giving your lua and luajit scripts the same package.path/cpath's will cause crashes
+		-- but on openresty we're using luajit but using lfs so ...
+		-- don't mix up your package.path/cpath's
+		-- and i'm gonna try both
+		for _,try in ipairs{'lfs', 'lfs_ffi'} do
+			local result
+			result, lfs = pcall(require, try)
+			lfs = result and lfs
+			if lfs then break end
+		end
 	end
 	return lfs
 end
