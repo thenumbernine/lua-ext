@@ -25,6 +25,7 @@ number.alphabets = {
 }
 
 function number.charfor(digit)
+	local table = require 'ext.table'
 	for _,alphabet in ipairs(number.alphabets) do
 		local start,fin = table.unpack(alphabet)
 		if digit <= fin - start then
@@ -43,6 +44,7 @@ end
 
 -- TODO rename above function to 'tochar' ?
 function number.todigit(ch)
+	local table = require 'ext.table'
 	local indexInAlphabet
 	if hasutf8 then
 		indexInAlphabet = utf8.codepoint(ch)
