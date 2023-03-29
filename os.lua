@@ -223,4 +223,11 @@ function os.fileexists(fn)
 	end
 end
 
+-- to complement os.getenv
+function os.home()
+	local home = os.getenv'HOME' or os.getenv'USERPROFILE'
+	if not home then return false, "failed to find environment variable HOME or USERPROFILE" end
+	return home
+end
+
 return os

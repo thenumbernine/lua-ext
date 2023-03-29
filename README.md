@@ -164,6 +164,8 @@ end
 
 `os.move(src, dst)` = Move file from src to dst.
 
+`os.home()` = Returns the home directory path.  Queries environment variable HOME or USERPROFILE.
+
 ### string.lua
 
 Don't forget that - just as with vanilla Lua - all of these are operable via Lua string metamethods: `("a b c"):split(" ")` gives you `{'a', 'b', 'c'}`.
