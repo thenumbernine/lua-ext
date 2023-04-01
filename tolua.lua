@@ -26,6 +26,8 @@ local function builtinPairs(t)
 	return next,t,nil
 end
 
+local _0byte = ('0'):byte()
+local _9byte = ('9'):byte()
 local function escapeString(s)
 	-- [[
 	-- this will only escape escape codes
@@ -35,9 +37,20 @@ local function escapeString(s)
 	o = o:gsub('\\\n','\\n')
 	return o
 	--]]
-	--[[ this gets those that builtin misses
+	--[==[ this gets those that builtin misses
 	-- but does it in lua so it'll be slow
 	-- and requires implementations of iscntrl and isdigit
+	--
+	-- it's slow and has bugs.
+	--
+	-- TODO 
+	-- for size-minimal strings:
+	-- if min(# single-quotes, # double-quotes) within the string > 2 then use [[ ]] (so long as that isn't used either)
+	-- otherwise use as quotes whatever the min is
+	-- or ... use " to wrap if less than 1 " is embedded
+	-- then use ' to wrap if less than 1 ' is embedded
+	-- then use [[ ]] to wrap if no [[ ]] is embedded
+	-- ... etc for [=...=[ all string escape options
 	local o = '"'
 	for i=1,#s do
 		local c = s:sub(i,i)
@@ -51,22 +64,64 @@ local function escapeString(s)
 			o = o .. '\\r'
 		elseif c == '\t' then
 			o = o .. '\\t'
+		elseif c == '\a' then
+			o = o .. '\\a'
+		elseif c == '\b' then
+			o = o .. '\\b'
+		elseif c == '\f' then
+			o = o .. '\\f'
+		elseif c == '\v' then
+			o = o .. '\\v'
 		else
 			local b = c:byte()
-			if b < 32 or b == 0x7f then	-- if iscntrl(c)
+			assert(b < 256)
+			if b < 0x20 or b == 0x7f then	-- if iscntrl(c)
+-- make sure the next character isn't a digit because that will mess up the encoded escape code
 				local b2 = c:byte(i+1)
-				if not (b2 >= ('0'):byte() and b2 <= ('9'):byte()) then	-- if not isdigit(c2) then
-					return ('\\%d'):format(c2)
+				if not (b2 and b2 >= _0byte and b2 <= _9byte) then	-- if not isdigit(c2) then
+					o = o .. ('\\%d'):format(b)
 				else
-					return ('\\%03d'):format(c2)
+					o = o .. ('\\%03d'):format(b)
 				end
+			else
+				-- TODO for extended ascii, why am I seeing different things here vs encoding one character at a time?
+				o = o .. c
 			end
-			o = o .. c
 		end
 	end
 	o = o .. '"'
+	o:gsub('\\(%d%d%d)', function(d)
+		if tonumber(d) > 255 then 
+			print('#s', #s)
+			print'o'
+			print(o)
+			print's'
+			print(s)
+			error("got an oob escape code: "..d) 
+		end
+	end)
+	local f = require 'ext.fromlua'(o)
+	if f ~= s then
+		print('#s', #s)
+		print('#f', #f)
+		print'o'
+		print(o)
+		print's'
+		print(s)
+		print'f'
+		print(f)
+		print("failed to reencode as the same string")
+		for i=1,math.min(#s,#f) do
+			if f:sub(i,i) ~= s:sub(i,i) then
+				print('char '..i..' differs')
+				break
+			end
+		end
+		error("here")
+
+	end
 	return o
-	--]]
+	--]==]
 end
 
 -- as of 5.4.  I could modify this based on the Lua version (like removing 'goto') but misfiring just means wrapping in quotes, so meh.
