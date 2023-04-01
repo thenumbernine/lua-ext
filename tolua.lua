@@ -27,7 +27,46 @@ local function builtinPairs(t)
 end
 
 local function escapeString(s)
-	return (('%q'):format(s):gsub('\\\n','\\n'))
+	-- [[
+	-- this will only escape escape codes
+	-- will respect unicode
+	-- but it skips \r \t and encodes them as \13 \9
+	local o = ('%q'):format(s)
+	o = o:gsub('\\\n','\\n')
+	return o
+	--]]
+	--[[ this gets those that builtin misses
+	-- but does it in lua so it'll be slow
+	-- and requires implementations of iscntrl and isdigit
+	local o = '"'
+	for i=1,#s do
+		local c = s:sub(i,i)
+		if c == '"' then
+			o = o .. '\\"'
+		elseif c == '\\' then
+			o = o .. '\\\\'
+		elseif c == '\n' then
+			o = o .. '\\n'
+		elseif c == '\r' then
+			o = o .. '\\r'
+		elseif c == '\t' then
+			o = o .. '\\t'
+		else
+			local b = c:byte()
+			if b < 32 or b == 0x7f then	-- if iscntrl(c)
+				local b2 = c:byte(i+1)
+				if not (b2 >= ('0'):byte() and b2 <= ('9'):byte()) then	-- if not isdigit(c2) then
+					return ('\\%d'):format(c2)
+				else
+					return ('\\%03d'):format(c2)
+				end
+			end
+			o = o .. c
+		end
+	end
+	o = o .. '"'
+	return o
+	--]]
 end
 
 -- as of 5.4.  I could modify this based on the Lua version (like removing 'goto') but misfiring just means wrapping in quotes, so meh.
