@@ -141,4 +141,9 @@ function math.gcd(a,b)
 	return b == 0 and a or math.gcd(b, a % b)
 end
 
+-- if this math lib gets too big ...
+function math.mix(a,b,s)
+	return a * (1 - s) + b * s
+end
+
 return math

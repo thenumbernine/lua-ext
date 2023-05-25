@@ -8,6 +8,8 @@ file[path]:read() - to read a file in entirety
 file[path]:write() - to write to a file
 file[path]:dir() - to iterate through a directory listing
 file[path]:attr() - to get file attributes
+
+TODO call it 'path', cuz a file is the opened object, but this is just a ref to a file
 --]]
 
 
