@@ -51,7 +51,12 @@ end
 -- this should really return the extension first.
 -- that is the function name, after all.
 function io.getfileext(fn)
-	return fn:match('^(.*)%.([^%./]-)$')
+	local front, ext = fn:match('^(.*)%.([^%./]-)$')
+	if front then
+		return front, ext
+	end
+	-- no ext? then leave that field nil - just return the base filename
+	return fn, nil
 end
 
 -- in Lua 5.3.5 at least:
