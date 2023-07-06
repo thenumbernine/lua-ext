@@ -91,6 +91,7 @@ end
 -- wrappers
 local mappings = {
 	[io] = {
+		lines = 'lines',
 		open = 'open',
 		read = 'readfile',
 		write = 'writefile',
