@@ -1,4 +1,6 @@
 --[[
+TODO rename this file 'path', cuz a file is the opened object, but this is just a ref to a file
+
 this will replace old "file", but i realize that's gonna take a big overhaul of every project that depends on "file"
 
 this is turning into a very shy wrapper to lfs ... and to io.readfile / io.writefile ... and then the vanilla Lua io file stuff
@@ -8,8 +10,6 @@ file[path]:read() - to read a file in entirety
 file[path]:write() - to write to a file
 file[path]:dir() - to iterate through a directory listing
 file[path]:attr() - to get file attributes
-
-TODO call it 'path', cuz a file is the opened object, but this is just a ref to a file
 --]]
 
 
@@ -79,6 +79,7 @@ local function appendPath(fn, path)
 end
 
 
+-- TODO rename to Path?
 local FileSys = class()
 
 --FileSys.sep = os.sep	-- TOO redundant?
@@ -143,8 +144,10 @@ for obj,mapping in pairs(mappings) do
 	end
 end
 
--- [[ same as above but with non-lfs options.  TODO put them in io or os like I am doing to abstract non-lfs stuff elsewhere?
+-- [[ same as above but with non-lfs options.
+-- TODO put them in io or os like I am doing to abstract non-lfs stuff elsewhere?
 
+-- TODO return a FileSys instance instead of a string?
 function FileSys:cwd()
 	if lfs then
 		return lfs.currentdir()
@@ -197,10 +200,15 @@ function FileSys:__call(k)
 	}
 end
 
+-- clever stl idea: path(a)/path(b) = path(a..'/'..b)
+FileSys.__div = FileSys.__call
+
+-- TODO remove the wrapper?  just convert to .path? for ease of use?
 function FileSys:__tostring()
 	return 'FileSys['..self.path..']'
 end
 
+function FileSys.__concat(a,b) return tostring(a) .. tostring(b) end
 
 local fileSys = FileSys{path='.'}
 
