@@ -2,6 +2,8 @@
 make lua functions for each operator.
 it looks like i'm mapping 1-1 between metamethods and fields in this table.
 useful for using Lua as a functional language.
+
+TODO rename to 'ops'?
 --]]
 
 -- test if we hae lua 5.3 bitwise operators
