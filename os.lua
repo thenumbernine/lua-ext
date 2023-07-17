@@ -69,9 +69,9 @@ function os.move(from, to)
 	return os.execute(cmd)
 	--]]
 	--[[
-	local d = file(from):read()
-	file(from):remove()	-- remove first in case to and from match
-	file(to):write(d)
+	local d = path(from):read()
+	path(from):remove()	-- remove first in case to and from match
+	path(to):write(d)
 	--]]
 end
 
