@@ -7,7 +7,7 @@ return function(env)
 	env.coroutine = require 'ext.coroutine'
 	env.io = require 'ext.io'
 	env.os = require 'ext.os'
-	env.file = require 'ext.file'
+	env.path = require 'ext.path'
 	env.tolua = require 'ext.tolua'
 	env.fromlua = require 'ext.fromlua'
 	env.class = require 'ext.class'

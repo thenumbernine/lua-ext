@@ -1,15 +1,9 @@
 --[[
-TODO rename this file 'path', cuz a file is the opened object, but this is just a ref to a file
-
-this will replace old "file", but i realize that's gonna take a big overhaul of every project that depends on "file"
-
-this is turning into a very shy wrapper to lfs ... and to io.readfile / io.writefile ... and then the vanilla Lua io file stuff
-
-file[path]:open(mode) - to get a file handle
-file[path]:read() - to read a file in entirety
-file[path]:write() - to write to a file
-file[path]:dir() - to iterate through a directory listing
-file[path]:attr() - to get file attributes
+path(pathtofile):open(mode) - to get a file handle
+path(pathtofile):read() - to read a file in entirety
+path(pathtofile):write() - to write to a file
+path(pathtofile):dir() - to iterate through a directory listing
+path(pathtofile):attr() - to get file attributes
 --]]
 
 
@@ -28,13 +22,13 @@ local class = require 'ext.class'
 local function fixpath(p)
 	p = string.split(p, '/')
 	for i=#p-1,1,-1 do
-		-- convert //'s to nothing
+		-- convert a//b's to a/b
 		if i > 1 then	-- don't remove empty '' as the first entry - this signifies a root path
 			while p[i] == '' do p:remove(i) end
 		end
-		-- convert /./'s to nothing
+		-- convert a/./b's to a/b
 		while p[i] == '.' do p:remove(i) end
-		-- convert Somewhere/..'s to nothing
+		-- convert a/b/../c's to a/c
 		if p[i+1] == '..'
 		and p[i] ~= '..'
 		then
@@ -51,10 +45,10 @@ end
 
 -- PREPEND the path if fn is relative, otherwise use fn
 -- I should reverse these arguments
--- but this function is really specific to the FileSys path state variable
-local function appendPath(fn, path)
+-- but this function is really specific to the Path path state variable
+local function appendPath(fn, p)
 	asserttype(fn, 'string')
-	asserttype(path, 'string')
+	asserttype(p, 'string')
 	--[[ dont change to path sep ... always use / internally
 	if detect_os() then
 		fn = os.path(fn)
@@ -62,12 +56,12 @@ local function appendPath(fn, path)
 			fn:sub(1,1) == '\\'
 			or fn:match'^[A-Z,a-z]:\\'
 		) then
-			fn = path .. '\\' .. fn
+			fn = p .. '\\' .. fn
 		end
 	else
 	--]]
 		if fn:sub(1,1) ~= '/' then
-			fn = path .. '/' .. fn
+			fn = p .. '/' .. fn
 		end
 	--end
 	fn = fn:gsub('/%./', '/')
@@ -79,12 +73,11 @@ local function appendPath(fn, path)
 end
 
 
--- TODO rename to Path?
-local FileSys = class()
+local Path = class()
 
---FileSys.sep = os.sep	-- TOO redundant?
+--Path.sep = os.sep	-- TOO redundant?
 
-function FileSys:init(args)
+function Path:init(args)
 	self.path = asserttype(asserttype(args, 'table').path, 'string')
 	assert(self.path ~= nil)
 end
@@ -127,7 +120,7 @@ if lfs then
 		link = 'link',
 		setmode = 'setmode',
 		touch = 'touch',
-		--cwd = 'currentdir',	-- TODO how about some kind of cwd or something ... default 'file' obj path is '.', so how about relating this to the default. path storage?
+		--cwd = 'currentdir',		-- TODO how about some kind of cwd or something ... default 'file' obj path is '.', so how about relating this to the default. path storage?
 		--mkdir = 'mkdir',			-- in 'ext.os'
 		--rmdir = 'rmdir',			-- in 'ext.os'
 		--lock = 'lock',			-- in 'file' objects via ext.io.open
@@ -138,7 +131,7 @@ end
 
 for obj,mapping in pairs(mappings) do
 	for k,v in pairs(mapping) do
-		FileSys[k] = function(self, ...)
+		Path[k] = function(self, ...)
 			return obj[v](self.path, ...)
 		end
 	end
@@ -147,8 +140,8 @@ end
 -- [[ same as above but with non-lfs options.
 -- TODO put them in io or os like I am doing to abstract non-lfs stuff elsewhere?
 
--- TODO return a FileSys instance instead of a string?
-function FileSys:cwd()
+-- TODO return a Path instance instead of a string?
+function Path:cwd()
 	if lfs then
 		return lfs.currentdir()
 	else
@@ -171,7 +164,7 @@ end
 
 -- os.listdir wrapper
 
-function FileSys:dir(state, lastfunc)
+function Path:dir(state, lastfunc)
 	assert(not lastfunc, "make sure to call() the dir")
 	if not os.isdir(self.path) then
 		error("can't dir() a non-directory")
@@ -184,9 +177,9 @@ end
 TODO how to do the new interface?
 specifically reading vs writing?
 
-instead of __newindex for writing new files, how about file(path):write()
+instead of __newindex for writing new files, how about path(path):write()
 --]]
-function FileSys:__call(k)
+function Path:__call(k)
 	assert(self.path ~= nil)
 	local fn = asserttype(appendPath(k, self.path), 'string')
 	-- is this safe?
@@ -195,21 +188,21 @@ function FileSys:__call(k)
 	-- one option is checking existence and returning nil if no file
 	-- but then how about file writing?
 
-	return FileSys{
+	return Path{
 		path = asserttype(fn, 'string'),
 	}
 end
 
 -- clever stl idea: path(a)/path(b) = path(a..'/'..b)
-FileSys.__div = FileSys.__call
+Path.__div = Path.__call
 
 -- TODO remove the wrapper?  just convert to .path? for ease of use?
-function FileSys:__tostring()
-	return 'FileSys['..self.path..']'
+function Path:__tostring()
+	return 'Path['..self.path..']'
 end
 
-function FileSys.__concat(a,b) return tostring(a) .. tostring(b) end
+function Path.__concat(a,b) return tostring(a) .. tostring(b) end
 
-local fileSys = FileSys{path='.'}
+local pathSys = Path{path='.'}
 
-return fileSys
+return pathSys
