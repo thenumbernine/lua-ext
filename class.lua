@@ -60,7 +60,6 @@ local function class(...)
 	cl.__index = cl
 	cl.new = newmember
 	cl.isa = isa	-- usage: Class:isa(obj)
-	cl.subclass = class	-- such that cl:subclass() or cl:subclass{...} will return a subclass of 'cl'
 
 --[[ if you want to keep track of all instances
 	cl.instances = setmetatable({}, {__mode = 'k'})
