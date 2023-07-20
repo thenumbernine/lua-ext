@@ -105,6 +105,13 @@ code = code .. [[
 		call = function(f, ...) return f(...) end,
 
 		symbols = symbols,
+
+		-- special pcall wrapping index, thanks luajit.  thanks.
+		safeindex = function(t, k)
+			local res, v = pcall(function() return t[k] end)
+			if not res then return nil, v end
+			return v
+		end,
 	}
 ]]
 return assert((loadstring or load)(code))()
