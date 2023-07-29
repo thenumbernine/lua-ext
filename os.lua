@@ -126,7 +126,7 @@ function os.listdir(path)
 			if detect_os() then
 				cmd = 'dir /b "'..os.path(path)..'"'
 			else
-				cmd = 'ls '..path:gsub('[|&;<>`\"\' \t\r\n#~=%$%(%)%%%[%*%?]', [[\%0]])
+				cmd = 'ls -a '..path:gsub('[|&;<>`\"\' \t\r\n#~=%$%(%)%%%[%*%?]', [[\%0]])
 			end
 			local filestr = io.readproc(cmd)
 			fns = string.split(filestr, '\n')
