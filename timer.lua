@@ -15,9 +15,9 @@ if not hasffi or ffi.os == 'Windows' then
 	-- in linux this is the live time, or something other than the actual time
 	T.getTime = os.clock
 else
-	require 'ffi.c.sys.time'	-- gettimeofday
-	require 'ffi.c.string'		-- strerror
-	local errno = require 'ffi.c.errno'
+	require 'ffi.req' 'c.sys.time'	-- gettimeofday
+	require 'ffi.req' 'c.string'		-- strerror
+	local errno = require 'ffi.req' 'c.errno'
 	local gettimeofday_tv = ffi.new'struct timeval[1]'
 	function T.getTime()
 		local result = ffi.C.gettimeofday(gettimeofday_tv, nil)

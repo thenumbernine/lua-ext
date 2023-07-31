@@ -140,7 +140,7 @@ function os.listdir(path)
 				error('windows sucks...')
 			else
 				fns = {}
-				require 'ffi.c.dirent'
+				require 'ffi.req' 'c.dirent'
 				-- https://stackoverflow.com/questions/10678522/how-can-i-get-this-readdir-code-sample-to-search-other-directories
 				local dirp = ffi.C.opendir(path)
 				if dirp == nil then

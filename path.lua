@@ -147,7 +147,7 @@ function Path:cwd()
 	else
 		--[=[ TODO should I even bother with the non-lfs fallback?
 		-- if so then use this:
-		require 'ffi.c.stdlib'
+		require 'ffi.req' 'c.stdlib'
 		local dirp = unistd.getcwd(nil, 0)
 		local dir = ffi.string(dirp)
 		ffi.C.free(dirp)

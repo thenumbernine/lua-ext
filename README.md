@@ -36,7 +36,7 @@ It also sets _ to os.execute for shorthand shell scripting.
 
 Class tables can instanciate object tables using the `\_\_call` operator:
 
-```
+``` lua
 Cl = class()
 obj = Cl(arg1, arg2, ...)
 ```
@@ -45,7 +45,7 @@ Upon construction of an object, the `Cl:init()` method is called, with arguments
 
 Example:
 
-```
+``` lua
 Cl = class()
 function Cl:init(arg)
 	self.x = arg
@@ -59,7 +59,7 @@ If `Cl:init()` does return any values then it will be returned by the constructo
 
 Example:
 
-```
+``` lua
 Cl = class()
 function Cl:init()
 	return 123
@@ -81,7 +81,7 @@ Class tables have the following methods:
 
 Notice that the object's metatable is the class table.  This means that any metamethods defined in the class table are functional in the object table:
 
-```
+``` lua
 Cl = class()
 function Cl.__add(a,b)
 	return 'abc'
@@ -152,7 +152,7 @@ assert(obj1 + obj2 == 'abc')
 `os.listdir(path)` = Return an iterator that iterates through all files in a directory.
 
 Example:
-```
+``` lua
 for fn in os.listdir('.') do
 	print(fn)
 end
@@ -190,7 +190,7 @@ Don't forget that - just as with vanilla Lua - all of these are operable via Lua
 
 Example of the output:
 
-```
+``` lua
 > io.readfile'8x8-24bpp-solidwhite.bmp':hexdump()
 00000000  42 4d 3a 01 00 00 00 00  00 00 7a 00 00 00 6c 00  00 00 08 00 00 00 08 00  00 00 01 00 18 00 00 00  BM:.......z...l.................
 00000020  00 00 c0 00 00 00 23 2e  00 00 23 2e 00 00 00 00  00 00 00 00 00 00 42 47  52 73 00 00 00 00 00 00  ..�...#...#...........BGRs......
@@ -274,7 +274,7 @@ The major contribution of this file is `number.tostring`:
 `number.maxdigits` = A number value specifying the default max digts.  This is initialized to 50.
 
 This library doesn't assign `tostring` to `\_\_tostring` by default, but you can accomplish this using the following code:
-```
+``` lua
 -- assign number to the Lua number metatable
 require 'ext.meta'
 
@@ -291,7 +291,7 @@ require 'ext.meta'
 `number.char` = Shorthand assigned to `string.char` for easy infix notation.  Example, when `number` is set to the number metatable, `(97):char()` produces `'a'`.
 
 Example with `number` as Lua number metatables:
-```
+``` lua
 > require 'ext.meta'
 > (10):tostring(3)
 101.00000000000000000000000000000000211012220021010120
@@ -304,7 +304,7 @@ Example with `number` as Lua number metatables:
 Yes, go ahead and sum up those digits scaled by their respective powers of pi, see that it does come out to be 10.
 
 Example with `number`, changing the default
-```
+``` lua
 > require 'ext.meta'
 > debug.getmetatable(0).base = 3
 > print(10)
@@ -347,7 +347,7 @@ Metatable changes:
 	The following binary operators will now work on functions: + - * / % ^
 	Example:
 
-```
+``` lua
 > function f(x) return 2*x end
 > function g(x) return x+1 end
 > (f+g)(3)	-- produces (function(x) return 2*x + x+1 end)
@@ -356,7 +356,7 @@ Metatable changes:
 
 	The following unary operators will now work on functions: - #
 
-```
+``` lua
 > function f() return 2 end
 > (-f)()
 -2

@@ -1,5 +1,5 @@
 local ffi = require 'ffi'
-require 'ffi.c.stdlib'
+require 'ffi.req' 'c.stdlib'
 
 --[[
 uses C malloc paired with ffi-based garbage collection
