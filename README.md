@@ -77,7 +77,7 @@ Class tables have the following methods:
 
 - `Cl:isa(obj)` = returns `true` if obj is a table, and is an instance of class `Cl`.
 
-- `Cl:subclass(...)` = create a subclass of `Cl` and possibly populate it with the contents of any tables specified in `...`.
+- `Cl:subclass(...)` = create a subclass of `Cl` and of any other tables specified in `...`.
 
 Notice that the object's metatable is the class table.  This means that any metamethods defined in the class table are functional in the object table:
 
