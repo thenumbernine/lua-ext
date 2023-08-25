@@ -436,31 +436,53 @@ Notice that, calling `require 'ext'` will also call `getCmdline` on `arg`, produ
 ### path.lua: path wrapper
 
 `path = require 'ext.path'` = represents an object representing the cwd.
+
 `p = path(pathstr)` returns a new `path` object representing the path at `pathstr`.  Relative paths are appended from the previous `path` object's path.
 
+
 `p:open(...)` is an alias of `io.open(p.path, ...)`.
+
 `p:read(...)` is an alias of `io.readfile(p.path, ...)`.
+
 `p:write(...)` is an alias of `io.writefile(p.path, ...)`.
+
 `p:append(...)` is an alias of `io.appendfile(p.path, ...)`.
+
 `p:getdir(...)` is an alias of `io.getfiledir(p.path, ...)`.
+
 `p:getext(...)` is an alias of `io.getfileext(p.path, ...)`.
 
+
 `p:remove(...)` is an alias of `os.remove(p.path, ...)`.
+
 `p:mkdir(...)` is an alias of `os.mkdir(p.path, ...)`.
+
 `p:listdir(...)` is an alias of `os.listdir(p.path, ...)`.
+
 `p:exists(...)` is an alias of `os.fileexists(p.path, ...)`.
+
 `p:isdir(...)` is an alias of `os.isdir(p.path, ...)`.
+
 `p:rdir(...)` is an alias of `os.rlistdir(p.path, ...)`.
 
+
 `p:attr(...)` is an alias of `lfs.attributes(p.path, ...)`.
+
 `p:symattr(...)` is an alias of `lfs.symlinkattributes(p.path, ...)`.
+
 `p:cd(...)` is an alias of `lfs.chdir(p.path, ...)`.
+
 `p:link(...)` is an alias of `lfs.link(p.path, ...)`.
+
 `p:setmode(...)` is an alias of `lfs.setmode(p.path, ...)`.
+
 `p:touch(...)` is an alias of `lfs.touch(p.path, ...)`.
+
 `p:lockdir(...)` is an alias of `lfs.lock_dir(p.path, ...)`.
 
+
 `p:dir()` is an alias of `os.listdir(p.path)`.
+
 `p:cwd()` is an alias of `lfs.currendir()` if available, or `io.readproc'pwd'` on Linux or `io.readproc'cd'` on Windows.
 
 ### gcmem.lua: Provides FFI-based functions for manually or automatically allocating and freeing memory.  WIP due to crashing in LuaJIT when you run `ptr = ffi.cast('T*', ptr)` and haven't bound `ptr` anywhere else.
