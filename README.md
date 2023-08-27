@@ -143,7 +143,9 @@ assert(obj1 + obj2 == 'abc')
 
 ### os.lua
 
-`os.execute(...)` = Attempts to fix the compatability of `os.execute` for Lua 5.1 to match that of Lua 5.2.
+`os.execute(...)` = Attempts to fix the compatability of `os.execute` for Lua 5.1 to match that of Lua 5.2+.
+
+`os.exec(...)` = Prints the command executed, then performs `os.execute`.
 
 `os.fileexists(path)` = Returns true/false whether the associated file exists.
 
@@ -451,6 +453,8 @@ Notice that, calling `require 'ext'` will also call `getCmdline` on `arg`, produ
 `p:getdir(...)` is an alias of `io.getfiledir(p.path, ...)`.
 
 `p:getext(...)` is an alias of `io.getfileext(p.path, ...)`.
+
+`p:setext(newext)` = Returns a copy of the path, but with the last extension replaced with `newext`.  If `newext` is `nil` then the last extension is removed.
 
 
 `p:remove(...)` is an alias of `os.remove(p.path, ...)`.

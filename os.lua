@@ -35,6 +35,13 @@ if _VERSION == 'Lua 5.1' then
 	end
 end
 
+-- too common not to put here
+-- this does execute but first prints the command to stdout
+function os.exec(cmd)
+	print('>'..cmd)
+	return os.execute(cmd)
+end
+
 -- TODO should this fail if the dir already exists?  or should it succeed?
 -- should it fail if a file is presently there? probably.
 -- should makeParents be set by default?  it's on by default in Windows.

@@ -172,6 +172,22 @@ function Path:dir(state, lastfunc)
 	return os.listdir(self.path)
 end
 
+-- shorthand for splitting off ext and replacing it
+-- Path:getext() splits off the last '.' and returns the letters after it
+-- but for files with no ext it returns nil afterwards
+-- so a file with only a single '.' at the end will produce a '' for an ext
+-- and a file with no '.' will produce ext nil
+-- so for compat, handle it likewise
+-- for newext == nil, remove the last .ext from the filename
+-- for newext == "", replace the last .ext with just a .
+function Path:setext(newext)
+	local base = self:getext()
+	if newext then
+		base = base .. '.' .. newext
+	end
+	return Path{path=base}
+end
+
 -- iirc setting __index and __newindex outside :init() is tough, since so much writing is still going on
 --[[
 TODO how to do the new interface?
@@ -196,9 +212,9 @@ end
 -- clever stl idea: path(a)/path(b) = path(a..'/'..b)
 Path.__div = Path.__call
 
--- TODO remove the wrapper?  just convert to .path? for ease of use?
+-- return the path but for whatever OS we're using
 function Path:__tostring()
-	return 'Path['..self.path..']'
+	return self:fixpathsep()
 end
 
 function Path.__concat(a,b) return tostring(a) .. tostring(b) end
