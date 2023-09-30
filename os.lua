@@ -168,7 +168,7 @@ function os.listdir(path)
 		return coroutine.wrap(function()
 			for _,k in ipairs(fns) do
 				--local fn = k:sub(1,1) == '/' and k or (path..'/'..k)
-				coroutine.yield(k)--, io.readfile(fn))
+				coroutine.yield(k)
 			end
 		end)
 	else

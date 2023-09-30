@@ -174,12 +174,14 @@ end
 -- another copy of maxn, with custom pairs
 local function maxn(t, state)
 	local max = 0
+	local count = 0
 	for k,v in state.pairs(t) do
+		count = count + 1
 		if type(k) == 'number' then
 			max = math.max(max, k)
 		end
 	end
-	return max
+	return max, count
 end
 
 
@@ -259,13 +261,17 @@ local defaultSerializeForType = {
 			state.touchedTables[x] = 'root'..path
 
 			-- prelim see if we can write it as an indexed table
-			local numx = maxn(x, state)
-			local intNilKeys, intNonNilKeys = 0, 0
-			for i=1,numx do
-				if x[i] == nil then
-					intNilKeys = intNilKeys + 1
-				else
-					intNonNilKeys = intNonNilKeys + 1
+			local numx, count = maxn(x, state)
+			local intNilKeys, intNonNilKeys
+			-- only count if our max isn't too high
+			if numx < 2 * count then
+				intNilKeys, intNonNilKeys = 0, 0
+				for i=1,numx do
+					if x[i] == nil then
+						intNilKeys = intNilKeys + 1
+					else
+						intNonNilKeys = intNonNilKeys + 1
+					end
 				end
 			end
 
@@ -275,7 +281,10 @@ local defaultSerializeForType = {
 
 			-- add integer keys without keys explicitly. nil-padded so long as there are 2x values than nils
 			local addedIntKeys = {}
-			if intNonNilKeys >= intNilKeys * 2 then	-- some metric
+			if intNonNilKeys
+			and intNilKeys
+			and intNonNilKeys >= intNilKeys * 2
+			then	-- some metric for when to create in-order tables
 				for k=1,numx do
 					if type(x[k]) == 'table' then hasSubTable = true end
 					local nextResult = toLuaRecurse(state, x[k], newtab, path and path..'['..k..']')
