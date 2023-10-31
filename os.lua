@@ -138,6 +138,8 @@ function os.listdir(path)
 			local filestr = io.readproc(cmd)
 			fns = string.split(filestr, '\n')
 			assert(fns:remove() == '')
+			if fns[1] == '.' then fns:remove(1) end
+			if fns[1] == '..' then fns:remove(1) end
 --[[
 		else
 			-- do a directory listing
