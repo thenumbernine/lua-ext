@@ -9,7 +9,7 @@ for k,v in pairs(require 'string') do string[k] = v end
 
 local table = require 'ext.table'
 
--- string.concat(string.split(a,b),b) == a
+-- table.concat(string.split(a,b),b) == a
 function string.split(s, exp)
 	exp = exp or ''
 	s = tostring(s)
@@ -30,6 +30,18 @@ function string.split(s, exp)
 		t:insert(s:sub(searchpos))
 	end
 	return t
+end
+
+-- TODO
+-- this is a common function, especially in metatable creation
+-- it is nearly table.concat, except table.concat errors upon non-string/number instead of calling tostring() automatically
+-- (should I change table.concat's default behavior and use that instead?)
+function string.defaultConcat(...)
+	local n = select('#', ...)
+	if n == 0 then return end
+	local s = tostring((...))
+	if n == 1 then return s end
+	return s .. string.defaultConcat(select(2, ...))
 end
 
 function string.trim(s)
