@@ -6,14 +6,12 @@ local op = require 'ext.op'
 
 -- fix up lua type metatables
 
-local function defaultConcat(a,b) return tostring(a) .. tostring(b) end
-
 -- nil
-debug.setmetatable(nil, {__concat = defaultConcat})
+debug.setmetatable(nil, {__concat = string.defaultConcat})
 
 -- booleans
 debug.setmetatable(true, {
-	__concat = defaultConcat,
+	__concat = string.defaultConcat,
 	__index = {
 		and_ = op.land,
 		or_ = op.lor,
@@ -26,7 +24,7 @@ debug.setmetatable(true, {
 debug.setmetatable(0, number)
 
 -- strings
-getmetatable('').__concat = defaultConcat
+getmetatable('').__concat = string.defaultConcat
 getmetatable('').__index = string
 
 -- It'd be fun if I could apply the operator to all return values, and not just the first ...
@@ -59,7 +57,7 @@ end
 local functionMeta = {
 	-- I could make this a function composition like the rest of the meta operations,
 	-- but instead I'm going to have it follow the default __concat convention I have with other primitive types
-	__concat = defaultConcat,
+	__concat = string.defaultConcat,
 	dump = function(f) return string.dump(f) end,
 	__add = function(f, g) return combineFunctionsWithBinaryOperator(f, g, op.add) end,
 	__sub = function(f, g) return combineFunctionsWithBinaryOperator(f, g, op.sub) end,
