@@ -36,12 +36,12 @@ end
 -- it is nearly table.concat, except table.concat errors upon non-string/number instead of calling tostring() automatically
 -- (should I change table.concat's default behavior and use that instead?  nah, because why require a table creation.)
 -- how about I just call this string.concat?
-function string.defaultConcat(...)
+function string.concat(...)
 	local n = select('#', ...)
 	if n == 0 then return end	-- base-case nil or "" ?
 	local s = tostring((...))
 	if n == 1 then return s end
-	return s .. string.defaultConcat(select(2, ...))
+	return s .. string.concat(select(2, ...))
 end
 
 function string.trim(s)

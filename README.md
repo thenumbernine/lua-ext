@@ -174,6 +174,8 @@ end
 
 Don't forget that - just as with vanilla Lua - all of these are operable via Lua string metamethods: `("a b c"):split(" ")` gives you `{'a', 'b', 'c'}`.
 
+`string.concat(...)` = `tostring`'s and then `concat`'s all the arguments.
+
 `string.split(str, sep)` = Splits a string, returning a table of the pieces separated by `sep`.  If `sep` is not provided then the string is split into individual characters.
 
 `string.trim(str)` = Returns the string with the whitespace at the beginning and end removed.
