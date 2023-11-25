@@ -138,7 +138,8 @@ for obj,mapping in pairs(mappings) do
 end
 
 function Path:getdir(...)
-	return Path{path=io.getfiledir(self.path, ...)}
+	local dir, name = io.getfiledir(self.path, ...)
+	return Path{path=dir}, name
 end
 
 -- [[ same as above but with non-lfs options.
