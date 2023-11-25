@@ -4,6 +4,17 @@ path(pathtofile):read() - to read a file in entirety
 path(pathtofile):write() - to write to a file
 path(pathtofile):dir() - to iterate through a directory listing
 path(pathtofile):attr() - to get file attributes
+
+
+TODO
+
+path:cwd() returns the *absolute* cwd, but 'path' doesn't ...
+... maybe path:cwd() should return path'.' and path:abs() should return the absolute path (using lfs.currentdir() for evaluation of '.')
+
+right now path(a)(b)(c) is the same as path(a)/b/c
+... maybe just use /'s and use call for something else? or don't use call at all?
+
+make rlistdir() an iterator like listdir() already is
 --]]
 
 
@@ -19,7 +30,7 @@ local class = require 'ext.class'
 
 
 -- TODO this goes in file or os or somewhere in ext
-local function fixpath(p)
+local function simplifypath(p)
 	p = string.split(p, '/')
 	for i=#p-1,1,-1 do
 		-- convert a//b's to a/b
@@ -105,9 +116,7 @@ local mappings = {
 		--dir = 'listdir',
 		rdir = 'rlistdir',
 
-		-- TODO what about the 'fixpath' that removes extra /'s also?
-		-- make that also replace with :sep()?
-		-- or make that into simplifypath() and this into fixpathsep() ?
+		-- TODO rename to 'fixpath' ?
 		fixpathsep = 'path',
 	},
 }
@@ -201,9 +210,11 @@ instead of __newindex for writing new files, how about path(path):write()
 --]]
 function Path:__call(k)
 	assert(self.path ~= nil)
+	if k == nil then return self end
+	if Path:isa(k) then k = k.path end
 	local fn = asserttype(appendPath(k, self.path), 'string')
 	-- is this safe?
-	fn = fixpath(fn)
+	fn = simplifypath(fn)
 
 	-- one option is checking existence and returning nil if no file
 	-- but then how about file writing?
@@ -219,6 +230,13 @@ Path.__div = Path.__call
 -- return the path but for whatever OS we're using
 function Path:__tostring()
 	return self:fixpathsep()
+end
+
+-- This is intended for shell / cmdline use
+-- TODO it doesn't need to quote if there are no special characters present
+-- also TODO make sure its escaping matches up with whatever OS is being used
+function Path:escape()
+	return('%q'):format(self:fixpathsep())
 end
 
 Path.__concat = string.concat
