@@ -90,7 +90,7 @@ local mappings = {
 		read = 'readfile',
 		write = 'writefile',
 		append = 'appendfile',
-		getdir = 'getfiledir',
+		--getdir = 'getfiledir',	-- defined later, wrapped in Path
 		getext = 'getfileext',
 	},
 	[os] = {
@@ -137,13 +137,16 @@ for obj,mapping in pairs(mappings) do
 	end
 end
 
+function Path:getdir(...)
+	return Path{path=io.getfiledir(self.path, ...)}
+end
+
 -- [[ same as above but with non-lfs options.
 -- TODO put them in io or os like I am doing to abstract non-lfs stuff elsewhere?
 
--- TODO return a Path instance instead of a string?
 function Path:cwd()
 	if lfs then
-		return lfs.currentdir()
+		return Path{path=lfs.currentdir()}
 	else
 		--[=[ TODO should I even bother with the non-lfs fallback?
 		-- if so then use this:
@@ -154,9 +157,9 @@ function Path:cwd()
 		return dir
 		--]=]
 		if detect_os() then
-			return string.trim(io.readproc'cd')
+			return Path{path=string.trim(io.readproc'cd')}
 		else
-			return string.trim(io.readproc'pwd')
+			return Path{path=string.trim(io.readproc'pwd')}
 		end
 	end
 end
@@ -217,7 +220,7 @@ function Path:__tostring()
 	return self:fixpathsep()
 end
 
-function Path.__concat(a,b) return tostring(a) .. tostring(b) end
+Path.__concat = string.concat
 
 local pathSys = Path{path='.'}
 
