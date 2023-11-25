@@ -102,7 +102,7 @@ local mappings = {
 		write = 'writefile',
 		append = 'appendfile',
 		--getdir = 'getfiledir',	-- defined later, wrapped in Path
-		getext = 'getfileext',
+		getext = 'getfileext',		-- TODO also wrap in Path? maybe return the ext first too, since that's the function name?
 	},
 	[os] = {
 		-- vanilla
