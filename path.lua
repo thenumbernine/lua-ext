@@ -50,6 +50,10 @@ local function simplifypath(p)
 			p:remove(i)
 		end
 	end
+	-- remove trailing '.''s except the first
+	while #p > 1 and p[#p] == '.' do
+		p:remove()
+	end
 	return p:concat'/'
 end
 
@@ -146,6 +150,7 @@ for obj,mapping in pairs(mappings) do
 	end
 end
 
+-- Path wrapping function, but return wraps in Path
 function Path:getdir(...)
 	local dir, name = io.getfiledir(self.path, ...)
 	return Path{path=dir}, name
@@ -174,6 +179,14 @@ function Path:cwd()
 	end
 end
 --]]
+
+-- convert relative to absolute paths
+function Path:abs()
+	if self.path:sub(1,1) == '/' then
+		return self
+	end
+	return Path:cwd()/self
+end
 
 -- os.listdir wrapper
 
