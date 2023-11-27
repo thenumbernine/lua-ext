@@ -452,7 +452,7 @@ Notice that, calling `require 'ext'` will also call `getCmdline` on `arg`, produ
 
 `p:append(...)` is an alias of `io.appendfile(p.path, ...)`.
 
-`p:getdir(...)` is an alias of `io.getfiledir(p.path, ...)`.
+`p:getdir(...)` is an alias of `io.getfiledir(p.path, ...)`, except that it wraps the first argument in a `Path` object.
 
 `p:getext(...)` is an alias of `io.getfileext(p.path, ...)`.
 
@@ -489,7 +489,9 @@ Notice that, calling `require 'ext'` will also call `getCmdline` on `arg`, produ
 
 `p:dir()` is an alias of `os.listdir(p.path)`.
 
-`p:cwd()` is an alias of `lfs.currendir()` if available, or `io.readproc'pwd'` on Linux or `io.readproc'cd'` on Windows.
+`p:cwd()` returns the absolute cwd path, as a Path object.  This is an alias of `lfs.currendir()` if available, or `io.readproc'pwd'` on Linux or `io.readproc'cd'` on Windows.
+
+`p:abs()` returns the absolute form of the path, as a Path object.
 
 ### gcmem.lua: Provides FFI-based functions for manually or automatically allocating and freeing memory.  WIP due to crashing in LuaJIT when you run `ptr = ffi.cast('T*', ptr)` and haven't bound `ptr` anywhere else.
 
