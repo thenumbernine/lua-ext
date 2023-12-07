@@ -83,7 +83,8 @@ local symbols, unary = assert((loadstring or load)(symbolscode..' return symbols
 
 local code = symbolscode .. [[
 	-- functions for operators
-	return {
+	local ops
+	ops = {
 ]]
 for name,symbol in pairs(symbols) do
 	if unary[name] then
@@ -108,10 +109,11 @@ code = code .. [[
 
 		-- special pcall wrapping index, thanks luajit.  thanks.
 		safeindex = function(t, k)
-			local res, v = pcall(function() return t[k] end)
+			local res, v = pcall(ops.index, t, k)
 			if not res then return nil, v end
 			return v
 		end,
 	}
+	return ops
 ]]
 return assert((loadstring or load)(code))()
