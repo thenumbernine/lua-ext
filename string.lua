@@ -35,7 +35,7 @@ end
 -- this is a common function, especially in metatable creation
 -- it is nearly table.concat, except table.concat errors upon non-string/number instead of calling tostring() automatically
 -- (should I change table.concat's default behavior and use that instead?  nah, because why require a table creation.)
--- how about I just call this string.concat?
+-- TODO tempted to make this ext.op.concat ... but that's specifically a binary op ... hmm
 function string.concat(...)
 	local n = select('#', ...)
 	if n == 0 then return end	-- base-case nil or "" ?
