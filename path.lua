@@ -106,7 +106,7 @@ local mappings = {
 		write = 'writefile',
 		append = 'appendfile',
 		--getdir = 'getfiledir',	-- defined later, wrapped in Path
-		getext = 'getfileext',		-- TODO also wrap in Path? maybe return the ext first too, since that's the function name?
+		--getext = 'getfileext',	-- defined later, wrapped in Path
 	},
 	[os] = {
 		-- vanilla
@@ -154,6 +154,12 @@ end
 function Path:getdir(...)
 	local dir, name = io.getfiledir(self.path, ...)
 	return Path{path=dir}, name
+end
+
+-- Path wrapping
+function Path:getext(...)
+	local base, ext = io.getfileext(self.path)
+	return Path{path=base}, ext
 end
 
 -- [[ same as above but with non-lfs options.
@@ -209,9 +215,9 @@ end
 function Path:setext(newext)
 	local base = self:getext()
 	if newext then
-		base = base .. '.' .. newext
+		base.path = base.path .. '.' .. newext
 	end
-	return Path{path=base}
+	return base
 end
 
 -- iirc setting __index and __newindex outside :init() is tough, since so much writing is still going on
