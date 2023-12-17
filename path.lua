@@ -8,13 +8,13 @@ path(pathtofile):attr() - to get file attributes
 
 TODO
 
-path:cwd() returns the *absolute* cwd, but 'path' doesn't ...
-... maybe path:cwd() should return path'.' and path:abs() should return the absolute path (using lfs.currentdir() for evaluation of '.')
+- `path:cwd()` returns the *absolute* cwd, but `path` returns the directory `.` ...
+... maybe path:cwd() should return `path'.'` and `path:abs()` should return the absolute path (using lfs.currentdir() for evaluation of '.')
 
-right now path(a)(b)(c) is the same as path(a)/b/c
+- maybe `path` shoudl be the class, so I can use `path:isa` instead of `path.class:isa` ?
+
+- right now path(a)(b)(c) is the same as path(a)/b/c
 ... maybe just use /'s and use call for something else? or don't use call at all?
-
-make rlistdir() an iterator like listdir() already is
 --]]
 
 
@@ -117,8 +117,8 @@ local mappings = {
 		move = 'move',
 		exists = 'fileexists',
 		isdir = 'isdir',
-		--dir = 'listdir',
-		rdir = 'rlistdir',
+		--dir = 'listdir',		-- wrapping in path
+		--rdir = 'rlistdir',
 
 		-- TODO rename to 'fixpath' ?
 		fixpathsep = 'path',
@@ -153,7 +153,7 @@ end
 -- Path wrapping function, but return wraps in Path
 function Path:getdir(...)
 	local dir, name = io.getfiledir(self.path, ...)
-	return Path{path=dir}, name
+	return Path{path=dir}, Path{path=name}
 end
 
 -- Path wrapping
@@ -196,13 +196,28 @@ end
 
 -- os.listdir wrapper
 
-function Path:dir(state, lastfunc)
-	assert(not lastfunc, "make sure to call() the dir")
+function Path:dir()
 	if not os.isdir(self.path) then
 		error("can't dir() a non-directory")
 	end
-	return os.listdir(self.path)
+	return coroutine.wrap(function()
+		for _,fn in os.listdir(self.path) do
+			coroutine.yield(Path{path=fn})
+		end
+	end)
 end
+
+function Path:rdir(callback)
+	if not os.isdir(self.path) then
+		error("can't rdir() a non-directory")
+	end
+	return coroutine.wrap(function()
+		for fn in os.rlistdir(self.path, callback) do
+			coroutine.yield(Path{path=fn})
+		end
+	end)
+end
+
 
 -- shorthand for splitting off ext and replacing it
 -- Path:getext() splits off the last '.' and returns the letters after it
@@ -213,11 +228,11 @@ end
 -- for newext == nil, remove the last .ext from the filename
 -- for newext == "", replace the last .ext with just a .
 function Path:setext(newext)
-	local base = self:getext()
+	local base = self:getext().path
 	if newext then
-		base.path = base.path .. '.' .. newext
+		base = base .. '.' .. newext
 	end
-	return base
+	return Path{path=base}
 end
 
 -- iirc setting __index and __newindex outside :init() is tough, since so much writing is still going on

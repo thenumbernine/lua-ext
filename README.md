@@ -160,7 +160,7 @@ for fn in os.listdir('.') do
 end
 ```
 
-`os.rlistdir(path, callback)` = Returns a list of all files from a recursive directory.  If `callback` is specified then it is called for each file, and if the callback returns false then sub-directories are not traversed and files are not inserted.
+`os.rlistdir(path, callback)` = Returns an iterator that recursively iterates through all files in a directory tree.  If `callback` is specified then it is called for each file, and if the callback returns false then the file is not returned, or the sub-directory is not traversed.
 
 `os.mkdir(path[, createParents])` = Create directory.  Set createParents to `true` to create parents as well.
 
@@ -452,24 +452,24 @@ Notice that, calling `require 'ext'` will also call `getCmdline` on `arg`, produ
 
 `p:append(...)` is an alias of `io.appendfile(p.path, ...)`.
 
-`p:getdir(...)` is an alias of `io.getfiledir(p.path, ...)`, except that it wraps the first argument in a `Path` object.
+`p:getdir(...)` is an alias of `io.getfiledir(p.path, ...)`, except that it wraps the arguments in a `Path` object.
 
-`p:getext(...)` is an alias of `io.getfileext(p.path, ...)`.
+`p:getext(...)` is an alias of `io.getfileext(p.path, ...)`, except that it wraps the 1st argument in a `Path` object.
 
-`p:setext(newext)` = Returns a copy of the path, but with the last extension replaced with `newext`.  If `newext` is `nil` then the last extension is removed.
+`p:setext(newext)` = Returns a path matching `p`s path but with the last extension replaced with `newext`.  If `newext` is `nil` then the last extension is removed.
 
 
 `p:remove(...)` is an alias of `os.remove(p.path, ...)`.
 
 `p:mkdir(...)` is an alias of `os.mkdir(p.path, ...)`.
 
-`p:listdir(...)` is an alias of `os.listdir(p.path, ...)`.
+`p:dir(...)` is an alias of `os.listdir(p.path, ...)`, except that it wraps the arguments in a `Path` object.
 
 `p:exists(...)` is an alias of `os.fileexists(p.path, ...)`.
 
 `p:isdir(...)` is an alias of `os.isdir(p.path, ...)`.
 
-`p:rdir(...)` is an alias of `os.rlistdir(p.path, ...)`.
+`p:rdir(...)` is an alias of `os.rlistdir(p.path, ...)`, except that it wraps the arguments in a `Path` object.
 
 
 `p:attr(...)` is an alias of `lfs.attributes(p.path, ...)`.
@@ -486,8 +486,6 @@ Notice that, calling `require 'ext'` will also call `getCmdline` on `arg`, produ
 
 `p:lockdir(...)` is an alias of `lfs.lock_dir(p.path, ...)`.
 
-
-`p:dir()` is an alias of `os.listdir(p.path)`.
 
 `p:cwd()` returns the absolute cwd path, as a Path object.  This is an alias of `lfs.currendir()` if available, or `io.readproc'pwd'` on Linux or `io.readproc'cd'` on Windows.
 

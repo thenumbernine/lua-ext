@@ -193,25 +193,26 @@ args:
 	callback(filename, isdir) = optional callback to filter each file
 
 should this be in io or os?
-should this be an iterator like os.listdir() is?
 --]]
-function os.rlistdir(dir, callback, fs)
-	fs = fs or table()
-	for f in os.listdir(dir) do
-		local path = dir..'/'..f
-		if os.isdir(path) then
-			if not callback or callback(path, true) then
-				os.rlistdir(path, callback, fs)
-			end
-		else
-			if not callback or callback(path, false) then
-				local fn = path
-				if #fn > 2 and fn:sub(1,2) == './' then fn = fn:sub(3) end
-				fs:insert(fn)
+function os.rlistdir(dir, callback)
+	return coroutine.wrap(function()
+		for f in os.listdir(dir) do
+			local path = dir..'/'..f
+			if os.isdir(path) then
+				if not callback or callback(path, true) then
+					for f in os.rlistdir(path, callback) do
+						coroutine.yield(f)
+					end
+				end
+			else
+				if not callback or callback(path, false) then
+					local fn = path
+					if #fn > 2 and fn:sub(1,2) == './' then fn = fn:sub(3) end
+					coroutine.yield(fn)
+				end
 			end
 		end
-	end
-	return fs
+	end)
 end
 
 function os.fileexists(fn)
