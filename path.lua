@@ -61,9 +61,8 @@ end
 -- PREPEND the path if fn is relative, otherwise use fn
 -- I should reverse these arguments
 -- but this function is really specific to the Path path state variable
-local function appendPath(fn, p)
-	asserttype(fn, 'string')
-	asserttype(p, 'string')
+local function appendPath(...)
+	local fn, p = asserttype.asserttypes('appendPth', 2, 'string', 'string', ...)
 	--[[ dont change to path sep ... always use / internally
 	if detect_os() then
 		fn = os.path(fn)
@@ -93,7 +92,15 @@ local Path = class()
 --Path.sep = os.sep	-- TOO redundant?
 
 function Path:init(args)
-	self.path = asserttype(asserttype(args, 'table').path, 'string')
+	self.path = asserttype(
+		asserttype(
+			args,
+			'table',
+			'Path:init args'
+		).path,
+		'string',
+		'Path:init args.path'
+	)
 	assert(self.path ~= nil)
 end
 
@@ -201,7 +208,7 @@ function Path:dir()
 		error("can't dir() a non-directory")
 	end
 	return coroutine.wrap(function()
-		for _,fn in os.listdir(self.path) do
+		for fn in os.listdir(self.path) do
 			coroutine.yield(Path{path=fn})
 		end
 	end)
@@ -246,7 +253,10 @@ function Path:__call(k)
 	assert(self.path ~= nil)
 	if k == nil then return self end
 	if Path:isa(k) then k = k.path end
-	local fn = asserttype(appendPath(k, self.path), 'string')
+	local fn = asserttype(
+		appendPath(k, self.path),
+		'string',
+		"Path:__call appendPath(k, self.path)")
 	-- is this safe?
 	fn = simplifypath(fn)
 
@@ -254,7 +264,7 @@ function Path:__call(k)
 	-- but then how about file writing?
 
 	return Path{
-		path = asserttype(fn, 'string'),
+		path = asserttype(fn, 'string', "Path:__call simplifypath"),
 	}
 end
 
