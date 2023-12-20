@@ -430,6 +430,7 @@ Set this to your own custom pairs function, or 'pairs' if you would like seriali
 
 `getCmdline = require 'cmdline'`
 `cmdline = getCmdline(...)` = builds the table `cmdline` from all command-line arguments.  Here are the rules it follows:
+- `cmdline[i]` is the `i`th command-line argument.
 - If a command-line argument `k` has no equals sign then `cmdline[k]` is assigned to `true`.
 - If a command-line argument has an equals sign present, i.e. is of the form `k=v`, then `cmdline[k]` is assigned the value of `v` if it was evaluated in Lua.
 - If evaluating it in Lua produces an error or nil then `cmdline[k]` is assigned the literal string of `v`.

@@ -5,7 +5,8 @@
 local fromlua = require 'ext.fromlua'
 
 local function getCmdline(...)
-	local cmdline = {}
+	-- let cmdline[1...] work as well
+	local cmdline = {...}
 
 	for _,w in ipairs{...} do
 		local k,v = w:match'^(.-)=(.*)$'
