@@ -496,9 +496,32 @@ Notice that, calling `require 'ext'` will also call `getCmdline` on `arg`, produ
 
 use this like so:
 
+Add debug code to your file like so:
+
+`--DEBUG:print"This only runs in debug"`
+
+then run your code like so:
+
 `lua -lext.debug ...`
 
+or
+
+`lua -e "require'ext.debug'" ...`
+
 ...and any single-line comments in any code that start with `--DEBUG:` will be uncommented.
+
+You can also add specific runtime tags:
+
+`--DEBUG(mytag):print"This only runs with debug'mytag'`
+
+`lua -e "require'ext.debug''mytag'`
+
+And multiple tags...
+
+`--DEBUG(tag1):print"This only runs with debug'tag1'`
+`--DEBUG(tag2):print"This only runs with debug'tag2'`
+
+`lua -e "require'ext.debug''tag1,tag2'`
 
 ### gcmem.lua: Provides FFI-based functions for manually or automatically allocating and freeing memory.  WIP due to crashing in LuaJIT when you run `ptr = ffi.cast('T*', ptr)` and haven't bound `ptr` anywhere else.
 
