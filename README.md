@@ -492,6 +492,14 @@ Notice that, calling `require 'ext'` will also call `getCmdline` on `arg`, produ
 
 `p:abs()` returns the absolute form of the path, as a Path object.
 
+### debug.lua
+
+use this like so:
+
+`lua -lext.debug ...`
+
+...and any single-line comments in any code that start with `--DEBUG:` will be uncommented.
+
 ### gcmem.lua: Provides FFI-based functions for manually or automatically allocating and freeing memory.  WIP due to crashing in LuaJIT when you run `ptr = ffi.cast('T*', ptr)` and haven't bound `ptr` anywhere else.
 
 NOTICE:

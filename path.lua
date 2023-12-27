@@ -127,7 +127,7 @@ local mappings = {
 		--dir = 'listdir',		-- wrapping in path
 		--rdir = 'rlistdir',
 
-		-- TODO rename to 'fixpath' ?
+		-- TODO rename to 'fixpath'? 'fixsep'?
 		fixpathsep = 'path',
 	},
 }
