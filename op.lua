@@ -31,6 +31,7 @@ local symbolscode = [[
 		unm = '-',			-- unary
 		concat = '..',
 		eq = '==',
+		ne = '~=',
 		lt = '<',
 		le = '<=',
 		gt = '>',
