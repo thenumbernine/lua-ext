@@ -11,13 +11,6 @@
 local searchers = assert(package.searchers or package.loaders, "couldn't find searchers")
 local oldsearchfile = searchers[2]
 
--- don't require ext.table just yet ...
-local function pack(...)
-	local t = {...}
-	t.n = select('#', ...)
-	return t
-end
-
 -- don't require ext.string just yet ...
 local escapeFind = '[' .. ([[^$()%.[]*+-?]]):gsub('.', '%%%1') .. ']'
 local function patescape(s)
@@ -27,20 +20,9 @@ end
 local tags = {}
 
 local function newsearchfile(req, ...)
-	--[[ using the old:
-	local res = pack(oldsearchfile(req, ...))
-	print('require()', req)
-	print('...res:', table.unpack(res, 1, res.n))
-	return table.unpack(res, 1, res.n)
-	--]]
-	-- [[ using my replacement:
 	local filename, err = package.searchpath(req, package.path)
 	if not filename then return err end
 
-	--[=[
-	return loadfile(filename)
-	--]=]
-	-- [=[
 	local f, err = io.open(filename, 'r')
 	if not f then return err end
 	local d, err = f:read'*a'
@@ -56,8 +38,6 @@ local function newsearchfile(req, ...)
 
 	local f, err = load(d, filename)
 	return f or err
-	--]=]
-	--]]
 end
 searchers[2] = newsearchfile
 
