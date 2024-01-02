@@ -24,6 +24,7 @@ build = {
 		["ext.class"] = "class.lua",
 		["ext.cmdline"] = "cmdline.lua",
 		["ext.coroutine"] = "coroutine.lua",
+		["ext.debug"] = "debug.lua",
 		["ext.detect_ffi"] = "detect_ffi.lua",
 		["ext.detect_lfs"] = "detect_lfs.lua",
 		["ext.detect_os"] = "detect_os.lua",
