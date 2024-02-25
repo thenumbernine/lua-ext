@@ -303,11 +303,12 @@ end
 -- returns a shuffled duplicate of the ipairs in table 't'
 function table.shuffle(t)
 	t = table(t)
-	local nt = table()
-	while #t > 0 do
-		nt:insert(t:remove(math.random(#t)))
+	-- https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
+	for i=#t,2,-1 do
+		local j = math.random(i-1)
+		t[i], t[j] = t[j], t[i]
 	end
-	return nt
+	return t
 end
 
 function table.pickRandom(t)
