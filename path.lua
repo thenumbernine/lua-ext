@@ -121,7 +121,7 @@ local mappings = {
 		-- ext
 		mkdir = 'mkdir',	-- using os.mkdir instead of lfs.mkdir becasuse of fallbacks ... and 'makeParents' flag
 		rmdir = 'rmdir',
-		move = 'move',
+		--move = 'move',	-- defined later for picking out path from arg
 		exists = 'fileexists',
 		isdir = 'isdir',
 		--dir = 'listdir',		-- wrapping in path
@@ -202,6 +202,11 @@ function Path:abs()
 end
 
 -- os.listdir wrapper
+
+function Path:move(to)
+	if Path:isa(to) then to = to.path end
+	return os.move(self.path, to)
+end
 
 function Path:dir()
 	if not os.isdir(self.path) then

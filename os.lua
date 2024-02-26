@@ -16,6 +16,8 @@ local detect_os = require 'ext.detect_os'
 
 os.sep = detect_os() and '\\' or '/'
 
+-- TODO this vs path.fixpathsep ...
+-- should I just move everything over to 'path' ...
 function os.path(str)
 	asserttype(str, 'string')
 	return (str:gsub('/', os.sep))
@@ -72,7 +74,9 @@ end
 function os.move(from, to)
 	-- [[
 	-- alternatively I could write this as readfile/writefile and os.remove
-	local cmd = (detect_os() and 'move' or 'mv') .. ' "'..os.path(from)..'" "'..os.path(to)..'"'
+	from = os.path(from)
+	to = os.path(to)
+	local cmd = (detect_os() and 'move' or 'mv') .. ' "'..from..'" "'..to..'"'
 	return os.execute(cmd)
 	--]]
 	--[[
