@@ -29,6 +29,14 @@ local function asserteq(a, b, msg)
 	return true
 end
 
+local function asserteqeps(a,b,eps,msg)
+	eps = eps or 1e-7
+	if math.abs(a - b) > eps then
+		error((msg and msg..': ' or '').."expected |"..a.." - "..b.."| < "..eps)
+	end
+	return a, b, eps, msg
+end
+
 local function assertne(a, b, msg)
 	if not (a ~= b) then
 		error(prependmsg(msg, "got "..tostring(a).." ~= "..tostring(b)))
@@ -79,6 +87,7 @@ local mt = {
 	assertgt = assertgt,
 	assertge = assertge,
 	assertindex = assertindex,
+	asserteqeps = asserteqeps,
 	__call = function(mt, ...)
 		return asserttype(...)
 	end,
