@@ -23,8 +23,43 @@ local function asserttypes(msg, n, ...)
 end
 
 local function asserteq(a, b, msg)
-	if a ~= b then
+	if not (a == b) then
 		error(prependmsg(msg, "got "..tostring(a).." == "..tostring(b)))
+	end
+	return true
+end
+
+local function assertne(a, b, msg)
+	if not (a ~= b) then
+		error(prependmsg(msg, "got "..tostring(a).." ~= "..tostring(b)))
+	end
+	return true
+end
+
+local function assertlt(a, b, msg)
+	if not (a < b) then
+		error(prependmsg(msg, "got "..tostring(a).." < "..tostring(b)))
+	end
+	return true
+end
+
+local function assertle(a, b, msg)
+	if not (a <= b) then
+		error(prependmsg(msg, "got "..tostring(a).." <= "..tostring(b)))
+	end
+	return true
+end
+
+local function assertgt(a, b, msg)
+	if not (a > b) then
+		error(prependmsg(msg, "got "..tostring(a).." > "..tostring(b)))
+	end
+	return true
+end
+
+local function assertge(a, b, msg)
+	if not (a >= b) then
+		error(prependmsg(msg, "got "..tostring(a).." >= "..tostring(b)))
 	end
 	return true
 end
@@ -38,6 +73,11 @@ local mt = {
 	asserttype = asserttype,
 	asserttypes = asserttypes,
 	asserteq = asserteq,
+	assertne = assertne,
+	assertlt = assertlt,
+	assertle = assertle,
+	assertgt = assertgt,
+	assertge = assertge,
 	assertindex = assertindex,
 	__call = function(mt, ...)
 		return asserttype(...)
