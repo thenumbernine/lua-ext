@@ -77,21 +77,15 @@ local function assertindex(t, k, msg)
 	return assert(v, prependmsg(msg, "expected "..tostring(t).." [ "..tostring(k).." ]"))
 end
 
-local mt = {
-	asserttype = asserttype,
-	asserttypes = asserttypes,
-	asserteq = asserteq,
-	assertne = assertne,
-	assertlt = assertlt,
-	assertle = assertle,
-	assertgt = assertgt,
-	assertge = assertge,
-	assertindex = assertindex,
-	asserteqeps = asserteqeps,
-	__call = function(mt, ...)
-		return asserttype(...)
-	end,
+return {
+	type = asserttype,
+	types = asserttypes,
+	eq = asserteq,
+	ne = assertne,
+	lt = assertlt,
+	le = assertle,
+	gt = assertgt,
+	ge = assertge,
+	index = assertindex,
+	eqeps = asserteqeps,
 }
-mt.__index = mt
-setmetatable(mt, mt)
-return mt

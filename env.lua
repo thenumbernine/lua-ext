@@ -21,4 +21,7 @@ return function(env)
 	-- requires ffi
 	--env.gcnew = require 'ext.gcmem'.new
 	--env.gcfree = require 'ext.gcmem'.free
+	for k,v in pairs(require 'ext.assert') do
+		env['assert'..k] = v
+	end
 end
