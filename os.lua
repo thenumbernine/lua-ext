@@ -10,7 +10,8 @@ local table = require 'ext.table'
 
 -- string.trim
 local string = require 'ext.string'
-local asserttype = require 'ext.asserttype'
+local asserttype = require 'ext.assert'.type
+local asserteq = require 'ext.assert'.eq
 local detect_lfs = require 'ext.detect_lfs'
 local detect_os = require 'ext.detect_os'
 
@@ -141,7 +142,7 @@ function os.listdir(path)
 			end
 			local filestr = io.readproc(cmd)
 			fns = string.split(filestr, '\n')
-			assert(fns:remove() == '')
+			asserteq(fns:remove(), '')
 			if fns[1] == '.' then fns:remove(1) end
 			if fns[1] == '..' then fns:remove(1) end
 --[[

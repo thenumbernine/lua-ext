@@ -21,7 +21,9 @@ TODO
 -- [[ TODO - this block is also in ext/os.lua and ext/file.lua
 local detect_os = require 'ext.detect_os'
 local detect_lfs = require 'ext.detect_lfs'
-local asserttype = require 'ext.asserttype'
+local asserttype = require 'ext.assert'.type
+local asserttypes = require 'ext.assert'.types
+local assertne = require 'ext.assert'.ne
 
 local io = require 'ext.io'
 local os = require 'ext.os'
@@ -62,7 +64,7 @@ end
 -- I should reverse these arguments
 -- but this function is really specific to the Path path state variable
 local function appendPath(...)
-	local fn, p = asserttype.asserttypes('appendPth', 2, 'string', 'string', ...)
+	local fn, p = asserttypes('appendPth', 2, 'string', 'string', ...)
 	--[[ dont change to path sep ... always use / internally
 	if detect_os() then
 		fn = os.path(fn)
@@ -101,7 +103,7 @@ function Path:init(args)
 		'string',
 		'Path:init args.path'
 	)
-	assert(self.path ~= nil)
+	assertne(self.path, nil)
 end
 
 -- wrappers
@@ -255,7 +257,7 @@ specifically reading vs writing?
 instead of __newindex for writing new files, how about path(path):write()
 --]]
 function Path:__call(k)
-	assert(self.path ~= nil)
+	assertne(self.path, nil)
 	if k == nil then return self end
 	if Path:isa(k) then k = k.path end
 	local fn = asserttype(
