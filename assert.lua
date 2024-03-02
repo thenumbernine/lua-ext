@@ -77,6 +77,15 @@ local function assertindex(t, k, msg)
 	return assert(v, prependmsg(msg, "expected "..tostring(t).." [ "..tostring(k).." ]"))
 end
 
+-- assert integer indexes 1 to len, and len of tables matches
+-- maybe I'll use ipairs... maybe
+local function asserttableieq(t1, t2, msg)
+	asserteq(#t1, #t2, msg)
+	for i=1,#t1 do
+		asserteq(t1[i], t2[i], msg)
+	end
+end
+
 return {
 	type = asserttype,
 	types = asserttypes,
@@ -88,4 +97,5 @@ return {
 	ge = assertge,
 	index = assertindex,
 	eqeps = asserteqeps,
+	tableieq = asserttableieq,
 }
