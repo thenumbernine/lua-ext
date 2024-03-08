@@ -25,6 +25,8 @@ function os.path(str)
 end
 
 -- 5.2 os.execute compat
+-- TODO if 5.1 was built with 5.2-compat then we don't have to do this ...
+-- how to test?
 if _VERSION == 'Lua 5.1' then
 	local execute = os.execute
 	function os.execute(cmd)
