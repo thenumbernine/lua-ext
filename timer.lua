@@ -38,9 +38,10 @@ local function timerReturn(name, startTime, indent, ...)
 	if name then
 		T.out:write(name..' ')
 	end
-	T.out:write('('..(endTime - startTime)..'s)\n')
+	local dt = endTime - startTime
+	T.out:write('('..dt..'s)\n')
 	T.out:flush()
-	return ...
+	return dt, ...
 end
 
 function T.timer(name, cb, ...)
