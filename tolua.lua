@@ -43,7 +43,7 @@ local function escapeString(s)
 	--
 	-- it's slow and has bugs.
 	--
-	-- TODO 
+	-- TODO
 	-- for size-minimal strings:
 	-- if min(# single-quotes, # double-quotes) within the string > 2 then use [[ ]] (so long as that isn't used either)
 	-- otherwise use as quotes whatever the min is
@@ -91,13 +91,13 @@ local function escapeString(s)
 	end
 	o = o .. '"'
 	o:gsub('\\(%d%d%d)', function(d)
-		if tonumber(d) > 255 then 
+		if tonumber(d) > 255 then
 			print('#s', #s)
 			print'o'
 			print(o)
 			print's'
 			print(s)
-			error("got an oob escape code: "..d) 
+			error("got an oob escape code: "..d)
 		end
 	end)
 	local f = require 'ext.fromlua'(o)
@@ -322,7 +322,7 @@ local defaultSerializeForType = {
 			s:append(mixed)
 
 			local thisNewLineChar, thisNewLineSepChar, thisTab, thisNewTab
-			if not hasSubTable then
+			if not hasSubTable and not state.alwaysIndent then
 				thisNewLineChar = ''
 				thisNewLineSepChar = ' '
 				thisTab = ''
@@ -394,7 +394,7 @@ end
 
 --[[
 args:
-	indent = default to 'true', set to 'false' to make results concise
+	indent = default to 'true', set to 'false' to make results concise, true will skip inner-most tables. set to 'always' for always indenting.
 	pairs = default to a form of pairs() which iterates over all fields using next().  Set this to your own custom pairs function, or 'pairs' if you would like serialization to respect the __pairs metatable (which it does not by default).
 	serializeForType = a table with keys of lua types and values of callbacks for serializing those types
 	serializeMetatables = set to 'true' to include serialization of metatables
@@ -411,7 +411,9 @@ local function tolua(x, args)
 	}
 	local indent = true
 	if args then
+		-- indent == ... false => none, true => some, "always" => always
 		if args.indent == false then indent = false end
+		if args.indent == 'always' then state.alwaysIndent = true end
 		state.serializeForType = args.serializeForType
 		state.serializeMetatables = args.serializeMetatables
 		state.serializeMetatableFunc = args.serializeMetatableFunc
