@@ -32,15 +32,18 @@ T.depth = 0
 T.tab = ' '
 
 local function timerReturn(name, startTime, indent, ...)
-	T.depth = T.depth - 1
 	local endTime = T.getTime()
+	local dt = endTime - startTime
+
+	-- this is all printing ...
+	T.depth = T.depth - 1
 	T.out:write(indent..'...done ')
 	if name then
 		T.out:write(name..' ')
 	end
-	local dt = endTime - startTime
 	T.out:write('('..dt..'s)\n')
 	T.out:flush()
+
 	return dt, ...
 end
 
@@ -54,6 +57,20 @@ function T.timer(name, cb, ...)
 	T.depth = T.depth + 1
 	return timerReturn(name, startTime, indent, cb(...))
 end
+
+
+-- same as above but without printing (and no name too cuz we're not printing)
+local function timerReturnQuiet(startTime, ...)
+	local endTime = T.getTime()
+	local dt = endTime - startTime
+	return dt, ...
+end
+
+function T.timerQuiet(cb, ...)
+	local startTime = T.getTime()
+	return timerReturnQuiet(startTime, cb(...))
+end
+
 
 setmetatable(T, {
 	-- call forwards to timer:
