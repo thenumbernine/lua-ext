@@ -83,10 +83,7 @@ local function validate(desc)
 
 		-- use desc[name] to handle the cmdline
 		if descValue == true then
-			descValue = {
-				-- check.  valid.
-				validate = function(cmdValue, key, cmdline) return true end,
-			}
+			descValue = {}
 		elseif type(descValue) == 'string' then
 			descValue = {
 				type = descValue,
@@ -99,6 +96,12 @@ local function validate(desc)
 			-- fallthru and handle next
 		else
 			error('idk how to handle this cmdline description '..tolua(descValue))
+		end
+
+		if not descValue.type
+		and not descValue.validate then
+			-- no type/validate is provided? use always
+			descValue.validate = function() end
 		end
 
 		-- convert desc's with .type into .validate
