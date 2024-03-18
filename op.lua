@@ -109,10 +109,12 @@ code = code .. [[
 		symbols = symbols,
 
 		-- special pcall wrapping index, thanks luajit.  thanks.
-		safeindex = function(t, k)
-			local res, v = pcall(ops.index, t, k)
+		-- while i'm here, multiple indexing, so it bails out nil early, so it's a chained .? operator
+		safeindex = function(t, ...)
+			if select('#', ...) == 0 then return t end
+			local res, v = pcall(ops.index, t, ...)
 			if not res then return nil, v end
-			return v
+			return ops.safeindex(v, select(2, ...))
 		end,
 	}
 	return ops
