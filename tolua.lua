@@ -29,6 +29,26 @@ end
 local _0byte = ('0'):byte()
 local _9byte = ('9'):byte()
 local function escapeString(s)
+	-- [[ multiline strings
+	if s:find'\n' then
+		for neq=0,math.huge do
+			local eq = ('='):rep(neq)
+			local open = '['..eq..'['
+			local close = ']'..eq..']'
+			if not s:find(open, 1, true)
+			and not s:find(close, 1, true)
+			then
+				-- open and close aren't in the string, we can use this to escape the string
+				-- ... ig all I have to search for is close, but meh
+				local ret = open .. '\n' 	-- \n cuz lua ignores trailing spaces/newline after the opening
+					.. s .. close
+--DEBUG: require 'ext.assert'.eq(load('return '..ret)(), s)
+				return ret
+			end
+		end
+	end
+	--]]
+
 	-- [[
 	-- this will only escape escape codes
 	-- will respect unicode
