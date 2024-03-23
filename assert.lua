@@ -7,7 +7,7 @@ end
 local function asserttype(x, t, msg)
 	local xt = type(x)
 	if xt ~= t then
-		error(prependmsg(msg, "expected "..t.." found "..xt))
+		error(prependmsg(msg, "expected "..tostring(t).." found "..tostring(xt)))
 	end
 	return x
 end
