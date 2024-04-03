@@ -30,7 +30,20 @@ local _0byte = ('0'):byte()
 local _9byte = ('9'):byte()
 local function escapeString(s)
 	-- [[ multiline strings
-	if s:find'\n' then
+	-- it seems certain chars can't be encoded in Lua multiline strings
+	-- TODO find out exactly which ones 
+	local foundNewline
+	local foundBadChar
+	for i=1,#s do
+		local b = s:byte(i)
+		if b == 10 or b == 13 then
+			foundNewline = true
+		elseif b < 32 or b > 126 then
+			foundBadChar = true
+			break	-- don't need to keep looking
+		end
+	end
+	if foundNewline and not foundBadChar then
 		for neq=0,math.huge do
 			local eq = ('='):rep(neq)
 			local open = '['..eq..'['
