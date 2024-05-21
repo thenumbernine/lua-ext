@@ -130,41 +130,45 @@ local function validate(desc)
 	-- now build our object that we're going to return to the caller
 
 	local cmdlineValidation = {}
-	setmetatable(cmdlineValidation, {
-		__call = function(cmdlineValidation, ...)
-			local cmdline = getCmdline(...)
-
-			-- make sure all cmdline keys are in the description
-			-- TODO this is going to assume the int key'd cmdline are from ...
-			--  and the string key'd cmdline are from 'k' or 'k=v'
-			-- so if someon does '[1]=true', then yes, it will overwrite the int-key'd cmdline, and that should probably be prevented in 'getCmdline'
-			for _,k in ipairs(table.keys(cmdline)) do
-				local cmdValue = cmdline[k]
-				if type(k) == 'number' then
-					-- assume its part of the ... sequence
-				elseif type(k) == 'string' then
-					local descValue = desc[k]
-					if not descValue then
-						error("got an unknown command "..tolua(k))
-					else
-						-- assert validation, sometimes overwriting cmdline[k] as we go
-						descValue.validate(cmdValue, k, cmdline, desc)
-					end
+	-- cmdline.validate(descs...):fromTable(getCmdline(cmdline...)) is equivalent to cmdline.validate(descs)(cmdline...)
+	-- or can be used to handle already-produced cmdline objects
+	cmdlineValidation.fromTable = function(self, cmdline)
+		-- make sure all cmdline keys are in the description
+		-- TODO this is going to assume the int key'd cmdline are from ...
+		--  and the string key'd cmdline are from 'k' or 'k=v'
+		-- so if someon does '[1]=true', then yes, it will overwrite the int-key'd cmdline, and that should probably be prevented in 'getCmdline'
+		for _,k in ipairs(table.keys(cmdline)) do
+			local cmdValue = cmdline[k]
+			if type(k) == 'number' then
+				-- assume its part of the ... sequence
+			elseif type(k) == 'string' then
+				local descValue = desc[k]
+				if not descValue then
+					error("got an unknown command "..tolua(k))
 				else
-					error("got a cmdline with an unknown key type: "..tolua(k))
+					-- assert validation, sometimes overwriting cmdline[k] as we go
+					descValue.validate(cmdValue, k, cmdline, desc)
+				end
+			else
+				error("got a cmdline with an unknown key type: "..tolua(k))
+			end
+		end
+
+		-- make sure all must-be keys are in the command-line
+		for k,v in pairs(desc) do
+			if v.must then
+				if not cmdline[k] then
+					error("expected to find key "..k)
 				end
 			end
+		end
 
-			-- make sure all must-be keys are in the command-line
-			for k,v in pairs(desc) do
-				if v.must then
-					if not cmdline[k] then
-						error("expected to find key "..k)
-					end
-				end
-			end
-
-			return cmdline
+		return cmdline
+	end
+	-- cmdline.validate(descs ...)(cmdline...) operates on the cmdline
+	setmetatable(cmdlineValidation, {
+		__call = function(self, ...)
+			return self:fromTable(getCmdline(...))
 		end,
 	})
 	return cmdlineValidation
