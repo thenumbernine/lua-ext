@@ -1,15 +1,21 @@
--- TODO rename this file to ext.assert
+--[[
+the original assert() asserts that the first arg is true, and returns all args, therefore we can assert that the first returned value will also always coerce to true
+1) should asserts always return a true value?
+2) or should asserts always return the forwarded value?
+I'm voting for #2 so assert can be used for wrapping args and not changing behvaior.  when would you need to assert the first arg is true afer the assert has already bene carried out anyways? 
+... except for certain specified operations that cannot return their first argument, like assertindex()
+--]]
 
 local function prependmsg(msg, str)
 	return (msg and (tostring(msg)..': ') or '')..str
 end
 
-local function asserttype(x, t, msg)
+local function asserttype(x, t, msg, ...)
 	local xt = type(x)
 	if xt ~= t then
 		error(prependmsg(msg, "expected "..tostring(t).." found "..tostring(xt)))
 	end
-	return x
+	return x, t, msg, ...
 end
 
 -- how to specify varargs...
@@ -22,68 +28,79 @@ local function asserttypes(msg, n, ...)
 	return select(n+1, ...)
 end
 
-local function asserteq(a, b, msg)
+local function asserteq(a, b, msg, ...)
 	if not (a == b) then
 		error(prependmsg(msg, "got "..tostring(a).." == "..tostring(b)))
 	end
-	return true
+	return a, b, msg, ...
 end
 
-local function asserteqeps(a,b,eps,msg)
+local function asserteqeps(a, b, eps, msg, ...)
 	eps = eps or 1e-7
 	if math.abs(a - b) > eps then
 		error((msg and msg..': ' or '').."expected |"..a.." - "..b.."| < "..eps)
 	end
-	return a, b, eps, msg
+	return a, b, eps, msg, ...
 end
 
-local function assertne(a, b, msg)
+local function assertne(a, b, msg, ...)
 	if not (a ~= b) then
 		error(prependmsg(msg, "got "..tostring(a).." ~= "..tostring(b)))
 	end
-	return true
+	return a, b, msg, ...
 end
 
-local function assertlt(a, b, msg)
+local function assertlt(a, b, msg, ...)
 	if not (a < b) then
 		error(prependmsg(msg, "got "..tostring(a).." < "..tostring(b)))
 	end
-	return true
+	return a, b, msg, ...
 end
 
-local function assertle(a, b, msg)
+local function assertle(a, b, msg, ...)
 	if not (a <= b) then
 		error(prependmsg(msg, "got "..tostring(a).." <= "..tostring(b)))
 	end
-	return true
+	return a, b, msg, ...
 end
 
-local function assertgt(a, b, msg)
+local function assertgt(a, b, msg, ...)
 	if not (a > b) then
 		error(prependmsg(msg, "got "..tostring(a).." > "..tostring(b)))
 	end
-	return true
+	return a, b, msg, ...
 end
 
-local function assertge(a, b, msg)
+local function assertge(a, b, msg, ...)
 	if not (a >= b) then
 		error(prependmsg(msg, "got "..tostring(a).." >= "..tostring(b)))
 	end
-	return true
+	return a, b, msg, ...
 end
 
-local function assertindex(t, k, msg)
+-- this is a t[k] operation + assert
+local function assertindex(t, k, msg, ...)
 	local v = t[k]
-	return assert(v, prependmsg(msg, "expected "..tostring(t).." [ "..tostring(k).." ]"))
+	assert(v, prependmsg(msg, "expected "..tostring(t).." [ "..tostring(k).." ]"))
+	return v, msg, ...
 end
 
 -- assert integer indexes 1 to len, and len of tables matches
 -- maybe I'll use ipairs... maybe
-local function asserttableieq(t1, t2, msg)
+local function asserttableieq(t1, t2, msg, ...)
 	asserteq(#t1, #t2, msg)
 	for i=1,#t1 do
 		asserteq(t1[i], t2[i], msg)
 	end
+	return t1, t2, msg, ...
+end
+
+-- for when you want to assert a table's length but still want to return the table
+-- TODO should this be like assertindex() where it performs the operation and returns the operator value, i.e. returns the length instead of the table?
+-- or would that be less usable than asserting the length and returning the table?
+local function assertlen(t, n, msg, ...)
+	asserteq(#t, n, msg)
+	return t, n, msg, ...
 end
 
 return {
@@ -98,4 +115,5 @@ return {
 	index = assertindex,
 	eqeps = asserteqeps,
 	tableieq = asserttableieq,
+	len = assertlen,
 }
