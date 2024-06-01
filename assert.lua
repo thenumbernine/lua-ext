@@ -80,6 +80,9 @@ end
 
 -- this is a t[k] operation + assert
 local function assertindex(t, k, msg, ...)
+	if not t then
+		error(prependmsg(msg, "object is nil"))
+	end
 	local v = t[k]
 	assert(v, prependmsg(msg, "expected "..tostring(t).." [ "..tostring(k).." ]"))
 	return v, msg, ...
