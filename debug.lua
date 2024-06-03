@@ -1,15 +1,10 @@
--- here's a quick hack for debugging
--- it's not meta-lua, not dependent on my parser lib, nothing like that
--- just this: when you require() a file, if the debug tag is set, then grep all --DEBUG: lines to remove the comment
--- usage" lua -lext.debug ..."
-
--- replace the package.loaders[2] / package.searchers[2] table entry
--- make it to replace file contents before loading
-
-
--- TODO will lua 5.1 package.loaders[2] return the filename?
-local searchers = assert(package.searchers or package.loaders, "couldn't find searchers")
-local oldsearchfile = searchers[2]
+--[[
+Here's a quick hack for debugging
+It's not meta-lua, not dependent on my parser lib, nothing like that
+It does use my new load() shim layer ext.load
+Just this: when you require() a file, if the debug tag is set, then grep all --DEBUG: lines to remove the comment
+Usage" lua -lext.debug ..."
+--]]
 
 -- don't require ext.string just yet ...
 local escapeFind = '[' .. ([[^$()%.[]*+-?]]):gsub('.', '%%%1') .. ']'
@@ -19,27 +14,15 @@ end
 
 local tags = {}
 
-local function newsearchfile(req, ...)
-	local filename, err = package.searchpath(req, package.path)
-	if not filename then return err end
-
-	local f, err = io.open(filename, 'r')
-	if not f then return err end
-	local d, err = f:read'*a'
-	f:close()
-	if err then return err end
-
+table.insert(require 'ext.load'.xforms, function(d)
 	-- and here I gsub all the --DEBUG: strings out of it ...
 	d = d:gsub(patescape('--DEBUG:'), '')
 	-- gsub all --DEBUG(${tag}): strings out as well
 	for _,tag in ipairs(tags) do
 		d = d:gsub(patescape('--DEBUG('..tag..'):'), '')
 	end
-
-	local f, err = load(d, filename)
-	return f or err
-end
-searchers[2] = newsearchfile
+	return d
+end)
 
 --[[
 TODO debug-levels? debug-tags?  enable dif tags for dif reports?

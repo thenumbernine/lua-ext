@@ -62,6 +62,8 @@ env.loadfile = newloadfile
 
 -- next TODO here , same as ext.debug (consider making modular)
 -- ... wedge in new package.seachers[2]/package.loaders[2] behavior to use my modified load()
+-- replace the package.loaders[2] / package.searchers[2] table entry
+-- make it to replace file contents before loading
 local searchers = assert(package.searchers or package.loaders, "couldn't find searchers")
 local oldsearchfile = searchers[2]
 local function newsearchfile(req, ...)
