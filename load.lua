@@ -30,7 +30,7 @@ local function newload(data, ...)
 	-- so I'll re-insert the generated code
 	-- TODO would be nice to save whitespace and re-insert that ... hmm maybe long into the future ...
 	-- TODO xpcall behavior testing for when we are allowed to forward the args ... maybe that compat behavior belongs in ext ?
-	local source = tostring((...))	-- TODO default source name ...
+	local source = ... or ('['..data:sub(1,10)..'...]')
 	local success, result = xpcall(function(...)
 		for i,xform in ipairs(xforms) do
 			data = assert(xform(data, source))
