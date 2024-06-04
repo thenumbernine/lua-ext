@@ -13,7 +13,7 @@ require 'ext.xpcall'
 -- ... too bad there's no easy way to get around the need for this ...
 local showcode = require 'template.showcode'
 
-local xforms = {}
+local xforms = setmetatable({}, {__index=table})
 
 -- TODO proper test?  like if load'string' fails?
 local loadUsesFunctions = (_VERSION == 'Lua 5.1' and not env.jit)
