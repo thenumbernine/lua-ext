@@ -52,7 +52,7 @@ if env.loadstring ~= nil then env.loadstring = newload end
 env.load = newload
 
 local function newloadfile(filename, ...)
-	local f, err = io.open(filename, 'r')
+	local f, err = io.open(filename, 'rb')
 	if not f then return nil, err end
 	local data, err = f:read'*a'
 	f:close()
