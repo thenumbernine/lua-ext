@@ -11,6 +11,7 @@ require 'ext.xpcall'
 
 -- used for error reporting in newload()
 -- ... too bad there's no easy way to get around the need for this ...
+-- ... like maybe in the future preserve all comments and whitespaces and newlines, and regen the source with those so as little as possible has changed ...
 local showcode = require 'template.showcode'
 
 local xforms = setmetatable({}, {__index=table})
