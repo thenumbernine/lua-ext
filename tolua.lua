@@ -29,14 +29,22 @@ end
 local _0byte = ('0'):byte()
 local _9byte = ('9'):byte()
 local function escapeString(s)
-	-- [[ multiline strings
+	--[[ multiline strings
 	-- it seems certain chars can't be encoded in Lua multiline strings
-	-- TODO find out exactly which ones 
+	-- TODO find out exactly which ones
+	-- TODO if 's' begins with [ or ends with ] then you're gonna have a bad time ...
+	-- in fact ... does Lua support multiline strings that begin with [ or end with ] ?  especially the latter ...
 	local foundNewline
 	local foundBadChar
 	for i=1,#s do
 		local b = s:byte(i)
-		if b == 10 or b == 13 then
+		if b == 10
+		-- TODO still lua loading will convert \r \n's into \n's ... so this is still not guaranteed to reproduce the original ...
+		-- I could disable multi line strs when encoding \r's ...
+		-- but this gets to be a bit os-specific ...
+		-- a better solution would be changing fromlua() to properly handle newline formatting within multiline strings ...
+		--or b == 13
+		then
 			foundNewline = true
 		elseif b < 32 or b > 126 then
 			foundBadChar = true
@@ -50,6 +58,7 @@ local function escapeString(s)
 			local close = ']'..eq..']'
 			if not s:find(open, 1, true)
 			and not s:find(close, 1, true)
+			and s:sub(-neq-1) ~= close:sub(1,neq+1) -- if the very end of the string is close without the last ] then it could still do a false match ...
 			then
 				-- open and close aren't in the string, we can use this to escape the string
 				-- ... ig all I have to search for is close, but meh
