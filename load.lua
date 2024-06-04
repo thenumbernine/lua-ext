@@ -33,11 +33,13 @@ local function newload(data, ...)
 	local source = ... or ('['..data:sub(1,10)..'...]')
 	local success, result = xpcall(function(...)
 		for i,xform in ipairs(xforms) do
-			data = assert(xform(data, source))
+			data = xform(data, source)
+			if not data then error("ext.load.xform["..i.."] produced nothing for source "..tostring(source)) end
 		end
 		return oldload(data, ...)
 	end, function(err)
-		return showcode(code)..'\n'
+		return 'error for source: '..tostring(source)..'\n'
+			..(code and showcode(code)..'\n' or '')
 			..err..'\n'
 			..debug.traceback()
 	end, ...)
