@@ -36,10 +36,10 @@ local function newload(data, ...)
 			data = xform(data, source)
 			if not data then error("ext.load.xform["..i.."] produced nothing for source "..tostring(source)) end
 		end
-		return oldload(data, ...)
+		return assert(oldload(data, ...))
 	end, function(err)
 		return 'error for source: '..tostring(source)..'\n'
-			..(code and showcode(code)..'\n' or '')
+			..(data and showcode(data)..'\n' or '')
 			..err..'\n'
 			..debug.traceback()
 	end, ...)
