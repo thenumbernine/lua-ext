@@ -7,7 +7,7 @@ I'm not sure if or when I'll change it to operate on specific envs.
 --]]
 local env = _G	-- TODO return function(env)  maybe?
 
-require 'ext.xpcall'
+require 'ext.xpcall'(env)
 
 -- used for error reporting in newload()
 -- ... too bad there's no easy way to get around the need for this ...
