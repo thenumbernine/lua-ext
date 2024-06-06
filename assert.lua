@@ -6,6 +6,12 @@ I'm voting for #2 so assert can be used for wrapping args and not changing behva
 ... except for certain specified operations that cannot return their first argument, like assertindex()
 --]]
 
+-- cheap 'tolua'
+local function tostr(x)
+	if type(x) == 'string' then return ('%q'):format(x) end
+	return tostring(x)
+end
+
 local function prependmsg(msg, str)
 	return (msg and (tostring(msg)..': ') or '')..str
 end
@@ -30,7 +36,7 @@ end
 
 local function asserteq(a, b, msg, ...)
 	if not (a == b) then
-		error(prependmsg(msg, "got "..tostring(a).." == "..tostring(b)))
+		error(prependmsg(msg, "got "..tostr(a).." == "..tostr(b)))
 	end
 	return a, b, msg, ...
 end
@@ -45,35 +51,35 @@ end
 
 local function assertne(a, b, msg, ...)
 	if not (a ~= b) then
-		error(prependmsg(msg, "got "..tostring(a).." ~= "..tostring(b)))
+		error(prependmsg(msg, "got "..tostr(a).." ~= "..tostr(b)))
 	end
 	return a, b, msg, ...
 end
 
 local function assertlt(a, b, msg, ...)
 	if not (a < b) then
-		error(prependmsg(msg, "got "..tostring(a).." < "..tostring(b)))
+		error(prependmsg(msg, "got "..tostr(a).." < "..tostr(b)))
 	end
 	return a, b, msg, ...
 end
 
 local function assertle(a, b, msg, ...)
 	if not (a <= b) then
-		error(prependmsg(msg, "got "..tostring(a).." <= "..tostring(b)))
+		error(prependmsg(msg, "got "..tostr(a).." <= "..tostr(b)))
 	end
 	return a, b, msg, ...
 end
 
 local function assertgt(a, b, msg, ...)
 	if not (a > b) then
-		error(prependmsg(msg, "got "..tostring(a).." > "..tostring(b)))
+		error(prependmsg(msg, "got "..tostr(a).." > "..tostr(b)))
 	end
 	return a, b, msg, ...
 end
 
 local function assertge(a, b, msg, ...)
 	if not (a >= b) then
-		error(prependmsg(msg, "got "..tostring(a).." >= "..tostring(b)))
+		error(prependmsg(msg, "got "..tostr(a).." >= "..tostr(b)))
 	end
 	return a, b, msg, ...
 end
@@ -84,7 +90,7 @@ local function assertindex(t, k, msg, ...)
 		error(prependmsg(msg, "object is nil"))
 	end
 	local v = t[k]
-	assert(v, prependmsg(msg, "expected "..tostring(t).." [ "..tostring(k).." ]"))
+	assert(v, prependmsg(msg, "expected "..tostr(t).."["..tostr(k).." ]"))
 	return v, msg, ...
 end
 
