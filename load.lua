@@ -9,6 +9,33 @@ local env = _G	-- TODO return function(env)  maybe?
 
 require 'ext.xpcall'(env)
 
+-- package.searchpath is missing in 5.1 (but not luajit) ... I need a package.searchpath
+-- Put in its own file?  does anyone else need this?  or not since it pairs with my require-override, which is in this file too.
+local searchpath = package.searchpath
+if not searchpath then
+	function searchpath(name, path, sep, rep)
+		sep = sep or ';'
+		rep = rep or '/'	-- or \ for windows ... TODO meh?
+		local namerep = name:gsub('%.', rep)
+		local attempted = {}
+		for w in path:gmatch('[^'..sep..']*') do	-- TODO escape sep? meh?
+			local fn = w
+			if fn == '' then	-- search default locations ... which are ... builtin ... or not?
+			else
+				fn = fn:gsub('%?', namerep)
+				-- path(fn):exists() implementation:
+				local exists = io.open(fn,'rb')
+				if exists then
+					exists:close()
+					return fn
+				end
+				table.insert(attempted, "\n\tno file '"..fn.."'")
+			end
+		end
+		return nil, table.concat(attempted)
+	end
+end
+
 -- used for error reporting in newload()
 -- ... too bad there's no easy way to get around the need for this ...
 -- ... like maybe in the future preserve all comments and whitespaces and newlines, and regen the source with those so as little as possible has changed ...
@@ -71,7 +98,7 @@ env.loadfile = newloadfile
 local searchers = assert(package.searchers or package.loaders, "couldn't find searchers")
 local oldsearchfile = searchers[2]
 local function newsearchfile(req, ...)
-	local filename, err = package.searchpath(req, package.path)
+	local filename, err = searchpath(req, package.path)
 	if not filename then return err end
 	local f, err = newloadfile(filename)
 	return f or err
