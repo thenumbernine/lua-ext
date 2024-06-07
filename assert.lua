@@ -112,6 +112,11 @@ local function assertlen(t, n, msg, ...)
 	return t, n, msg, ...
 end
 
+local function asserterror(f, msg, ...)
+	asserteq(pcall(f, ...), false, msg)
+	return f, msg, ...
+end
+
 return {
 	type = asserttype,
 	types = asserttypes,
@@ -125,4 +130,5 @@ return {
 	eqeps = asserteqeps,
 	tableieq = asserttableieq,
 	len = assertlen,
+	error = asserterror,
 }
