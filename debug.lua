@@ -14,7 +14,7 @@ end
 
 local tags = {}
 
-table.insert(require 'ext.load'.xforms, function(d)
+table.insert(require 'ext.load'().xforms, function(d)
 	-- and here I gsub all the --DEBUG: strings out of it ...
 	d = d:gsub(patescape('--DEBUG:'), '')
 	-- gsub all --DEBUG(${tag}): strings out as well
