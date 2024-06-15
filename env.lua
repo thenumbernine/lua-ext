@@ -2,6 +2,7 @@ local table = require 'ext.table'
 return function(env)
 	env = env or _G
 	require 'ext.xpcall'(env)
+	require 'ext.load'(env)
 	env.math = require 'ext.math'
 	env.table = table
 	env.string = require 'ext.string'
