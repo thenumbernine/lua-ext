@@ -64,7 +64,7 @@ end
 -- I should reverse these arguments
 -- but this function is really specific to the Path path state variable
 local function appendPath(...)
-	local fn, p = asserttypes('appendPth', 2, 'string', 'string', ...)
+	local fn, p = asserttypes('appendPath', 2, 'string', 'string', ...)
 	--[[ dont change to path sep ... always use / internally
 	if detect_os() then
 		fn = os.path(fn)

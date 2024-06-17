@@ -92,7 +92,7 @@ return function(env)
 			end
 			return assert(state.oldload(data, ...))
 		end, function(err)
-			return 'error for source: '..tostring(source)..'\n'
+			return '\nerror for source: '..tostring(source)..'\n'
 				..(data and showcode(data)..'\n' or '')
 				..err..'\n'
 				..debug.traceback()
