@@ -268,10 +268,12 @@ end
 
 -- just like string subset
 function table.sub(t,i,j)
-	if i < 0 then i = math.max(1, #t + i + 1) else i = math.max(1, i) end
+	if i < 0 then i = math.max(1, #t + i + 1) end
+	--if i < 0 then i = math.max(1, #t + i + 1) else i = math.max(1, i) end		-- TODO this is affecting symmath edge cases somewhere ...
 	j = j or #t
 	j = math.min(j, #t)
-	if j < 0 then j = math.min(#t, #t + j + 1) else j = math.max(1, j) end
+	if j < 0 then j = math.min(#t, #t + j + 1) end
+	--if j < 0 then j = math.min(#t, #t + j + 1) else j = math.max(1, j) end	-- TODO this is affecting symmath edge cases somewhere ...
 	local res = {}
 	for k=i,j do
 		res[k-i+1] = t[k]
