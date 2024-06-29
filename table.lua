@@ -129,6 +129,9 @@ function table:filter(f)
 	if type(f) == 'function' then
 		for k,v in pairs(self) do
 			if f(v,k) then
+				-- TODO instead of this at runtime, how about filter vs filteri like map vs mapi
+				-- but most the times filter is used it is for integers already
+				-- how about filterk?  or probably filteri and change everything
 				if type(k) == 'string' then
 					t[k] = v
 				else
