@@ -15,6 +15,8 @@ state has the following:
 	load = new load function that is now also assigned to env.load
 	oldloadfile = old loadfile function
 	loadfile = new loadfile function that is now also assigned to env.loadfile
+	olddofile = old dofile function
+	dofile = new dofile function that is now also assigned to env.dofile
 	oldloadstring = (if env.loadstring exists) old loadstring function
 	loadstring = (if env.loadstring exists) new loadstring function that is now also assigned to env.loadstring
 	oldsearchfile = old package.searchers[2] or package.loaders[2]
@@ -113,16 +115,30 @@ return function(env)
 	env.load = state.load
 
 	state.oldloadfile = env.loadfile
-	state.loadfile = function(filename, ...)
-		local f, err = io.open(filename, 'rb')
-		if not f then return nil, err end
-		local data, err = f:read'*a'
-		f:close()
-		if err then return nil, err end
+	-- NOTICE when specifying args (filename, mode, env) explicitly, and forwarding them explicitly, the CLI had some trouble with _ENV var in lua 5.4 ...
+	-- so for vanilla lua cli the number of args matters for some reason
+	state.loadfile = function(...)
+		local filename, mode, loadenv = ...
+		local data, err
+		if filename then
+			local f, err = io.open(filename, 'rb')
+			if not f then return nil, err end
+			data, err = f:read'*a'
+			f:close()
+			if err then return nil, err end
+		else
+			data, err = io.read'*a'
+		end
 
-		return state.load(data, filename, ...)
+		return state.load(data, ...)
 	end
 	env.loadfile = state.loadfile
+
+	state.olddofile = env.dofile
+	state.dofile = function(filename)
+		return assert(state.loadfile(filename))()
+	end
+	env.dofile = state.dofile
 
 	-- next TODO here , same as ext.debug (consider making modular)
 	-- ... wedge in new package.seachers[2]/package.loaders[2] behavior to use my modified load()

@@ -6,6 +6,9 @@ useful for using Lua as a functional language.
 TODO rename to 'ops'?
 --]]
 
+--local load = require 'string'.load	-- string.load = loadstring or load
+local load = loadstring or load
+
 -- test if we hae lua 5.3 bitwise operators
 -- orrr I could just try each op and bail out on error
 -- and honestly I should be defaulting to the 'bit' library anyways, esp in the case of luajit where it is translated to an asm opcode
@@ -80,7 +83,7 @@ symbolscode = symbolscode .. [[
 	}
 ]]
 
-local symbols, unary = assert((loadstring or load)(symbolscode..' return symbols, unary'))()
+local symbols, unary = assert(load(symbolscode..' return symbols, unary'))()
 
 local code = symbolscode .. [[
 	-- functions for operators
@@ -119,4 +122,4 @@ code = code .. [[
 	}
 	return ops
 ]]
-return assert((loadstring or load)(code))()
+return assert(load(code))()
