@@ -80,6 +80,16 @@ return function(env)
 	-- ok here's my modified load behavior
 	-- it's going to parse the lua 5.4 code and spit out the luajit code
 	state.load = function(data, ...)
+		if type(data) == 'function' then
+			local s = {}
+			repeat
+				-- "A return of an empty string, nil, or no value signals the end of the chunk."
+				local chunk = data()
+				if chunk == '' or chunk == nil then break end
+				table.insert(s, chunk)
+			until false
+			data = table.concat(s)
+		end
 		-- 5.1 behavior: load(func, name) versus loadstring(data, name)
 		-- 5.2..5.4 behavior: load(chunk, name, mode, env)
 		-- TODO mind you the formatting on re-converting it will be off ...
@@ -118,7 +128,7 @@ return function(env)
 	-- NOTICE when specifying args (filename, mode, env) explicitly, and forwarding them explicitly, the CLI had some trouble with _ENV var in lua 5.4 ...
 	-- so for vanilla lua cli the number of args matters for some reason
 	state.loadfile = function(...)
-		local filename, mode, loadenv = ...
+		local filename = ...
 		local data, err
 		if filename then
 			local f
