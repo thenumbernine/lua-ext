@@ -121,14 +121,15 @@ return function(env)
 		local filename, mode, loadenv = ...
 		local data, err
 		if filename then
-			local f, err = io.open(filename, 'rb')
+			local f
+			f, err = io.open(filename, 'rb')
 			if not f then return nil, err end
 			data, err = f:read'*a'
 			f:close()
-			if err then return nil, err end
 		else
 			data, err = io.read'*a'
 		end
+		if err then return nil, err end
 
 		return state.load(data, ...)
 	end
