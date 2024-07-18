@@ -141,6 +141,13 @@ return function(env)
 		end
 		if err then return nil, err end
 
+		-- luajit loadfile/dofile will skip the first # just fine
+		-- but lua 5.4 will not ... lua 5.4 seems to only skip the leading # if you run it directly
+		-- so here's some luajit compat ...
+		if data then
+			data = data:match'^#[^\n]*\n(.*)$' or data
+		end
+
 		return state.load(data, ...)
 	end
 	env.loadfile = state.loadfile
