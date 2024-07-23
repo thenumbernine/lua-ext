@@ -8,7 +8,7 @@ TODO tempting to always insert a new xpcall and give it a default error-handler 
 --]]
 return function(env)
 	env = env or _G
-	local oldxpcall = env.xpcall
+	local oldxpcall = env.xpcall or _G.xpcall
 	local xpcallfwdargs = select(2,
 		oldxpcall(
 			function(x) return x end,

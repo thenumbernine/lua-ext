@@ -42,7 +42,7 @@ return function(env)
 	require 'ext.xpcall'(env)
 	require 'ext.require'(env)
 
-	local package = env.package
+	local package = env.package or _G.package
 
 	-- package.searchpath is missing in 5.1 (but not luajit) ... I need a package.searchpath
 	-- Put in its own file?  does anyone else need this?  or not since it pairs with my require-override, which is in this file too.
@@ -75,7 +75,7 @@ return function(env)
 
 	-- TODO proper test?  like if load'string' fails?
 	local loadUsesFunctions = (_VERSION == 'Lua 5.1' and not env.jit)
-	state.oldload = loadUsesFunctions and env.loadstring or env.load
+	state.oldload = loadUsesFunctions and (env.loadstring or _G.loadstring) or (env.load or _G.load)
 
 	-- ok here's my modified load behavior
 	-- it's going to parse the lua 5.4 code and spit out the luajit code
@@ -116,15 +116,15 @@ return function(env)
 
 	-- override global load() function, and maybe loadfile() if it's present too
 	-- (maybe loadstring() too ?)
-	if env.loadstring ~= nil then
-		state.oldloadstring = env.loadstring
+	if env.loadstring ~= nil or _G.loadstring ~= nil then
+		state.oldloadstring = env.loadstring or _G.loadstring
 		state.loadstring = state.load
 		env.loadstring = state.loadstring
 	end
 	-- TODO if we're in luajit (_VERSION=Lua 5.1) then load() will handle strings, but if we're in lua 5.1 then it will only handle functions (according to docs?) right?
 	env.load = state.load
 
-	state.oldloadfile = env.loadfile
+	state.oldloadfile = env.loadfile or _G.loadfile
 	-- NOTICE when specifying args (filename, mode, env) explicitly, and forwarding them explicitly, the CLI had some trouble with _ENV var in lua 5.4 ...
 	-- so for vanilla lua cli the number of args matters for some reason
 	state.loadfile = function(...)
@@ -152,7 +152,7 @@ return function(env)
 	end
 	env.loadfile = state.loadfile
 
-	state.olddofile = env.dofile
+	state.olddofile = env.dofile or _G.dofile
 	state.dofile = function(filename)
 		return assert(state.loadfile(filename))()
 	end
