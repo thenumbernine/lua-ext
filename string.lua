@@ -32,18 +32,6 @@ function string.split(s, exp)
 	return t
 end
 
--- this is a common function, especially in metatable creation
--- it is nearly table.concat, except table.concat errors upon non-string/number instead of calling tostring() automatically
--- (should I change table.concat's default behavior and use that instead?  nah, because why require a table creation.)
--- TODO tempted to make this ext.op.concat ... but that's specifically a binary op ... hmm
-function string.concat(...)
-	local n = select('#', ...)
-	if n == 0 then return end	-- base-case nil or "" ?
-	local s = tostring((...))
-	if n == 1 then return s end
-	return s .. string.concat(select(2, ...))
-end
-
 function string.trim(s)
 	return s:match('^%s*(.-)%s*$')
 end
@@ -122,6 +110,34 @@ end
 local escapeFind = '[' .. ([[^$()%.[]*+-?]]):gsub('.', '%%%1') .. ']'
 function string.patescape(s)
 	return (s:gsub(escapeFind, '%%%1'))
+end
+
+-- this is a common function, especially as a __concat metamethod
+-- it is nearly table.concat, except table.concat errors upon non-string/number instead of calling tostring() automatically
+-- (should I change table.concat's default behavior and use that instead?  nah, because why require a table creation.)
+-- tempted to make this ext.op.concat ... but that's specifically a binary op ... and that shouldn't call tostring() while this should ...
+-- maybe I should move this to ext.op as 'tostringconcat' or something?
+function string.concat(...)
+	local n = select('#', ...)
+	if n == 0 then return end	-- base-case nil or "" ?
+	local s = tostring((...))
+	if n == 1 then return s end
+	return s .. string.concat(select(2, ...))
+end
+
+-- another common __tostring metamethod
+-- since luajit doesn't support __name metafield
+function string:nametostring()
+	-- NOTICE this will break for anything that overrides its __metatable metafield
+	local mt = getmetatable(self)
+
+	-- invoke a 'rawtostring' call / get the builtin 'tostring' result
+	setmetatable(self, nil)
+	local s = tostring(self)
+	setmetatable(self, mt)
+
+	local name = mt.__name
+	return name and tostring(name)..s:sub(6) or s
 end
 
 return string
