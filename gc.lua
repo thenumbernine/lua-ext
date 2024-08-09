@@ -17,7 +17,7 @@ if not newproxy then return end
 local gcProxies = setmetatable({}, {__mode='kv'})
 local oldsetmetatable = setmetatable
 function setmetatable(t, mt)
-	if mt.__gc then
+	if mt and mt.__gc then
 		local p = newproxy(true)
 		gcProxies[mt] = p
 		getmetatable(p).__gc = function()
