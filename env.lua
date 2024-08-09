@@ -1,3 +1,4 @@
+require 'ext.gc'
 local table = require 'ext.table'
 return function(env)
 	env = env or _G
