@@ -1,5 +1,4 @@
 --[[
-
 lua 5.2+ supports __gc for tables and userdata
 lua 5.1 supports __gc for userdata only
 luajit (5.1+...?) supports __gc for userdata and cdata ... but not tables
@@ -17,9 +16,15 @@ if not newproxy then return end
 local gcProxies = setmetatable({}, {__mode='kv'})
 local oldsetmetatable = setmetatable
 function setmetatable(t, mt)
+	local oldp = gcProxies[t]
+	if oldp then
+		getmetatable(oldp).__gc = nil
+		--oldsetmetatable(oldp, nil)
+	end
+
 	if mt and mt.__gc then
 		local p = newproxy(true)
-		gcProxies[mt] = p
+		gcProxies[t] = p
 		getmetatable(p).__gc = function()
 			if type(mt.__gc) == 'function' then
 				mt.__gc(t)
