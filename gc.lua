@@ -13,7 +13,7 @@ if not newproxy then return end
 
 -- from https://stackoverflow.com/a/77702023/2714073
 -- TODO accept an 'env' param like so many other of my override functions ... maybe ... tho I don't do this with all, do I?
-local gcProxies = setmetatable({}, {__mode='kv'})
+local gcProxies = setmetatable({}, {__mode='k'})
 local oldsetmetatable = setmetatable
 function setmetatable(t, mt)
 	local oldp = gcProxies[t]
