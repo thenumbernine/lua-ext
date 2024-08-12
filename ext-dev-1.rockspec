@@ -32,6 +32,7 @@ build = {
 		["ext.env"] = "env.lua",
 		["ext"] = "ext.lua",
 		["ext.fromlua"] = "fromlua.lua",
+		["ext.gc"] = "gc.lua",
 		["ext.gcmem"] = "gcmem.lua",
 		["ext.io"] = "io.lua",
 		["ext.load"] = "load.lua",
