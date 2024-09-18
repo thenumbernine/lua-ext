@@ -63,7 +63,7 @@ function math.cbrt(x)
 end
 
 function math.clamp(v,min,max)
-	return math.max(math.min(v,min), max)
+	return math.max(math.min(v, max), min)
 end
 
 function math.sign(x)
