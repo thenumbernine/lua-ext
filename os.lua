@@ -10,8 +10,7 @@ local table = require 'ext.table'
 
 -- string.trim
 local string = require 'ext.string'
-local asserttype = require 'ext.assert'.type
-local asserteq = require 'ext.assert'.eq
+local assert = require 'ext.assert'
 local detect_lfs = require 'ext.detect_lfs'
 local detect_os = require 'ext.detect_os'
 
@@ -20,7 +19,7 @@ os.sep = detect_os() and '\\' or '/'
 -- TODO this vs path.fixpathsep ...
 -- should I just move everything over to 'path' ...
 function os.path(str)
-	asserttype(str, 'string')
+	assert.type(str, 'string')
 	return (str:gsub('/', os.sep))
 end
 
@@ -144,7 +143,7 @@ function os.listdir(path)
 			end
 			local filestr = io.readproc(cmd)
 			fns = string.split(filestr, '\n')
-			asserteq(fns:remove(), '')
+			assert.eq(fns:remove(), '')
 			if fns[1] == '.' then fns:remove(1) end
 			if fns[1] == '..' then fns:remove(1) end
 --[[

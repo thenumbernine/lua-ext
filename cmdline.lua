@@ -3,7 +3,7 @@
 -- have ext.env store them in the global
 
 local fromlua = require 'ext.fromlua'
-local asserttype = require 'ext.assert'.type
+local assert = require 'ext.assert'
 local table = require 'ext.table'
 local string = require 'ext.string'
 local tolua = require 'ext.tolua'
@@ -113,10 +113,10 @@ local function validate(desc)
 				if descType == 'number' then
 					cmdline[name] = assert(tonumber(cmdValue))
 				elseif descType == 'file' then
-					asserttype(cmdValue, 'string')
+					assert.type(cmdValue, 'string')
 					assert(require 'ext.path'(cmdValue):exists(), "failed to find file "..tolua(cmdValue))
 				else
-					asserttype(cmdValue, descType)
+					assert.type(cmdValue, descType)
 				end
 			end
 			--desc.type = nil	-- still useful?

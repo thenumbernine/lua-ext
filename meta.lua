@@ -1,4 +1,4 @@
-local asserttype = require 'ext.assert'.type
+local assert = require 'ext.assert'
 local table = require 'ext.table'
 local string = require 'ext.string'
 local coroutine = require 'ext.coroutine'
@@ -101,7 +101,7 @@ local functionMeta = {
 		compose = function(...)
 			local funcs = table.pack(...)
 			for i=1,funcs.n do
-				asserttype(funcs[i], 'function')
+				assert.type(funcs[i], 'function')
 			end
 			return function(...)
 				local args = table.pack(...)

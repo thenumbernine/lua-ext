@@ -21,9 +21,7 @@ TODO
 -- [[ TODO - this block is also in ext/os.lua and ext/file.lua
 local detect_os = require 'ext.detect_os'
 local detect_lfs = require 'ext.detect_lfs'
-local asserttype = require 'ext.assert'.type
-local asserttypes = require 'ext.assert'.types
-local assertne = require 'ext.assert'.ne
+local assert = require 'ext.assert'
 
 local io = require 'ext.io'
 local os = require 'ext.os'
@@ -64,7 +62,7 @@ end
 -- I should reverse these arguments
 -- but this function is really specific to the Path path state variable
 local function appendPath(...)
-	local fn, p = asserttypes('appendPath', 2, 'string', 'string', ...)
+	local fn, p = assert.types('appendPath', 2, 'string', 'string', ...)
 	--[[ dont change to path sep ... always use / internally
 	if detect_os() then
 		fn = os.path(fn)
@@ -94,8 +92,8 @@ local Path = class()
 --Path.sep = os.sep	-- TOO redundant?
 
 function Path:init(args)
-	self.path = asserttype(
-		asserttype(
+	self.path = assert.type(
+		assert.type(
 			args,
 			'table',
 			'Path:init args'
@@ -103,7 +101,7 @@ function Path:init(args)
 		'string',
 		'Path:init args.path'
 	)
-	assertne(self.path, nil)
+	assert.ne(self.path, nil)
 end
 
 -- wrappers
@@ -257,10 +255,10 @@ specifically reading vs writing?
 instead of __newindex for writing new files, how about path(path):write()
 --]]
 function Path:__call(k)
-	assertne(self.path, nil)
+	assert.ne(self.path, nil)
 	if k == nil then return self end
 	if Path:isa(k) then k = k.path end
-	local fn = asserttype(
+	local fn = assert.type(
 		appendPath(k, self.path),
 		'string',
 		"Path:__call appendPath(k, self.path)")
@@ -271,7 +269,7 @@ function Path:__call(k)
 	-- but then how about file writing?
 
 	return Path{
-		path = asserttype(fn, 'string', "Path:__call simplifypath"),
+		path = assert.type(fn, 'string', "Path:__call simplifypath"),
 	}
 end
 
