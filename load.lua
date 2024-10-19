@@ -23,13 +23,6 @@ state has the following:
 	searchfile = new package.searchers[2] or package.loaders[2]
 --]]
 
---[[
-showcode is used for error reporting in state.load()
-... too bad there's no easy way to get around the need for this ...
-... like maybe in the future preserve all comments and whitespaces and newlines, and regen the source with those so as little as possible has changed ...
---]]
-local showcode = require 'template.showcode'
-
 local stateForEnv = {}
 
 return function(env)
@@ -106,7 +99,7 @@ return function(env)
 			return assert(state.oldload(data, ...))
 		end, function(err)
 			return '\nerror for source: '..tostring(source)..'\n'
-				..(data and showcode(data)..'\n' or '')
+--DEBUG(ext.load):..(data and require 'template.showcode'(data)..'\n' or '')
 				..err..'\n'
 				..debug.traceback()
 		end, ...)
