@@ -21,20 +21,34 @@ Descriptions of the Files:
 ### assert.lua
 
 Returns an object that can be used as a typical `assert()` call, but also contains several functions that can be used for testing and outputting specific assert cases:
-`type`
-`types`
-`is`
-`eq`
-`ne`
-`lt`
-`le`
-`gt`
-`ge`
-`index`
-`eqeps`
-`tableieq`
-`len`
-`error`
+
+`assert.eq(a, b, [msg, ...])` = If `a == b` returns all arguments.  Otherwise error with message specifying `a`, `b`, and optionally `msg`.
+
+`assert.eqeps(a, b, [eps, msg, ...])` = If `|a-b|<=eps` returns all arguments.  Otherwise error with message specifying `a`, `b`, `eps`, and optionally `msg`.  Default `eps` is `1e-7`.
+
+`assert.ne(a, b, [msg, ...])` = If `a ~= b` returns all arguments.
+
+`assert.ge(a, b, [msg, ...])` = If `a >= b` returns all arguments.
+
+`assert.gt(a, b, [msg, ...])` = If `a > b` returns all arguments.
+
+`assert.le(a, b, [msg, ...])` = If `a <= b` returns all arguments.
+
+`assert.lt(a, b, [msg, ...])` = If `a < b` returns all arguments.
+
+`assert.len(t, n, [msg, ...])` = If `#t == n` returns all arguments.
+
+`assert.type(x, t, [msg, ...])` = If `type(x) == t` returns all arguments.
+
+`assert.types(msg, n, ...)` = Assumes `...` holds `n` types and then `n` variables.  If all the `[n+1,2*n]` variables' types match the `[1,n]` types then it returns all the variables.
+
+`assert.index(t, k, [msg, ...])` = If `t[k]` evaluates to true then returns `t[k], msg, ...`.
+
+`assert.tableieq(t1, t2, [msg, ...])` = If `#t1 == #t2` and `t1[i] == t2[i]` then returns all arguments.
+
+`assert.error(f, [msg, ...])` = If calling `f(...)` produces an error then returns all arguments.
+
+`assert.is(o, cl, [msg, ...])` = If object `o` is an instance of class `cl` then returns all arguments.
 
 ### ext.lua
 
