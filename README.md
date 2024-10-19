@@ -18,6 +18,24 @@ TLDR, how to set up your environment, choose one:
 
 Descriptions of the Files:
 
+### assert.lua
+
+Returns an object that can be used as a typical `assert()` call, but also contains several functions that can be used for testing and outputting specific assert cases:
+`type`
+`types`
+`is`
+`eq`
+`ne`
+`lt`
+`le`
+`gt`
+`ge`
+`index`
+`eqeps`
+`tableieq`
+`len`
+`error`
+
 ### ext.lua
 
 `require`ing this file sets up global environment via ext.env and overrides metatables to all default Lua types via ext.meta.

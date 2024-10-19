@@ -24,6 +24,16 @@ local function asserttype(x, t, msg, ...)
 	return x, t, msg, ...
 end
 
+local function assertis(obj, cl, msg, ...)
+	if not cl.isa then
+		error(prependmsg(msg, "assertis expected 2nd arg to be a class"))
+	end
+	if not cl:isa(obj) then
+		error(prependmsg(msg, "object "..tostring(obj).." is not of class "..tostring(class)))
+	end
+	return obj, cl, msg, ...
+end
+
 -- how to specify varargs...
 -- for now: (msg, N, type1, ..., typeN, arg1, ..., argN)
 local function asserttypes(msg, n, ...)
@@ -117,9 +127,10 @@ local function asserterror(f, msg, ...)
 	return f, msg, ...
 end
 
-return {
+return setmetatable({
 	type = asserttype,
 	types = asserttypes,
+	is = assertis,
 	eq = asserteq,
 	ne = assertne,
 	lt = assertlt,
@@ -131,4 +142,9 @@ return {
 	tableieq = asserttableieq,
 	len = assertlen,
 	error = asserterror,
-}
+}, {
+	-- default `assert = require 'ext.assert'` works, as well as `assertle = assert.le`
+	__call = function(t, ...)
+		return assert(...)
+	end,
+})
