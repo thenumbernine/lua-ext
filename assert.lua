@@ -127,6 +127,7 @@ local function asserterror(f, msg, ...)
 	return f, msg, ...
 end
 
+local origassert = _G.assert
 return setmetatable({
 	type = asserttype,
 	types = asserttypes,
@@ -145,6 +146,6 @@ return setmetatable({
 }, {
 	-- default `assert = require 'ext.assert'` works, as well as `assertle = assert.le`
 	__call = function(t, ...)
-		return assert(...)
+		return origassert(...)
 	end,
 })
