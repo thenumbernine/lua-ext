@@ -29,7 +29,7 @@ local function assertis(obj, cl, msg, ...)
 		error(prependmsg(msg, "assertis expected 2nd arg to be a class"))
 	end
 	if not cl:isa(obj) then
-		error(prependmsg(msg, "object "..tostring(obj).." is not of class "..tostring(class)))
+		error(prependmsg(msg, "object "..tostring(obj).." is not of class "..tostring(cl)))
 	end
 	return obj, cl, msg, ...
 end
