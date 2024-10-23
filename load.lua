@@ -91,20 +91,14 @@ return function(env)
 		-- TODO would be nice to save whitespace and re-insert that ... hmm maybe long into the future ...
 		-- TODO xpcall behavior testing for when we are allowed to forward the args ... maybe that compat behavior belongs in ext ?
 		local source = ... or ('['..data:sub(1,10)..'...]')
-		local success, result = xpcall(function(...)
-			for i,xform in ipairs(state.xforms) do
-				data = xform(data, source)
-				if not data then error("ext.load.xform["..i.."] produced nothing for source "..tostring(source)) end
+		for i,xform in ipairs(state.xforms) do
+			local reason
+			data, reason = xform(data, source)
+			if not data then
+				return false, "ext.load.xform["..i.."]: "..(reason and tostring(reason) or '')
 			end
-			return assert(state.oldload(data, ...))
-		end, function(err)
-			return '\nerror for source: '..tostring(source)..'\n'
---DEBUG(ext.load):..(data and require 'template.showcode'(data)..'\n' or '')
-				..err..'\n'
-				..debug.traceback()
-		end, ...)
-		if not success then return nil, result end
-		return result
+		end
+		return state.oldload(data, ...)
 	end
 
 	-- override global load() function, and maybe loadfile() if it's present too

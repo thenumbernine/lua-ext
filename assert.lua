@@ -13,7 +13,17 @@ local function tostr(x)
 end
 
 local function prependmsg(msg, str)
-	return (msg and (tostring(msg)..': ') or '')..str
+	if type(msg) == 'number' then
+		msg = tostring(msg)
+	end
+	if type(msg) == 'nil' then
+		return str
+	end
+	if type(msg) == 'string' then
+		return msg..': '..str
+	end
+	-- not implicitly converted to string -- return as is without message
+	return msg
 end
 
 local function asserttype(x, t, msg, ...)
