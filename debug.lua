@@ -14,7 +14,16 @@ end
 
 local tags = {}
 
-table.insert(require 'ext.load'().xforms, function(d)
+--[[
+Strip out DEBUG: and DEBUG(...): tags based on what tags were requested via `require 'ext.debug'(tag1,tag2,...)`
+
+d = data
+source = for require'd files will be an absolute file path, from ext.load, from package.searchers[2]
+
+TODO How to handle multiple tags?  Then I get into AND vs OR queries
+TODO Automatic tags for filenames and for functions (use parser.xform_load for functions / getting function names).  Abs vs rel source paths?
+--]]
+table.insert(require 'ext.load'().xforms, function(d, source)
 	-- and here I gsub all the --DEBUG: strings out of it ...
 	d = d:gsub(patescape('--DEBUG:'), '')
 	-- gsub all --DEBUG(${tag}): strings out as well
