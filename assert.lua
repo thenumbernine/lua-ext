@@ -56,7 +56,7 @@ end
 
 local function asserteq(a, b, msg, ...)
 	if not (a == b) then
-		error(prependmsg(msg, "got "..tostr(a).." == "..tostr(b)))
+		error(prependmsg(msg, "expected "..tostr(a).." == "..tostr(b)))
 	end
 	return a, b, msg, ...
 end
@@ -71,35 +71,35 @@ end
 
 local function assertne(a, b, msg, ...)
 	if not (a ~= b) then
-		error(prependmsg(msg, "got "..tostr(a).." ~= "..tostr(b)))
+		error(prependmsg(msg, "expected "..tostr(a).." ~= "..tostr(b)))
 	end
 	return a, b, msg, ...
 end
 
 local function assertlt(a, b, msg, ...)
 	if not (a < b) then
-		error(prependmsg(msg, "got "..tostr(a).." < "..tostr(b)))
+		error(prependmsg(msg, "expected "..tostr(a).." < "..tostr(b)))
 	end
 	return a, b, msg, ...
 end
 
 local function assertle(a, b, msg, ...)
 	if not (a <= b) then
-		error(prependmsg(msg, "got "..tostr(a).." <= "..tostr(b)))
+		error(prependmsg(msg, "expected "..tostr(a).." <= "..tostr(b)))
 	end
 	return a, b, msg, ...
 end
 
 local function assertgt(a, b, msg, ...)
 	if not (a > b) then
-		error(prependmsg(msg, "got "..tostr(a).." > "..tostr(b)))
+		error(prependmsg(msg, "expected "..tostr(a).." > "..tostr(b)))
 	end
 	return a, b, msg, ...
 end
 
 local function assertge(a, b, msg, ...)
 	if not (a >= b) then
-		error(prependmsg(msg, "got "..tostr(a).." >= "..tostr(b)))
+		error(prependmsg(msg, "expected "..tostr(a).." >= "..tostr(b)))
 	end
 	return a, b, msg, ...
 end
