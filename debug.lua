@@ -3,16 +3,54 @@ Here's a quick hack for debugging
 It's not meta-lua, not dependent on my parser lib, nothing like that
 It does use my new load() shim layer ext.load
 Just this: when you require() a file, if the debug tag is set, then grep all --DEBUG: lines to remove the comment
-Usage" lua -lext.debug ..."
+Usage: `lua -lext.debug ...`
+or if you want to query specific dags: `lua -e "require 'ext.debug' 'tag1,tag2,tag3'" ...`
+
+
+But now I'm tired of always tagging files, so how about a proper query script.
+Something that looks like this:
+	lua -e "require 'ext.debug' 'source:match'sdl*' and level>3 and func:match'SDLAPP' and tag:match'testing''"
+
+That's great but those are a lot of variables that I haven't got yet.
+
+What kind of variables would we like:
+	source = string of the current loaded source
+	level = log-level, needs to be specified in the DEBUG tag
+	func = current function ... how to pick out, aside from making this use the parser (that means moving it out of ext and into its own library...)
+	tag = same as before
+
+How to specify things like tag and level ...
+
+DEBUG(tag@level): ?
+DEBUG(@1):
+
+What should default log level be?  1.
 --]]
 
--- don't require ext.string just yet ...
-local escapeFind = '[' .. ([[^$()%.[]*+-?]]):gsub('.', '%%%1') .. ']'
-local function patescape(s)
-	return (s:gsub(escapeFind, '%%%1'))
+function string_split(s, exp)
+	exp = exp or ''
+	s = tostring(s)
+	local t = {}
+	-- handle the exp='' case
+	if exp == '' then
+		for i=1,#s do
+			table.insert(t, s:sub(i,i))
+		end
+	else
+		local searchpos = 1
+		local start, fin = s:find(exp, searchpos)
+		while start do
+			table.insert(t, s:sub(searchpos, start-1))
+			searchpos = fin+1
+			start, fin = s:find(exp, searchpos)
+		end
+		table.insert(t, s:sub(searchpos))
+	end
+	return t
 end
 
-local tags = {}
+local oldload = load or loadstring
+local logcond
 
 --[[
 Strip out DEBUG: and DEBUG(...): tags based on what tags were requested via `require 'ext.debug'(tag1,tag2,...)`
@@ -20,36 +58,56 @@ Strip out DEBUG: and DEBUG(...): tags based on what tags were requested via `req
 d = data
 source = for require'd files will be an absolute file path, from ext.load, from package.searchers[2]
 
-TODO How to handle multiple tags?  Then I get into AND vs OR queries
-TODO Automatic tags for filenames and for functions (use parser.xform_load for functions / getting function names).  Abs vs rel source paths?
+Tags will look like:
+`--DEBUG(tag):` to specify a tag.
+`--DEBUG(@level):` to specify a level.
+`--DEBUG(tag@level):` to specify both.
 --]]
 table.insert(require 'ext.load'().xforms, function(d, source)
-	-- and here I gsub all the --DEBUG: strings out of it ...
-	d = d:gsub(patescape('--DEBUG:'), '')
-	-- gsub all --DEBUG(${tag}): strings out as well
-	for _,tag in ipairs(tags) do
-		d = d:gsub(patescape('--DEBUG('..tag..'):'), '')
+	local result = {}
+	local ls = string_split(d, '\n')
+	for lineno=1,#ls do
+		local l = ls[lineno]
+		local found
+		repeat
+			found = false
+
+			local start, fin = l:find'%-%-DEBUG:'
+			if start then
+				if logcond(source, lineno, 1) then
+					l = l:sub(1, start-1)..l:sub(fin+1)
+					ls[lineno] = l
+					found = true
+				end
+			end
+
+			local start, fin = l:find'%-%-DEBUG%b():'
+			if start then
+				local inside = l:sub(start+8, fin-2)
+				local tag, level = table.unpack(string_split(inside, '@'))
+				level = tonumber(level)
+				if logcond(source, lineno, level, tag) then
+					l = l:sub(1, start-1)..l:sub(fin+1)
+					ls[lineno] = l
+					found = true
+				end
+			end
+		until not found
 	end
+	d = table.concat(ls, '\n')
 	return d
 end)
 
 --[[
-TODO debug-levels? debug-tags?  enable dif tags for dif reports?
-have this return a function which you can call with some kind of tags to be used for how to parse out debug stuff...
+Use this with: `lua -e "require 'ext.debug' 'source:match'sdl*' or level>3 and tag:match'testing''"`
 
-lua -lext.debug ...
-	to turn all on?  or just turn the no-tags stuff on?
-lua -e "require'ext.debug' 'list,of,comma,separated,tags,to,enable'" ...
-	to enable specific runlevel tags
+Conditions can use the variables: source, line, level, tag
 --]]
-return function(reqtags)
-	local t = type(reqtags)
-	tags = {}
-	if t == 'table' then	-- list-of-strings
-		tags = reqtags
-	elseif t == 'string' then
-		for k in reqtags:gmatch'[^,]+' do
-			table.insert(tags, k)
-		end
-	end
+local function setCond(condstr)
+	local code = 'local source, line, level, tag = ... return '..condstr
+	logcond = assert(oldload(code))
 end
+
+setCond'level == 1'
+
+return setCond

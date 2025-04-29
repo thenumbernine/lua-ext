@@ -545,14 +545,21 @@ You can also add specific runtime tags:
 
 `--DEBUG(mytag):print"This only runs with debug'mytag'`
 
-`lua -e "require'ext.debug''mytag'`
+`lua -e "require'ext.debug''tag==[[mytag]]'`
 
-And multiple tags...
+... or log-levels (the default level is 1):
 
-`--DEBUG(tag1):print"This only runs with debug'tag1'`
-`--DEBUG(tag2):print"This only runs with debug'tag2'`
+`--DEBUG(@2):print"This only runs with debug'level<=2'`
 
-`lua -e "require'ext.debug''tag1,tag2'`
+`lua -e "require'ext.debug''level<=2'`
+
+... or both:
+
+`--DEBUG(mytag@3):print"This only runs with debug'tag=="mytag" and level<=3'`
+
+`lua -e "require'ext.debug''tag==[[mytag]] and level<=3'`
+
+Debug queries can be any Lua expression using the variables `source`, `line`, `tag`, and `log`.
 
 ### gcmem.lua: Provides FFI-based functions for manually or automatically allocating and freeing memory.  WIP due to crashing in LuaJIT when you run `ptr = ffi.cast('T*', ptr)` and haven't bound `ptr` anywhere else.
 
