@@ -8,8 +8,19 @@ I'm voting for #2 so assert can be used for wrapping args and not changing behva
 
 -- cheap 'tolua'
 local function tostr(x)
+	--[[ just tostring
+	return tostring(x)
+	--]]
+	--[[ also quotes to help distinguish strings-of-numbers from numbers
 	if type(x) == 'string' then return ('%q'):format(x) end
 	return tostring(x)
+	--]]
+	--[[ full-on lua serialization ... might have trouble with cdata, especially cdata-primitives
+	return require 'ext.tolua'(x)
+	--]]
+	-- [[ lua type and value
+	return type(x)..'('..tostring(x)..')'
+	--]]
 end
 
 local function prependmsg(msg, str)
