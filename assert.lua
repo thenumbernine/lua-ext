@@ -144,8 +144,16 @@ local function assertlen(t, n, msg, ...)
 end
 
 local function asserterror(f, msg, ...)
-	asserteq(pcall(f, ...), false, msg)
-	return f, msg, ...
+	local result, errmsg = pcall(f, ...)
+	asserteq(result, false, prependmsg(msg, errmsg))
+	-- I'd like to forward all arguments like every assert above
+	--return f, msg, ...
+	-- but by its nature, "asserterror" means "we expect a discontinuity in execution from this code"
+	-- and the calling code wants to see the resulting error information
+	-- and since I already error'd if no error was found,
+	-- then we already know the pcall's result at this point is false
+	-- so I'll do this:
+	return errmsg
 end
 
 local origassert = _G.assert
