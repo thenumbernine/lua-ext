@@ -561,8 +561,12 @@ You can also add specific runtime tags:
 
 Debug queries can be any Lua expression using the variables `source`, `line`, `tag`, and `log`.
 
-### gcmem.lua: Provides FFI-based functions for manually or automatically allocating and freeing memory.  WIP due to crashing in LuaJIT when you run `ptr = ffi.cast('T*', ptr)` and haven't bound `ptr` anywhere else.
+### gcmem.lua:
 
-NOTICE:
+Provides FFI-based functions for manually or automatically allocating and freeing memory.
+
+WIP due to crashing in LuaJIT when you run `ptr = ffi.cast('T*', ptr)` and haven't bound `ptr` anywhere else.
+
+# NOTICE:
 - path.lua will optionally use luafilesystem, if available.  My own luafilesystem fork is preferred: https://github.com/thenumbernine/luafilesystem since it maintains a single copy of ffi cdefs within my lua-ffi-bindings library.
 - gcmem.lua depends on ffi, particularly some ffi headers of stdio found in my lua-ffi-bindings project: https://github.com/thenumbernine/lua-ffi-bindings
