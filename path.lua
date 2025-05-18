@@ -30,8 +30,8 @@ local class = require 'ext.class'
 
 
 -- TODO this goes in file or os or somewhere in ext
-local function simplifypath(p)
-	p = string.split(p, '/')
+local function simplifypath(s)
+	local p = string.split(s, '/')
 	for i=#p-1,1,-1 do
 		-- convert a//b's to a/b
 		if i > 1 then	-- don't remove empty '' as the first entry - this signifies a root path
@@ -44,7 +44,7 @@ local function simplifypath(p)
 		and p[i] ~= '..'
 		then
 			if i == 1 and p[1] == '' then
-				error("/.. absolute + previous doesn't make sense")	-- don't allow /../ to remove the base / ... btw this is invalid anyways ...
+				error("/.. absolute + previous doesn't make sense: "..tostring(s))	-- don't allow /../ to remove the base / ... btw this is invalid anyways ...
 			end
 			p:remove(i)
 			p:remove(i)
@@ -210,7 +210,7 @@ end
 
 function Path:dir()
 	if not os.isdir(self.path) then
-		error("can't dir() a non-directory")
+		error("can't dir() a non-directory: "..tostring(self.path))
 	end
 	return coroutine.wrap(function()
 		for fn in os.listdir(self.path) do
@@ -221,7 +221,7 @@ end
 
 function Path:rdir(callback)
 	if not os.isdir(self.path) then
-		error("can't rdir() a non-directory")
+		error("can't rdir() a non-directory: "..tostring(self.path))
 	end
 	return coroutine.wrap(function()
 		for fn in os.rlistdir(self.path, callback) do
