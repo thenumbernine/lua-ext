@@ -50,42 +50,77 @@ end
 -- should it fail if a file is presently there? probably.
 -- should makeParents be set by default?  it's on by default in Windows.
 function os.mkdir(dir, makeParents)
-	--[[ should I use the lfs option?  it doesn't have a 'makeParent' option so.....
 	local lfs = detect_lfs()
 	if lfs then
-		return lfs.mkdir(dir)
-	end
-	--]]
-	local tonull
-	if detect_os() then
-		dir = os.path(dir)
-		tonull = ' 2> nul'
-		makeParents = nil -- mkdir in Windows always makes parents, and doesn't need a switch
+		if not makeParents then
+			-- no parents - just mkdir
+			return lfs.mkdir(dir)
+		else
+			-- if then split up path into /'s and make sure each part exists or make it
+			local parts = string.split(dir, '/')
+			for i=1,#parts do
+				local parent = parts:sub(1, i):concat'/'
+				if not os.fileexists(parent) then
+					local results = table.pack(lfs.mkdir(parent))
+					if not results[1] then return results:unpack() end
+				else
+					-- TODO if it exists and it's not a dir then we're going to be in trouble.
+					-- what does shell mkdir -p do in that case?
+				end
+			end
+			return true
+		end
 	else
-		tonull = ' 2> /dev/null'
+		-- fallback on shell
+		local tonull
+		if detect_os() then
+			dir = os.path(dir)
+			tonull = ' 2> nul'
+			makeParents = nil -- mkdir in Windows always makes parents, and doesn't need a switch
+		else
+			tonull = ' 2> /dev/null'
+		end
+		local cmd = 'mkdir'..(makeParents and ' -p' or '')..' '..('%q'):format(dir)..tonull
+		return os.execute(cmd)
 	end
-	local cmd = 'mkdir'..(makeParents and ' -p' or '')..' '..('%q'):format(dir)..tonull
-	return os.execute(cmd)
 end
 
 function os.rmdir(dir)
-	local cmd = 'rmdir "'..os.path(dir)..'"'
-	return os.execute(cmd)
+	local lfs = detect_lfs()
+	if lfs then
+		-- lfs
+		return lfs.rmdir(dir)
+	else
+		-- shell
+		local cmd = 'rmdir "'..os.path(dir)..'"'
+		return os.execute(cmd)
+	end
 end
 
 function os.move(from, to)
-	-- [[
-	-- alternatively I could write this as readfile/writefile and os.remove
-	from = os.path(from)
-	to = os.path(to)
-	local cmd = (detect_os() and 'move' or 'mv') .. ' "'..from..'" "'..to..'"'
-	return os.execute(cmd)
-	--]]
-	--[[
-	local d = path(from):read()
-	path(from):remove()	-- remove first in case to and from match
-	path(to):write(d)
-	--]]
+	-- WHY isn't this a part of luafilesystem?  https://lunarmodules.github.io/luafilesystem/manual.html
+	local detect_ffi = require 'ext.detect_ffi'
+	local ffi = detect_ffi()
+	if ffi then
+		-- if we have ffi then we can use <stdio.h> rename()
+		local stdio = require 'ffi.req' 'c.stdio'
+		local errno = require 'ffi.req' 'c.errno'
+		if stdio.rename(from, to) == 0 then return true end
+		return nil, errno.str()
+	else
+		-- [[ shell
+		-- alternatively I could write this as readfile/writefile and os.remove
+		from = os.path(from)
+		to = os.path(to)
+		local cmd = (detect_os() and 'move' or 'mv') .. ' "'..from..'" "'..to..'"'
+		return os.execute(cmd)
+		--]]
+		--[[ worst case, rewrite it.
+		local d = path(from):read()
+		path(from):remove()	-- remove first in case to and from match
+		path(to):write(d)
+		--]]
+	end
 end
 
 function os.isdir(fn)
