@@ -43,8 +43,15 @@ function io.readproc(cmd)
 end
 
 function io.getfiledir(fn)
-	local dir, name = fn:match('^(.*)/([^/]-)$')
-	if not dir then return '.', fn end
+	local dir, name = fn:match'^(.*)/([^/]-)$'
+	if dir == '' then
+		-- "/" => "/", "/"
+		if name == '' then return '/', '/' end
+		-- "/x" => "/", "x"
+		return '/', name
+	elseif not dir then
+		return '.', fn
+	end
 	return dir, name
 end
 
