@@ -290,6 +290,12 @@ end
 
 Path.__concat = string.concat
 
+-- don't coerce strings just yet
+-- don't coerce abs path either
+function Path.__eq(a,b) return a.path == b.path end
+function Path.__lt(a,b) return a.path < b.path end
+function Path.__le(a,b) return a.path <= b.path end
+
 local pathSys = Path{path='.'}
 
 return pathSys
