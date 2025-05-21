@@ -74,10 +74,22 @@ end
 
 local function asserteqeps(a, b, eps, msg, ...)
 	eps = eps or 1e-7
-	if math.abs(a - b) > eps then
-		error((msg and msg..': ' or '').."expected |"..a.." - "..b.."| < "..eps)
+	local normval = math.abs(a - b)
+	if normval > eps then
+		error((msg and msg..': ' or '').."expected |"..tostr(a).." - "..tostr(b).."| <= "..eps..' but found norm to be '..tostr(normval))
 	end
 	return a, b, eps, msg, ...
+end
+
+local function absdiff(a,b) return math.abs(a - b) end
+local function asserteqepsnorm(a, b, eps, norm, msg, ...)
+	eps = eps or 1e-7
+	norm = norm or absdiff
+	local normval = norm(a, b)
+	if normval > eps then
+		error((msg and msg..': ' or '').."expected |"..tostr(a)..", "..tostr(b).."| <= "..eps..' but found norm to be '..tostr(normval))
+	end
+	return a, b, eps, norm, msg, ...
 end
 
 local function assertne(a, b, msg, ...)
@@ -169,6 +181,7 @@ return setmetatable({
 	ge = assertge,
 	index = assertindex,
 	eqeps = asserteqeps,
+	eqepsnorm = asserteqepsnorm,
 	tableieq = asserttableieq,
 	len = assertlen,
 	error = asserterror,

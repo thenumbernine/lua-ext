@@ -26,6 +26,8 @@ Returns an object that can be used as a typical `assert()` call, but also contai
 
 `assert.eqeps(a, b, [eps, msg, ...])` = If `|a-b|<=eps` returns all arguments.  Otherwise error with message specifying `a`, `b`, `eps`, and optionally `msg`.  Default `eps` is `1e-7`.
 
+`assert.eqepsnorm(a, b, [eps, norm, msg, ...])` = If `norm(a,b)<=eps` returns all arguments.  Otherwise error with message specifying `a`, `b`, `eps`, and optionally `msg`.  Default `eps` is `1e-7`, and default `norm(a,b)` is `math.abs(a - b)`.
+
 `assert.ne(a, b, [msg, ...])` = If `a ~= b` returns all arguments.  Otherwise error.
 
 `assert.ge(a, b, [msg, ...])` = If `a >= b` returns all arguments.  Otherwise error.
