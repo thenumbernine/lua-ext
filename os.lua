@@ -58,7 +58,7 @@ function os.mkdir(dir, makeParents)
 		else
 			-- if then split up path into /'s and make sure each part exists or make it
 			local parts = string.split(dir, '/')
-			for i=1,#parts do
+			for i=(parts[1] == '' and 2 or 1),#parts do
 				local parent = parts:sub(1, i):concat'/'
 				if not os.fileexists(parent) then
 					local results = table.pack(lfs.mkdir(parent))
