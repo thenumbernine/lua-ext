@@ -36,4 +36,6 @@ files = {
 }
 deps = {
 	"ffi",
+	--"lfs",	-- for vanilla lua
+	"lfs_ffi",	-- for luajit
 }
