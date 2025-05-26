@@ -320,6 +320,19 @@ function table.pickRandom(t)
 	return t[math.random(#t)]
 end
 
+-- keys = options, values = probs
+function table.pickWeighted(t)
+	local total = table.values(t):sum()
+	local x = math.random() * total
+	for k,v in pairs(t) do
+		x -= v
+		if x <= 0 then
+			return k
+		end
+	end
+	-- this should never be reached unless you have some not-a-number's as values
+end
+
 -- where to put this ...
 -- I want to convert iterators into tables
 -- it looks like a coroutine but it is made for functions returned from coroutine.wrap

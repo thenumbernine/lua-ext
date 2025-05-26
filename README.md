@@ -298,6 +298,16 @@ Notice that tables created with `table()` / `table.new()`, i.e. tables with `tab
 
 `table.shuffle(t)` = Returns a new table with the integer keys of t shuffled randomly.
 
+`table.pickRandom(t)` = Return a random value in an indexed table.
+
+`table.pickWeighted(t)` = Asssumes collection to pick from are in keys and probabilities are in values.  Returns a random key based.
+
+`table.wrapfor(f, s, var)` = Iterates over a Lua iterator, collecting results in a table.
+
+`table.permutations(t)` = Return an iterator across all permutations of indexed table values.
+
+`table.setmetatable(t)` = `setmetatable`
+
 ### number.lua: holds some extra number metatable functionality
 
 This is an extension off of the `ext/math.lua` file, with additional modifications for use as a replacement for the Lua number metatable.
