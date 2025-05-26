@@ -325,7 +325,7 @@ function table.pickWeighted(t)
 	local total = table.values(t):sum()
 	local x = math.random() * total
 	for k,v in pairs(t) do
-		x -= v
+		x = x - v
 		if x <= 0 then
 			return k
 		end
