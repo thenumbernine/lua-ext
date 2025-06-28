@@ -100,6 +100,11 @@ function Path:init(args)
 		).path,
 		'string',
 		'Path:init args.path'
+
+	-- always use / internally
+	):gsub(
+		os.sep,
+		'/'
 	)
 	assert.ne(self.path, nil)
 end
