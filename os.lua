@@ -238,16 +238,17 @@ should this be in io or os?
 function os.rlistdir(dir, callback)
 	return coroutine.wrap(function()
 		for f in os.listdir(dir) do
-			local path = dir..'/'..f
-			if os.isdir(path) then
-				if not callback or callback(path, true) then
-					for f in os.rlistdir(path, callback) do
+			local path = require 'ext.path'
+			local fpath = path(dir)(f).path
+			if os.isdir(fpath) then
+				if not callback or callback(fpath, true) then
+					for f in os.rlistdir(fpath, callback) do
 						coroutine.yield(f)
 					end
 				end
 			else
-				if not callback or callback(path, false) then
-					local fn = path
+				if not callback or callback(fpath, false) then
+					local fn = fpath
 					if #fn > 2 and fn:sub(1,2) == './' then fn = fn:sub(3) end
 					coroutine.yield(fn)
 				end
