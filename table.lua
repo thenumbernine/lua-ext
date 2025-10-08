@@ -126,23 +126,28 @@ end
 -- and calling table.map and returning nil kills on filtered items
 function table:filter(f)
 	local t = table()
-	if type(f) == 'function' then
-		for k,v in pairs(self) do
-			if f(v,k) then
-				-- TODO instead of this at runtime, how about filter vs filteri like map vs mapi
-				-- but most the times filter is used it is for integers already
-				-- how about filterk?  or probably filteri and change everything
-				if type(k) == 'string' then
-					t[k] = v
-				else
-					t:insert(v)
-				end
+	for k,v in pairs(self) do
+		if f(v,k) then
+			-- TODO now that i made filteri, should this only ever always directly map keys
+			--  even if the key is an integer?
+			-- or should it still insert integer keys?
+			if type(k) == 'string' then
+				t[k] = v
+			else
+				t:insert(v)
 			end
 		end
-	else
-		-- I kind of want to do arrays ... but should we be indexing the keys or values?
-		-- or separate functions for each?
-		error('table.filter second arg must be a function')
+	end
+	return t
+end
+
+-- like filter but only works on ipairs entries
+function table:filteri(f)
+	local t = table()
+	for k,v in ipairs(self) do
+		if f(v,k) then
+			t:insert(v)
+		end
 	end
 	return t
 end

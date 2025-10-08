@@ -264,7 +264,9 @@ Notice that tables created with `table()` / `table.new()`, i.e. tables with `tab
 
 `table.mapi(t, callback)` = Same as `table.map`, but only iterates through the `ipairs` keys.
 
-`table.filter(t, callback)` = Returns a new table formed by iterating through all keys of table `t` and calling the callback.  If the callback returns false then the key/value is excluded from the new table, otherwise it is included.  If the key is numeric then it is inserted using `table.insert`, otherwise it is directly assigned to the new table.
+`table.filter(t, callback)` = Returns a new table formed by iterating through all keys of table `t` using `pairs` and calling the callback.  If the callback returns false then the key/value is excluded from the new table, otherwise it is included.  If the key is numeric then it is inserted using `table.insert`, otherwise it is directly assigned to the new table.
+
+`table.filteri(t, callback)` = Returns a new table formed by iterating through all keys of table `t` using `ipairs` and calling the callback.  If the callback returns false then the key/value is excluded from the new table, otherwise it is inserted using `table.insert`.
 
 `table.keys(t)` = Returns a new table of the enumerated keys of `t` in the order that `pairs` provides them.
 
