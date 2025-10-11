@@ -28,12 +28,14 @@ else
 		return tonumber(gettimeofday_tv[0].tv_sec) + tonumber(gettimeofday_tv[0].tv_usec) / 1000000
 	end
 
+	local tm_1 = ffi.typeof'struct tm[1]'
+
 	-- takes in a timestamp (your timezone? do timestamps consider timezone, or are they all UTC?)
 	-- spits out UTC date info
 	-- TODO add a first 'format' option that formats this... ?
 	-- TODO TODO either rename this to 'ext.time' or move it into its own ... repo? file? idk...
 	function T.timegm(t)
-		local ts = ffi.new'struct tm[1]'
+		local ts = tm_1()
 		ts[0].tm_year = (t.year or 1900) - 1900
 		ts[0].tm_mon = (t.month or 1) - 1
 		ts[0].tm_mday = t.day or 0
@@ -48,11 +50,13 @@ else
 		return ffi.C.time(nil)
 	end
 
+	local time_t_1 = ffi.typeof'time_t[1]'
+
 	-- takes in UTC date info, spits out a timestamp
 	-- pass it unix timestamp, or nil for the current time
 	-- returns a date stucture with .year .month .day .hour .min .sec .isdst hopeully with the same range as Lua's os.date
 	function T.gmtime(t)
-		local tp = ffi.new'time_t[1]'
+		local tp = time_t_1()
 		tp[0] = t or T.time()
 		local ts = ffi.C.gmtime(tp)
 		return {

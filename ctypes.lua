@@ -4,6 +4,10 @@ put all the ctypes in scope for more c++-ish programming
 I'm not sure if this belongs in ext or ffi or anywhere else ...
 I probably won't add it to git
 Maybe I'll never use this, since it primarily operates on the global namespace
+
+hmm could/should I bother cache these in a module table,
+and then in ext.env write to _G?
+would it save anything to lookup in require'ext.ctypes'.double versus ffi.typeof'double' ?
 --]]
 
 local ffi = require 'ffi'
