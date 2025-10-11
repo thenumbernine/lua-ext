@@ -140,4 +140,14 @@ function string:nametostring()
 	return name and tostring(name)..s:sub(6) or s
 end
 
+-- I use this too often ....
+function string.hex(s, uppercase)
+	local fmt = uppercase and '%02X' or '%02x'
+	return (tostring(s):gsub('.', function(c)
+		return fmt:format(c:byte())
+	end))
+end
+
+-- TODO other encoders?
+
 return string

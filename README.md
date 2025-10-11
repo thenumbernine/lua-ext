@@ -219,6 +219,8 @@ Don't forget that - just as with vanilla Lua - all of these are operable via Lua
 
 `string.csub(str, start, size)` = Returns a substring, where `start` is 0-based and `size` is the length of the substring.
 
+`string.hex(s, [uppercase])` = Return a hex encoding of the string.
+
 `string.hexdump(str, columnLength, hexWordSize, spaceEveryNColumns)` = Returns a hex-dump of the string.
 - `str` = The string to be hex-dumped.
 - `columnLength` = How many columns wide. Default 32.
