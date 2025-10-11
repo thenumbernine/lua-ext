@@ -148,6 +148,17 @@ function string.hex(s, uppercase)
 	end))
 end
 
+function string.unhex(h)
+	if bit.band(#h, 1) == 1
+	or h:find'[^0-9a-fA-F]'
+	then
+		return nil, "string is not hex"
+	end
+	return h:gsub('..', function(d)
+		return string.char(assert(tonumber(d, 16)))
+	end)
+end
+
 -- TODO other encoders?
 
 return string

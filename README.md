@@ -221,6 +221,8 @@ Don't forget that - just as with vanilla Lua - all of these are operable via Lua
 
 `string.hex(s, [uppercase])` = Return a hex encoding of the string.
 
+`string.unhex(s)` = Returns a string from a hex-encoding.
+
 `string.hexdump(str, columnLength, hexWordSize, spaceEveryNColumns)` = Returns a hex-dump of the string.
 - `str` = The string to be hex-dumped.
 - `columnLength` = How many columns wide. Default 32.
