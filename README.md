@@ -278,7 +278,9 @@ Notice that tables created with `table()` / `table.new()`, i.e. tables with `tab
 
 `table.kvpairs(t)` = Returns a new table containing a list of `{[key] = value}` for each key/value pair within `t`.  Intended for use with `next()`.
 
-`table.find(t, value, callback)` = Returns the key and value of the results of finding a value in a table `t`.  If `callback` is not provided then the table is searched for `value`, and matching is tested with ==.  If `callback` is provided then it is called for each i'th value in the table as `callback(ithValue, value)`.  If it returns true then this element is considered to be matching.
+`table.find(t, value, callback)` = Returns the key and value of the results of finding a value in a table `t` using `pairs`.  If `callback` is not provided then the table is searched for `value`, and matching is tested with ==.  If `callback` is provided then it is called for each i'th value in the table as `callback(ithValue, value)`.  If it returns true then this element is considered to be matching.
+
+`table.findi(t, value, callback)` = Returns the key and value of the results of finding a value in a table `t` using `ipairs`.  If `callback` is not provided then the table is searched for `value`, and matching is tested with ==.  If `callback` is provided then it is called for each i'th value in the table as `callback(ithValue, value)`.  If it returns true then this element is considered to be matching.
 
 `table.insertUnique(t, value, callback)` = Inserts a value into a vable only if it does not already exist in the table (using `table.find`).  If `callback` is provided then it is used as the callback in `table.find`.
 

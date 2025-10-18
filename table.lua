@@ -168,7 +168,6 @@ function table:values()
 	return t
 end
 
--- should we have separate finds for pairs and ipairs?
 -- should we also return value, key to match map, sup, and inf?
 --   that seems redundant if it's find-by-value ...
 function table:find(value, eq)
@@ -178,6 +177,18 @@ function table:find(value, eq)
 		end
 	else
 		for k,v in pairs(self) do
+			if v == value then return k, v end
+		end
+	end
+end
+
+function table:findi(value, eq)
+	if eq then
+		for k,v in ipairs(self) do
+			if eq(v, value) then return k, v end
+		end
+	else
+		for k,v in ipairs(self) do
 			if v == value then return k, v end
 		end
 	end
