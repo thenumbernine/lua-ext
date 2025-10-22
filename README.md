@@ -336,6 +336,13 @@ require 'ext.meta'
 -- assign number's tostring to __tostring
 (function(m) m.__tostring = m.tostring end)(debug.getmetatable(0))
 ```
+Here are some useful shorthands:
+
+`number.hex(x)` = Returns the hexadecimal value of this number.
+
+`number.oct(x)` = Returns the octal value of this number.
+
+`number.bin(x)` = Returns the binary value of this number.
 
 `number.charfor(digit)` = Returns a character for the specified digit.  This function assumes the digit is within the range of its desired base.
 
