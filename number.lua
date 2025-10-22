@@ -74,24 +74,23 @@ number.tostring = function(t, base, maxdigits)
 		table.insert(s, '-')
 	end
 	if t == 0 then
-		table.insert(s, '0.')
+		table.insert(s, '0')
+		table.insert(s, '.')
 	else
-		--print('t',t)
 		if not base then base = number.base end
 		if not maxdigits then maxdigits = number.maxdigits end
-		--print('base',base)
 		local i = math.floor(math.log(t,base))+1
 		if i == math.huge then error'infinite number of digits' end
-		--print('i',i)
 		t = t / base^i
-		--print('t',t)
 		local dot
 		while true do
 			if i < 1 then
 				if not dot then
 					dot = true
 					table.insert(s, '.')
-					table.insert(s, ('0'):rep(-i))
+					if i < 0 then
+						table.insert(s, ('0'):rep(-i))
+					end
 				end
 				if t == 0 then break end
 				if i <= -maxdigits then break end
@@ -113,9 +112,9 @@ number.tostring = function(t, base, maxdigits)
 			-- 		this is harder to convey when descibing the number system
 			table.insert(s, number.charfor(digit))
 			i = i - 1
-			--print('t',t,'i',i,'digit',digit)
 		end
 	end
+	if s[#s] == '.' then s[#s] = nil end
 	return table.concat(s)
 end
 --]]
