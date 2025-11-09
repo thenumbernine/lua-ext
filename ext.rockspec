@@ -15,7 +15,7 @@ To work with compatability of everyone else who does not use this convention, I 
 	license = "MIT"
 }
 dependencies = {
-	"lua ~> 5.1"
+	"lua => 5.1"
 }
 build = {
 	type = "builtin",
