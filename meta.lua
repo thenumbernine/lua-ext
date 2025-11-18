@@ -59,7 +59,6 @@ local functionMeta = {
 	-- I could make this a function composition like the rest of the meta operations,
 	-- but instead I'm going to have it follow the default __concat convention I have with other primitive types
 	__concat = string.concat,
-	dump = function(f) return string.dump(f) end,
 	__add = function(f, g) return combineFunctionsWithBinaryOperator(f, g, op.add) end,
 	__sub = function(f, g) return combineFunctionsWithBinaryOperator(f, g, op.sub) end,
 	__mul = function(f, g) return combineFunctionsWithBinaryOperator(f, g, op.mul) end,
