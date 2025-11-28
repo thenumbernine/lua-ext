@@ -123,9 +123,9 @@ end
 number.char = string.char
 
 -- me getting tired of typing 'tostring(16)' etc ...
-function number.bin(x) return number.tostring(x, 2) end
-function number.oct(x) return number.tostring(x, 8) end
-function number.hex(x) return number.tostring(x, 16) end
+function number.bin(x, maxdigits) return number.tostring(x, 2, maxdigits) end
+function number.oct(x, maxdigits) return number.tostring(x, 8, maxdigits) end
+function number.hex(x, maxdigits) return number.tostring(x, 16, maxdigits) end
 
 -- so the lookup goes: primitive number -> number -> math
 return number
