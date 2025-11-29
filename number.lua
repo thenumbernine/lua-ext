@@ -64,10 +64,10 @@ function number.todigit(ch)
 end
 
 number.base = 10
-number.maxdigits = 50
+number.maxdecimals = 50
 -- I'm not going to set this as __tostring by default, but I will leave it as part of the meta
 -- feel free to use it with a line something like (function(m)m.__tostring=m.tostring end)(debug.getmetatable(0))
-number.tostring = function(t, base, maxdigits)
+number.tostring = function(t, base, maxdecimals)
 	local s = {}
 	if t < 0 then
 		t = -t
@@ -78,7 +78,7 @@ number.tostring = function(t, base, maxdigits)
 		table.insert(s, '.')
 	else
 		if not base then base = number.base end
-		if not maxdigits then maxdigits = number.maxdigits end
+		if not maxdecimals then maxdecimals = number.maxdecimals end
 		local i = math.floor(math.log(t,base))+1
 		if i == math.huge then error'infinite number of digits' end
 		t = t / base^i
@@ -93,7 +93,7 @@ number.tostring = function(t, base, maxdigits)
 					end
 				end
 				if t == 0 then break end
-				if i <= -maxdigits then break end
+				if i <= -maxdecimals then break end
 			end
 			t = t * base
 			local digit = math.floor(t)
@@ -123,9 +123,9 @@ end
 number.char = string.char
 
 -- me getting tired of typing 'tostring(16)' etc ...
-function number.bin(x, maxdigits) return number.tostring(x, 2, maxdigits) end
-function number.oct(x, maxdigits) return number.tostring(x, 8, maxdigits) end
-function number.hex(x, maxdigits) return number.tostring(x, 16, maxdigits) end
+function number.bin(x, ...) return number.tostring(x, 2, ...) end
+function number.oct(x, ...) return number.tostring(x, 8, ...) end
+function number.hex(x, ...) return number.tostring(x, 16, ...) end
 
 -- so the lookup goes: primitive number -> number -> math
 return number

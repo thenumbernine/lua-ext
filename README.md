@@ -326,7 +326,7 @@ The major contribution of this file is `number.tostring`:
 
 `number.tostring(n, base, maxDigits)` = Converts a number to a string, where `base` is the specified base (default 10, non-integers are valid) and `maxDigits` is the maximum number of digits (default 50).
 `number.base` = A number value specifying the default base.  This is initialized to 10.
-`number.maxdigits` = A number value specifying the default max digts.  This is initialized to 50.
+`number.maxdecimals` = A number value specifying the default max decimal place digts.  This is initialized to 50.
 
 This library doesn't assign `tostring` to `\_\_tostring` by default, but you can accomplish this using the following code:
 ``` lua
