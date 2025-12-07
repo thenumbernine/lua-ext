@@ -142,6 +142,7 @@ function math.gcd(a,b)
 end
 
 -- if this math lib gets too big ...
+-- TODO maybe, for the sake of number __index operator, s should go first
 function math.mix(a,b,s)
 	return a * (1 - s) + b * s
 end
