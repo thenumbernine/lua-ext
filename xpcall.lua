@@ -37,6 +37,12 @@ return function(env)
 				return oldxpcall(f, err, ...)
 			end
 			env.xpcall = newxpcall
+		else
+			-- no changes necessary to xpcall's behavior
+			-- write .xpcall if it's not already there
+			if not env.xpcall then
+				env.xpcall = oldxpcall
+			end
 		end
 	else
 		-- xpcall arg forwarding doesn't work
