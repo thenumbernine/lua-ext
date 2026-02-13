@@ -1,4 +1,4 @@
---[[
+--[=[
 Here's a quick hack for debugging
 It's not meta-lua, not dependent on my parser lib, nothing like that
 It does use my new load() shim layer ext.load
@@ -9,7 +9,7 @@ or if you want to query specific dags: `lua -e "require 'ext.debug' 'tag1,tag2,t
 
 But now I'm tired of always tagging files, so how about a proper query script.
 Something that looks like this:
-	lua -e "require 'ext.debug' 'source:match'sdl*' and level>3 and func:match'SDLAPP' and tag:match'testing''"
+	lua -e "require 'ext.debug' 'source:match[[sdl*]] and level>3 and func:match[[SDLAPP]] and tag:match[[testing]]'"
 
 That's great but those are a lot of variables that I haven't got yet.
 
@@ -25,7 +25,7 @@ DEBUG(tag@level): ?
 DEBUG(@1):
 
 What should default log level be?  1.
---]]
+--]=]
 
 function string_split(s, exp)
 	exp = exp or ''
