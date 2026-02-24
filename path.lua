@@ -290,6 +290,7 @@ end
 -- TODO it doesn't need to quote if there are no special characters present
 -- also TODO make sure its escaping matches up with whatever OS is being used
 function Path:escape()
+	if not Path:isa(self) then return Path{path=self}:escape() end	-- hopefully Path:isa will always work...
 	return('%q'):format(self:fixpathsep())
 end
 
