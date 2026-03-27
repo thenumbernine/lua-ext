@@ -43,9 +43,10 @@ end
 -- this does execute but first prints the command to stdout
 -- it also concats args with space, and escapes path objects passed to it
 function os.exec(...)
+	local path = require 'ext.path'
+	local pathmt = getmetatable(path)
 	local cmd = table{...}:mapi(function(part)
-		local path = require 'ext.path'
-		if path:isa(part) then return part:escape() end
+		if pathmt:isa(part) then return part:escape() end
 		return tostring(part)
 	end):concat' '
 	print('>'..cmd)
