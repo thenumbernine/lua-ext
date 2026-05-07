@@ -157,7 +157,7 @@ end
 
 local function asserterror(f, msg, ...)
 	local result, errmsg = pcall(f, ...)
-	asserteq(result, false, prependmsg(msg, errmsg))
+	asserteq(result, false, 'asserterror: '..prependmsg(msg, errmsg))
 	-- I'd like to forward all arguments like every assert above
 	--return f, msg, ...
 	-- but by its nature, "asserterror" means "we expect a discontinuity in execution from this code"
