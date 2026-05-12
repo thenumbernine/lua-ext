@@ -513,6 +513,8 @@ Notice that, calling `require 'ext'` will also call `getCmdline` on `arg`, produ
 
 `p:getdir(...)` is an alias of `io.getfiledir(p.path, ...)`, except that it wraps the arguments in a `Path` object.
 
+`p:getname(...)` is an alias of `select(2, io.getfiledir(p.path, ...))`.
+
 `p:getext(...)` is an alias of `io.getfileext(p.path, ...)`, except that it wraps the 1st argument in a `Path` object.
 
 `p:setext(newext)` = Returns a path matching `p`s path but with the last extension replaced with `newext`.  If `newext` is `nil` then the last extension is removed.

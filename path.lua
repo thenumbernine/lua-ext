@@ -168,6 +168,12 @@ function Path:getdir(...)
 	return Path{path=dir}, Path{path=name}
 end
 
+-- shorthand for select(2, getdir())
+-- and name is a string, not a path ... right? or is path better?
+function Path:getname(...)
+	return (select(2, io.getfiledir(self.path, ...)))
+end
+
 -- Path wrapping
 function Path:getext(...)
 	local base, ext = io.getfileext(self.path)
