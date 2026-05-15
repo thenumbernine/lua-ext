@@ -14,8 +14,15 @@ function string.split(s, exp)
 	exp = exp or ''
 	s = tostring(s)
 	local t = table()
-	-- handle the exp='' case
-	if exp == '' then
+	if s == '' then
+		-- handle the s='' case
+		-- otherwise it will return {''}
+		-- which technically is also an inverse of table.concat
+		-- but so is an empty table
+		-- and it's my preference that an empty string and an empty table are inverses of each other.
+		return t
+	elseif exp == '' then
+		-- handle the exp='' case
 		for i=1,#s do
 			t:insert(s:sub(i,i))
 		end

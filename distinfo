@@ -3,7 +3,6 @@
 --------------------------------------------
 
 name = "ext"
-
 git = "https://github.com/thenumbernine/lua-ext"
 
 files = {
