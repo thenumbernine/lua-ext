@@ -133,7 +133,9 @@ local function assertindex(t, k, msg, ...)
 		error(prependmsg(msg, "object is nil"))
 	end
 	local v = t[k]
-	assert(v, prependmsg(msg, "expected "..tostr(t).."["..tostr(k).." ]"))
+	if not v then
+		error(prependmsg(msg, "expected "..tostr(t).."["..tostr(k).." ]"))
+	end
 	return v, msg, ...
 end
 
