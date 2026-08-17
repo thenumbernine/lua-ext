@@ -11,9 +11,25 @@ local T = {}
 
 T.out = io.stderr
 
-if not hasffi or ffi.os == 'Windows' then
-	-- in linux this is the live time, or something other than the actual time
+if not hasffi then
 	T.getTime = os.clock
+elseif ffi.os == 'Windows' then
+	local assert = require 'ext.assert'
+	local profileapi = require 'ffi.req' 'c.profileapi'
+
+	local freq = ffi.new'LARGE_INTEGER'
+    assert.ne(profileapi.QueryPerformanceFrequency(freq), 0, 'QueryPerformanceFrequency failed')
+	local freqNum = tonumber(freq.QuadPart)
+
+    local startTime = ffi.new'LARGE_INTEGER'
+    profileapi.QueryPerformanceCounter(startTime)
+
+	local thisTime = ffi.new'LARGE_INTEGER'
+	function T.getTime()
+		profileapi.QueryPerformanceCounter(thisTime)
+		return tonumber(thisTime.QuadPart - startTime.QuadPart) / freqNum
+	end
+
 else
 	require 'ffi.req' 'c.time'		-- timegm, gmtime
 	require 'ffi.req' 'c.sys.time'	-- gettimeofday
