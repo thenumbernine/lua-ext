@@ -30,6 +30,43 @@ elseif ffi.os == 'Windows' then
 		return tonumber(thisTime.QuadPart - startTime.QuadPart) / freqNum
 	end
 
+	local posix_time = require 'ffi.req' 'c.time'
+
+	function T.timegm(t)
+		local ts = tm_1()
+		ts[0].tm_year = (t.year or 1900) - 1900
+		ts[0].tm_mon = (t.month or 1) - 1
+		ts[0].tm_mday = t.day or 0
+		ts[0].tm_hour = t.hour or 12
+		ts[0].tm_min = t.min or 0
+		ts[0].tm_sec = t.sec or 0
+		ts[0].tm_isdst = t.isdst or false
+		return posix_time._mkgmtime(ts)
+	end
+
+	function T.time()
+		return posix_time.time(nil)
+	end
+
+	local time_t_1 = ffi.typeof'time_t[1]'
+
+	-- takes in UTC date info, spits out a timestamp
+	-- pass it unix timestamp, or nil for the current time
+	-- returns a date stucture with .year .month .day .hour .min .sec .isdst hopeully with the same range as Lua's os.date
+	function T.gmtime(t)
+		local tp = time_t_1()
+		tp[0] = t or T.time()
+		local ts = posix_time.gmtime(tp)
+		return {
+			year = ts[0].tm_year + 1900,
+			month = ts[0].tm_mon + 1,
+			day = ts[0].tm_mday,
+			hour = ts[0].tm_hour,
+			min = ts[0].tm_min,
+			sec = ts[0].tm_sec,
+			isdst = ts[0].tm_isdst ~= 0,
+		}
+	end
 else
 	require 'ffi.req' 'c.time'		-- timegm, gmtime
 	require 'ffi.req' 'c.sys.time'	-- gettimeofday
