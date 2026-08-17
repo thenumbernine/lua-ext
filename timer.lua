@@ -32,6 +32,8 @@ elseif ffi.os == 'Windows' then
 
 	local posix_time = require 'ffi.req' 'c.time'
 
+	local tm_1 = ffi.typeof'struct tm[1]'
+
 	function T.timegm(t)
 		local ts = tm_1()
 		ts[0].tm_year = (t.year or 1900) - 1900
