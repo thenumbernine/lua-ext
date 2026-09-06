@@ -95,6 +95,10 @@ function table:removeKeys(...)
 	end
 end
 
+--[[
+TODO for the following, maybe table() should be replaced with setmetatable({}, getmetatable(self)) ?
+--]]
+
 -- cb(value, key, newtable) returns newvalue[, newkey]
 -- nil newkey means use the old key
 function table:map(cb)
@@ -120,28 +124,19 @@ function table:mapi(cb)
 	return t
 end
 
--- this excludes keys that don't pass the callback function
--- if the key is an ineteger then it is table.remove'd
--- currently the handling of integer keys is the only difference between this
--- and calling table.map and returning nil kills on filtered items
+-- f is a callback.
+-- if f(value, key) returns true then the key/value is kept, otherwise it is removed.
 function table:filter(f)
 	local t = table()
 	for k,v in pairs(self) do
 		if f(v,k) then
-			-- TODO now that i made filteri, should this only ever always directly map keys
-			--  even if the key is an integer?
-			-- or should it still insert integer keys?
-			if type(k) == 'string' then
-				t[k] = v
-			else
-				t:insert(v)
-			end
+			t[k] = v
 		end
 	end
 	return t
 end
 
--- like filter but only works on ipairs entries
+-- filter-for-ipairs.  re-inserts entries that pass the filter, such that the input is assumed to be sequential, and the output will be sequential as well.
 function table:filteri(f)
 	local t = table()
 	for k,v in ipairs(self) do
