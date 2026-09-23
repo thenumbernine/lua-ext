@@ -67,15 +67,17 @@ number.base = 10
 number.maxdecimals = 50
 -- I'm not going to set this as __tostring by default, but I will leave it as part of the meta
 -- feel free to use it with a line something like (function(m)m.__tostring=m.tostring end)(debug.getmetatable(0))
-number.tostring = function(t, base, maxdecimals)
+number.tostring = function(t, base, maxdecimals, mindigits, padding)
 	local s = {}
+	local negative
 	if t < 0 then
 		t = -t
-		table.insert(s, '-')
+		negative = true
 	end
+	local onesloc
 	if t == 0 then
 		table.insert(s, '0')
-		table.insert(s, '.')
+		onesloc = #s
 	else
 		if not base then base = number.base end
 		if not maxdecimals then maxdecimals = number.maxdecimals end
@@ -87,6 +89,7 @@ number.tostring = function(t, base, maxdecimals)
 			if i < 1 then
 				if not dot then
 					dot = true
+					onesloc = #s
 					table.insert(s, '.')
 					if i < 0 then
 						table.insert(s, ('0'):rep(-i))
@@ -113,9 +116,23 @@ number.tostring = function(t, base, maxdecimals)
 			table.insert(s, number.charfor(digit))
 			i = i - 1
 		end
+		if s[#s] == '.' then s[#s] = nil end
 	end
-	if s[#s] == '.' then s[#s] = nil end
-	return table.concat(s)
+	if mindigits then
+		if not onesloc then onesloc = #s end
+		local numposexpdigits = onesloc
+		if numposexpdigits < mindigits then
+			padding = padding or '0'
+			table.insert(s, 1, padding:rep(mindigits - numposexpdigits))
+		end
+	end
+	local ss = table.concat(s)
+	if negative then
+		ss = '-'..ss
+	elseif mindigits then
+		ss = ' '..ss
+	end
+	return ss
 end
 --]]
 
