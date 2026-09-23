@@ -129,8 +129,11 @@ number.tostring = function(t, base, maxdecimals, mindigits, padding)
 	local ss = table.concat(s)
 	if negative then
 		ss = '-'..ss
-	elseif mindigits then
-		ss = ' '..ss
+	-- auto lhs pad positives by one?
+	-- pro: aligns with negatives
+	-- con: extra space...
+	--elseif mindigits then
+	--	ss = ' '..ss
 	end
 	return ss
 end
