@@ -68,17 +68,17 @@ function string.csub(d, start, size)
 end
 
 --d = string data
---l = length of a column.  default 32
+--l = length of a column.  default 16
 --w = hex word size.  default 1
---c = extra column space.  default 8
+--c = extra column space.  default 4
 function string.hexdump(d, l, w, c)
 	d = tostring(d)
 	l = tonumber(l)
 	w = tonumber(w)
 	c = tonumber(c)
-	if not l or l < 1 then l = 32 end
+	if not l or l < 1 then l = 16 end
 	if not w or w < 1 then w = 1 end
-	if not c or c < 1 then c = 8 end
+	if not c or c < 1 then c = 4 end
 	local s = table()
 	local rhs = table()
 	local col = 0

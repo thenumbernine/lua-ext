@@ -225,14 +225,14 @@ Don't forget that - just as with vanilla Lua - all of these are operable via Lua
 
 `string.hexdump(str, columnLength, hexWordSize, spaceEveryNColumns)` = Returns a hex-dump of the string.
 - `str` = The string to be hex-dumped.
-- `columnLength` = How many columns wide. Default 32.
+- `columnLength` = How many columns wide. Default 16.
 - `hexWordSize` = How many bytes per word in the hex dump.  Default 1.
-- `spaceEveryNColumns` = How often to insert an extra 1-character space.  Default every 8 bytes.
+- `spaceEveryNColumns` = How often to insert an extra 1-character space.  Default every 4 bytes.
 
 Example of the output:
 
 ``` lua
-> io.readfile'8x8-24bpp-solidwhite.bmp':hexdump()
+> io.readfile'8x8-24bpp-solidwhite.bmp':hexdump(32,1,16)
 00000000  42 4d 3a 01 00 00 00 00  00 00 7a 00 00 00 6c 00  00 00 08 00 00 00 08 00  00 00 01 00 18 00 00 00  BM:.......z...l.................
 00000020  00 00 c0 00 00 00 23 2e  00 00 23 2e 00 00 00 00  00 00 00 00 00 00 42 47  52 73 00 00 00 00 00 00  ..�...#...#...........BGRs......
 00000040  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................................
