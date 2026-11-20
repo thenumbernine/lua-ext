@@ -260,6 +260,8 @@ Notice that tables created with `table()` / `table.new()`, i.e. tables with `tab
 
 `table.sort(t, comparator)` is modified to return itself, for ease of chaining infix operations.
 
+`table.clear(t)` = remove all elements from `t`.  Uses LuaJIT's `table.clear` if it is present.
+
 `table.append(t, [t1, t2, ...])` = For each additional table provided in the argument (t1, t2, ...), inserts its numeric keys on the end of the first table `t`.
 
 `table.removeKeys(t, k1, k2, ...)` = Remove the specified keys from the table.
