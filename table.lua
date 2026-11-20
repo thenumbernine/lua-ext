@@ -1,3 +1,6 @@
+-- luajit, require'ing this will add it to the builtin 'table' table
+pcall(require, 'table.clear')
+
 local table = {}
 for k,v in pairs(require 'table') do table[k] = v end
 
@@ -5,6 +8,19 @@ table.__index = table
 
 function table.new(...)
 	return setmetatable({}, table):union(...)
+end
+
+-- hmm, luajit has table.new ... used for pre-allocating memory
+-- but I've had 'table.new' in my code for a very very very long time (decade+)
+-- so how should I mix these up?
+
+-- vanilla compat for luajit table.clear
+if not table.clear then
+	function table:clear()
+		for k in pairs(self) do
+			self[k] = nil
+		end
+	end
 end
 
 setmetatable(table, {
